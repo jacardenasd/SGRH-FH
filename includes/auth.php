@@ -108,7 +108,7 @@ function cambiar_password($usuario_id, $new_password) {
 
     $hash = password_hash($new_password, PASSWORD_DEFAULT);
 
-    $stmt = $pdo->prepare("UPDATE usuarios SET password_hash = :h, debe_cambiar_pass = 0 WHERE usuario_id = :uid");
+    $stmt = $pdo->prepare("UPDATE usuarios SET password_hash = :h, debe_cambiar_pass = 0, pass_cambiada = 1 WHERE usuario_id = :uid");
     $stmt->execute([':h' => $hash, ':uid' => (int)$usuario_id]);
 
     if (session_status() === PHP_SESSION_NONE) {

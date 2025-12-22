@@ -72,6 +72,11 @@ include __DIR__ . '/../includes/layout/head.php';
               <small class="text-muted">Contraseña inicial: tu número de empleado.</small>
             </div>
 
+
+            <div class="text-center mt-3">
+              <a href="recuperar_contrasena.php">¿Olvidaste tu contraseña?</a>
+            </div>
+
           </div>
         </div>
       </form>

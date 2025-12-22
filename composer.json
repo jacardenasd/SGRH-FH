@@ -1,0 +1,12 @@
+{
+    "name": "subrh/sgrh",
+    "authors": [
+        {
+            "name": "Juan Cardenas",
+            "email": "jacardenas@outlook.com"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "^5.3"
+    }
+}
