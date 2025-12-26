@@ -1,7 +1,3 @@
-	</div>
-	<!-- /inner content -->
-</div>
+  </div><!-- /content-inner -->
+</div><!-- /content-wrapper -->
 <!-- /main content -->
-
-</div>
-<!-- /page content -->

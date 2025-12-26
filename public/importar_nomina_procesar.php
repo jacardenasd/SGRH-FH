@@ -14,7 +14,8 @@ require_once __DIR__ . '/../includes/permisos.php';
 require_login();
 require_password_change_redirect();
 require_empresa();
-require_perm('usuarios.admin');
+// Permiso correcto según catálogo: permisos.clave = 'nomina.importar'
+require_perm('nomina.importar');
 
 ini_set('memory_limit', '768M');
 set_time_limit(0);
@@ -83,7 +84,15 @@ function table_columns(PDO $pdo, $table) {
     return $cols;
 }
 
-function build_upsert_sql($table, $data, $uniqueKeys) {
+/**
+ * Construye un UPSERT dinámico.
+ *
+ * @param string $table
+ * @param array  $data        col => placeholder (":x") o expresión ("NOW()")
+ * @param array  $uniqueKeys  columnas que forman la llave única
+ * @param array  $noUpdate    columnas que NO deben actualizarse en DUPLICATE KEY
+ */
+function build_upsert_sql($table, $data, $uniqueKeys, $noUpdate = []) {
     // $data: col=>placeholder OR 'NOW()'
     $cols = array_keys($data);
 
@@ -99,6 +108,7 @@ function build_upsert_sql($table, $data, $uniqueKeys) {
         if (in_array($c, $uniqueKeys, true)) continue;
         // No intentamos actualizar created_at si existe
         if ($c === 'created_at') continue;
+        if (in_array($c, $noUpdate, true)) continue;
         $updates[] = "$c=VALUES($c)";
     }
 
@@ -107,6 +117,74 @@ function build_upsert_sql($table, $data, $uniqueKeys) {
         $sql .= " ON DUPLICATE KEY UPDATE " . implode(',', $updates);
     }
     return $sql;
+}
+
+/**
+ * Asegura accesos mínimos:
+ * 1) usuario_roles: rol "Empleado" (rol_id=1)
+ * 2) usuario_empresas: relación usuario-empresa (y empleado_id si existe)
+ *
+ * Reglas:
+ * - No pisa roles existentes; solo agrega el mínimo si el usuario no tiene ninguno.
+ * - No crea permisos directos: se heredan del rol.
+ */
+function ensure_accesos_minimos(PDO $pdo, $usuario_id, $empresa_id, $empleado_id = null) {
+    $usuario_id = (int)$usuario_id;
+    $empresa_id = (int)$empresa_id;
+    $empleado_id = $empleado_id !== null ? (int)$empleado_id : null;
+
+    // 1) Rol mínimo: solo si NO tiene roles.
+    $hasRoles = false;
+    try {
+        $stmt = $pdo->prepare("SELECT 1 FROM usuario_roles WHERE usuario_id=? LIMIT 1");
+        $stmt->execute([$usuario_id]);
+        $hasRoles = (bool)$stmt->fetchColumn();
+    } catch (Throwable $e) {
+        // Si no existe la tabla o falla, no rompemos importación.
+        $hasRoles = true;
+    }
+
+    if (!$hasRoles) {
+        // Inserta rol_id=1 (Empleado)
+        $pdo->prepare("INSERT IGNORE INTO usuario_roles (usuario_id, rol_id) VALUES (?, 1)")
+            ->execute([$usuario_id]);
+    }
+
+    // 2) Relación usuario-empresa (si existe la tabla)
+    try {
+        $colsUE = [];
+        $q = $pdo->query("SHOW COLUMNS FROM `usuario_empresas`");
+        while ($r = $q->fetch(PDO::FETCH_ASSOC)) $colsUE[$r['Field']] = true;
+
+        if (isset($colsUE['usuario_id']) && isset($colsUE['empresa_id'])) {
+            if (isset($colsUE['empleado_id'])) {
+                $sql = "
+                    INSERT INTO usuario_empresas (usuario_id, empresa_id, empleado_id, es_admin, estatus)
+                    VALUES (:uid, :eid, :empid, 0, 1)
+                    ON DUPLICATE KEY UPDATE
+                        estatus=1,
+                        empleado_id=COALESCE(empleado_id, VALUES(empleado_id))
+                ";
+                $pdo->prepare($sql)->execute([
+                    ':uid' => $usuario_id,
+                    ':eid' => $empresa_id,
+                    ':empid' => $empleado_id
+                ]);
+            } else {
+                $sql = "
+                    INSERT INTO usuario_empresas (usuario_id, empresa_id, es_admin, estatus)
+                    VALUES (:uid, :eid, 0, 1)
+                    ON DUPLICATE KEY UPDATE estatus=1
+                ";
+                $pdo->prepare($sql)->execute([
+                    ':uid' => $usuario_id,
+                    ':eid' => $empresa_id
+                ]);
+            }
+        }
+    } catch (Throwable $e) {
+        // No romper importación.
+    }
 }
 
 if (empty($_FILES['archivo']['tmp_name'])) {
@@ -267,28 +345,17 @@ try {
     $usrUniqueKeys = ['no_emp'];
     if (isset($colsUsr['rfc_base'])) $usrUniqueKeys[] = 'rfc_base';
 
-    $insUsrSql = build_upsert_sql('usuarios', $usrDataForSql, $usrUniqueKeys);
+    // Importación NO debe resetear contraseñas ni flags de primer acceso.
+    $noUpdateUsr = ['password_hash', 'debe_cambiar_pass', 'pass_cambiada'];
+    $insUsrSql = build_upsert_sql('usuarios', $usrDataForSql, $usrUniqueKeys, $noUpdateUsr);
     $insUsr = $pdo->prepare($insUsrSql);
 
-    // usuario_empresas opcional
-    $useUE = false;
-    try {
-        $colsUE = table_columns($pdo, 'usuario_empresas');
-        $useUE = isset($colsUE['usuario_id']) && isset($colsUE['empresa_id']);
-    } catch (Throwable $e) { $useUE = false; }
-
-    if ($useUE) {
-        $insUE = $pdo->prepare("
-            INSERT INTO usuario_empresas (usuario_id, empresa_id, es_admin, estatus)
-            VALUES (:uid, :eid, 0, 1)
-            ON DUPLICATE KEY UPDATE estatus=1
-        ");
-        $selUsrIdSql = "SELECT usuario_id FROM usuarios WHERE no_emp=:no";
-        $selUsrNeedsRfc = false;
-        if (isset($colsUsr['rfc_base'])) { $selUsrIdSql .= " AND rfc_base=:rfc"; $selUsrNeedsRfc = true; }
-        $selUsrIdSql .= " LIMIT 1";
-        $selUsrId = $pdo->prepare($selUsrIdSql);
-    }
+    // Para amarrar accesos mínimos necesitamos resolver usuario_id
+    $selUsrIdSql = "SELECT usuario_id FROM usuarios WHERE no_emp=:no";
+    $selUsrNeedsRfc = false;
+    if (isset($colsUsr['rfc_base'])) { $selUsrIdSql .= " AND rfc_base=:rfc"; $selUsrNeedsRfc = true; }
+    $selUsrIdSql .= " LIMIT 1";
+    $selUsrId = $pdo->prepare($selUsrIdSql);
 
     $total = 0; $insertados = 0; $actualizados = 0; $errores = 0;
 
@@ -412,7 +479,8 @@ try {
                 case ':jefe_nom': $empParams[':jefe_nom'] = ($jefe_nom !== '' ? $jefe_nom : null); break;
                 case ':sd': $empParams[':sd'] = $salario_diario; break;
                 case ':sm': $empParams[':sm'] = $salario_mensual; break;
-                case ':estatus': $empParams[':estatus'] = 1; break;
+                // empleados.estatus es ENUM ('activo','baja','suspendido')
+                case ':estatus': $empParams[':estatus'] = 'activo'; break;
             }
         }
 
@@ -427,7 +495,9 @@ try {
         if (!$emp) $insertados++; else $actualizados++;
 
         // Usuarios upsert (si existe)
-        $pass_hash = password_hash($no_emp, PASSWORD_DEFAULT);
+        // Contraseña inicial: RFC (base) si existe; si no, No. empleado.
+        $pass_plain = ($rfc !== '' ? $rfc : $no_emp);
+        $pass_hash = password_hash($pass_plain, PASSWORD_DEFAULT);
 
         $usrParams = [];
         foreach ($usrDataForSql as $col => $ph) {
@@ -440,7 +510,8 @@ try {
                 case ':ap': $usrParams[':ap'] = ($ap !== '' ? $ap : null); break;
                 case ':am': $usrParams[':am'] = ($am !== '' ? $am : null); break;
                 case ':correo': $usrParams[':correo'] = null; break;
-                case ':estatus': $usrParams[':estatus'] = 1; break;
+                // usuarios.estatus es ENUM ('activo','inactivo','baja')
+                case ':estatus': $usrParams[':estatus'] = 'activo'; break;
                 case ':empleado_id': $usrParams[':empleado_id'] = $empleado_id; break;
                 case ':pass_hash': $usrParams[':pass_hash'] = $pass_hash; break;
                 case ':debe_cambiar': $usrParams[':debe_cambiar'] = 1; break;
@@ -449,14 +520,14 @@ try {
         }
         $insUsr->execute($usrParams);
 
-        // Relación usuario-empresa si aplica
-        if ($useUE) {
+        // Accesos mínimos por empleado (roles + vínculo empresa)
+        if ($empresa_id !== null) {
             $selUsrParams = [':no'=>$no_emp];
             if ($selUsrNeedsRfc) $selUsrParams[':rfc'] = $rfc;
             $selUsrId->execute($selUsrParams);
             $u = $selUsrId->fetch(PDO::FETCH_ASSOC);
             if ($u) {
-                $insUE->execute([':uid'=>(int)$u['usuario_id'], ':eid'=>$empresa_id]);
+                ensure_accesos_minimos($pdo, (int)$u['usuario_id'], (int)$empresa_id, $empleado_id);
             }
         }
 

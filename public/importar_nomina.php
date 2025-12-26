@@ -6,7 +6,8 @@ require_once __DIR__ . '/../includes/permisos.php';
 require_login();
 require_password_change_redirect();
 require_empresa();
-require_perm('usuarios.admin'); // ajusta a tu permiso real
+// Permiso correcto según catálogo: permisos.clave = 'nomina.importar'
+require_perm('nomina.importar');
 
 $page_title = 'Importar nómina | SGRH';
 include __DIR__ . '/../includes/layout/head.php';

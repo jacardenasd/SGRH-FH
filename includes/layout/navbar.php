@@ -1,8 +1,20 @@
 <?php
-$nombre_usuario = $_SESSION['nombre_usuario'] ?? 'Usuario';
-$empresa_nombre = $_SESSION['empresa_alias'] ?: ($_SESSION['empresa_nombre'] ?? 'Sin empresa');
-$empresas = $_SESSION['empresas'] ?? [];
+$nombre_usuario = isset($_SESSION['nombre_usuario']) && $_SESSION['nombre_usuario'] !== '' ? $_SESSION['nombre_usuario'] : 'Usuario';
+
+$empresa_alias  = isset($_SESSION['empresa_alias']) ? $_SESSION['empresa_alias'] : '';
+$empresa_nombre_sess = isset($_SESSION['empresa_nombre']) ? $_SESSION['empresa_nombre'] : 'Sin empresa';
+$empresa_nombre = $empresa_alias ? $empresa_alias : $empresa_nombre_sess;
+
+$empresas = isset($_SESSION['empresas']) ? $_SESSION['empresas'] : [];
 $multiempresa = (count($empresas) > 1);
+
+// empleado_id para la empresa activa (lo seteas en seleccionar_empresa.php)
+$empleado_id = isset($_SESSION['empleado_id']) ? (int)$_SESSION['empleado_id'] : 0;
+
+// URL de foto (con fallback a placeholder)
+$foto_url = ($empleado_id > 0)
+    ? (ASSET_BASE . 'public/ver_foto_empleado.php?empleado_id=' . $empleado_id)
+    : (ASSET_BASE . 'global_assets/images/placeholders/placeholder.jpg');
 ?>
 <!-- Main navbar -->
 <div class="navbar navbar-expand-lg navbar-dark navbar-static">
@@ -60,7 +72,7 @@ $multiempresa = (count($empresas) > 1);
     <ul class="navbar-nav ml-lg-auto">
       <li class="nav-item nav-item-dropdown-lg dropdown dropdown-user h-100">
         <a href="#" class="navbar-nav-link navbar-nav-link-toggler dropdown-toggle d-inline-flex align-items-center h-100" data-toggle="dropdown">
-          <img src="<?php echo ASSET_BASE; ?>global_assets/images/placeholders/placeholder.jpg" class="rounded-pill mr-lg-2" height="34" alt="">
+          <img src="<?php echo htmlspecialchars($foto_url, ENT_QUOTES, 'UTF-8'); ?>" class="rounded-pill mr-lg-2" height="34" width="34" style="object-fit:cover;" alt="">
           <span class="d-none d-lg-inline-block"><?php echo htmlspecialchars($nombre_usuario); ?></span>
         </a>
 

@@ -7,6 +7,26 @@ if (!isset($active_menu)) { $active_menu = ''; }
 function is_active($key, $active_menu) {
   return ($key === $active_menu) ? 'active' : '';
 }
+
+// Sin ?? (compatibilidad)
+$nombre_usuario = (isset($_SESSION['nombre_usuario']) && $_SESSION['nombre_usuario'] !== '') ? $_SESSION['nombre_usuario'] : 'Usuario';
+$rol_nombre = (isset($_SESSION['rol_nombre']) && $_SESSION['rol_nombre'] !== '') ? $_SESSION['rol_nombre'] : '';
+
+// Foto: storage -> se sirve por ver_foto_empleado.php
+$empleado_id = isset($_SESSION['empleado_id']) ? (int)$_SESSION['empleado_id'] : 0;
+
+$foto_url = ($empleado_id > 0)
+  ? (ASSET_BASE . 'public/ver_foto_empleado.php?empleado_id=' . $empleado_id)
+  : (ASSET_BASE . 'global_assets/images/placeholders/placeholder.jpg');
+
+$admin_active = in_array($active_menu, [
+  'admin_usuarios',
+  'import_nomina',
+  'admin_org_unidades',
+  'admin_org_adscripciones',
+  'admin_org_puestos',
+  'admin_org_centros_trabajo'
+], true);
 ?>
 <!-- Page content -->
 <div class="page-content">
@@ -20,13 +40,12 @@ function is_active($key, $active_menu) {
         <div class="sidebar-section-body">
           <div class="media">
             <a href="#" class="mr-3">
-              <img src="<?php echo ASSET_BASE; ?>global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" alt="">
-            </a>
+            <img src="<?php echo htmlspecialchars($foto_url, ENT_QUOTES, 'UTF-8'); ?>" class="rounded-circle" width="38" height="38" style="object-fit:cover;" alt="">            </a>
             <div class="media-body">
-              <div class="font-weight-semibold"><?php echo htmlspecialchars($_SESSION['nombre_usuario'] ?? 'Usuario'); ?></div>
-              <div class="font-size-sm line-height-sm opacity-50">
-                <?php echo htmlspecialchars($_SESSION['rol_nombre'] ?? ''); ?>
-              </div>
+          <div class="font-weight-semibold"><?php echo htmlspecialchars($nombre_usuario, ENT_QUOTES, 'UTF-8'); ?></div>
+            <div class="font-size-sm line-height-sm opacity-50">
+              <?php echo htmlspecialchars($rol_nombre, ENT_QUOTES, 'UTF-8'); ?>
+            </div>
             </div>
             <div class="ml-3 align-self-center">
               <button type="button" class="btn btn-outline-light-100 text-white border-transparent btn-icon rounded-pill btn-sm sidebar-control sidebar-main-resize d-none d-lg-inline-flex">
@@ -93,20 +112,60 @@ function is_active($key, $active_menu) {
           </li>
           <?php endif; ?>
 
-          <?php if (can('usuarios.admin')): ?>
-          <li class="nav-item nav-item-submenu">
-            <a href="#" class="nav-link"><i class="icon-cog3"></i> <span>Administración</span></a>
+          <?php if (can('usuarios.admin') || can('organizacion.admin')): ?>
+          <li class="nav-item nav-item-submenu <?php echo $admin_active ? 'nav-item-expanded nav-item-open' : ''; ?>">
+            <a href="#" class="nav-link <?php echo $admin_active ? 'active' : ''; ?>">
+              <i class="icon-cog3"></i> <span>Administración</span>
+            </a>
+
             <ul class="nav nav-group-sub" data-submenu-title="Administración">
+
+              <?php if (can('usuarios.admin')): ?>
               <li class="nav-item">
-                <a href="<?php echo ASSET_BASE; ?>public/admin_usuarios.php" class="nav-link <?php echo is_active('admin_usuarios', $active_menu); ?>">
+                <a href="<?php echo ASSET_BASE; ?>public/admin_usuarios.php"
+                  class="nav-link <?php echo is_active('admin_usuarios', $active_menu); ?>">
                   Usuarios
                 </a>
               </li>
+
               <li class="nav-item">
-                <a href="<?php echo ASSET_BASE; ?>public/importar_nomina.php" class="nav-link <?php echo is_active('import_nomina', $active_menu); ?>">
+                <a href="<?php echo ASSET_BASE; ?>public/importar_nomina.php"
+                  class="nav-link <?php echo is_active('import_nomina', $active_menu); ?>">
                   Importar nómina
                 </a>
               </li>
+              <?php endif; ?>
+
+              <?php if (can('organizacion.admin')): ?>
+              <li class="nav-item">
+                <a href="<?php echo ASSET_BASE; ?>public/admin_org_unidades.php"
+                  class="nav-link <?php echo is_active('admin_org_unidades', $active_menu); ?>">
+                  Unidades (Deptos)
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="<?php echo ASSET_BASE; ?>public/admin_org_adscripciones.php"
+                  class="nav-link <?php echo is_active('admin_org_adscripciones', $active_menu); ?>">
+                  Adscripciones (Subáreas)
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="<?php echo ASSET_BASE; ?>public/admin_org_puestos.php"
+                  class="nav-link <?php echo is_active('admin_org_puestos', $active_menu); ?>">
+                  Puestos
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="<?php echo ASSET_BASE; ?>public/admin_org_centros_trabajo.php"
+                  class="nav-link <?php echo is_active('admin_org_centros_trabajo', $active_menu); ?>">
+                  Centros de trabajo
+                </a>
+              </li>
+              <?php endif; ?>
+
             </ul>
           </li>
           <?php endif; ?>

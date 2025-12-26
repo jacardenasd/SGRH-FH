@@ -2,27 +2,45 @@
 // includes/password_reset.php
 require_once __DIR__ . '/conexion.php';
 
+/**
+ * SGRH: busca usuario por RFC base (10 chars) y No. empleado.
+ * Regresa: usuario_id, estatus, correo
+ */
 function pr_find_user_by_rfc_noemp($rfc_raw, $no_emp) {
     global $pdo;
 
     $rfc = strtoupper(trim($rfc_raw));
     $rfc = preg_replace('/[^A-Z0-9]/', '', $rfc);
+
+    // SGRH estaba usando rfc_base (10). Conservamos esa lógica.
     $rfc = substr($rfc, 0, 10);
+
     $no_emp = trim($no_emp);
 
     $sql = "
-      SELECT u.usuario_id, u.estatus, u.empleado_id,
-             COALESCE(e.correo, u.correo) AS correo
+      SELECT
+        u.usuario_id,
+        u.estatus,
+        u.correo
       FROM usuarios u
-      LEFT JOIN empleados e ON e.empleado_id = u.empleado_id
-      WHERE u.rfc_base = :rfc AND u.no_emp = :no_emp
+      WHERE u.rfc_base = :rfc
+        AND u.no_emp = :no_emp
       LIMIT 1
     ";
+
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([':rfc' => $rfc, ':no_emp' => $no_emp]);
+    $stmt->execute([
+        ':rfc'    => $rfc,
+        ':no_emp' => $no_emp
+    ]);
+
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
+/**
+ * Crea token y lo guarda hasheado en password_resets
+ * Retorna token plano para envío por correo
+ */
 function pr_create_token($usuario_id, $ip = null) {
     global $pdo;
 
@@ -32,8 +50,12 @@ function pr_create_token($usuario_id, $ip = null) {
     // Vigencia: 60 minutos
     $expires_at = (new DateTime('+60 minutes'))->format('Y-m-d H:i:s');
 
-    // Invalida tokens anteriores no usados (opcional, recomendado)
-    $stmt = $pdo->prepare("UPDATE password_resets SET used_at = NOW() WHERE usuario_id = :uid AND used_at IS NULL");
+    // Invalida tokens anteriores no usados
+    $stmt = $pdo->prepare("
+        UPDATE password_resets
+        SET used_at = NOW()
+        WHERE usuario_id = :uid AND used_at IS NULL
+    ");
     $stmt->execute([':uid' => (int)$usuario_id]);
 
     $stmt = $pdo->prepare("
@@ -47,7 +69,7 @@ function pr_create_token($usuario_id, $ip = null) {
         ':ip'  => $ip
     ]);
 
-    return $token; // token plano solo para enviar por correo
+    return $token;
 }
 
 function pr_validate_token($token) {
@@ -71,7 +93,7 @@ function pr_validate_token($token) {
     if (!empty($row['used_at'])) return false;
     if (strtotime($row['expires_at']) < time()) return false;
 
-    return $row; // contiene reset_id y usuario_id
+    return $row;
 }
 
 function pr_mark_used($reset_id) {
@@ -80,6 +102,9 @@ function pr_mark_used($reset_id) {
     $stmt->execute([':rid' => (int)$reset_id]);
 }
 
+/**
+ * Actualiza password en SGRH (tabla usuarios)
+ */
 function pr_update_password($usuario_id, $new_password) {
     global $pdo;
 
@@ -90,12 +115,15 @@ function pr_update_password($usuario_id, $new_password) {
 
     $hash = password_hash($new_password, PASSWORD_DEFAULT);
 
+    // NOTA: dejo los flags tal cual los tenías.
+    // Si tu tabla usuarios NO tiene estos campos, te volverá a marcar "Unknown column"
     $stmt = $pdo->prepare("
       UPDATE usuarios
       SET password_hash = :h,
           debe_cambiar_pass = 0,
           pass_cambiada = 1
       WHERE usuario_id = :uid
+      LIMIT 1
     ");
     $stmt->execute([':h' => $hash, ':uid' => (int)$usuario_id]);
 

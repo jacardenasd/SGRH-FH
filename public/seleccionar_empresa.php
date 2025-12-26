@@ -5,15 +5,42 @@ require_once __DIR__ . '/../includes/permisos.php';
 
 require_login();
 
-$empresas = $_SESSION['empresas'] ?? [];
+// NOTA: sin ?? (compatibilidad)
+$empresas = isset($_SESSION['empresas']) ? $_SESSION['empresas'] : [];
 $error = '';
 
 if (count($empresas) === 0) {
     $error = 'No tienes empresas asignadas. Contacta al administrador.';
 }
 
+// helper: obtiene empleado_id por usuario + empresa desde usuario_empresas
+function obtener_empleado_id_por_empresa($pdo, $usuario_id, $empresa_id) {
+    $stmt = $pdo->prepare("
+        SELECT empleado_id
+        FROM usuario_empresas
+        WHERE usuario_id = :usuario_id
+          AND empresa_id = :empresa_id
+          AND estatus = 1
+        LIMIT 1
+    ");
+    $stmt->execute([
+        ':usuario_id' => (int)$usuario_id,
+        ':empresa_id' => (int)$empresa_id
+    ]);
+    $val = $stmt->fetchColumn();
+    return $val ? (int)$val : null;
+}
+
+// Validar que exista la conexión ($pdo) desde auth.php (incluido por guard.php)
+if (!isset($pdo)) {
+    // Si tu conexión tiene otro nombre, ajusta aquí.
+    // Pero por estándar, auth.php debería dejar $pdo disponible.
+    // No detenemos la página si solo va a renderizar, pero sí si va a guardar selección.
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && count($empresas) > 0) {
-    $empresa_id = (int)($_POST['empresa_id'] ?? 0);
+
+    $empresa_id = isset($_POST['empresa_id']) ? (int)$_POST['empresa_id'] : 0;
 
     $found = null;
     foreach ($empresas as $e) {
@@ -26,23 +53,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && count($empresas) > 0) {
     if (!$found) {
         $error = 'Empresa no válida.';
     } else {
+
         $_SESSION['empresa_id'] = (int)$found['empresa_id'];
         $_SESSION['empresa_nombre'] = $found['nombre'];
         $_SESSION['empresa_alias'] = $found['alias'];
         $_SESSION['es_admin_empresa'] = (int)$found['es_admin'];
 
+        // NUEVO: setear empleado_id por empresa seleccionada (modelo multi-empresa)
+        if (!isset($pdo)) {
+            $error = 'No se pudo establecer el empleado por empresa: falta conexión ($pdo). Revisa includes/auth.php.';
+        } else {
+            $empleado_id = obtener_empleado_id_por_empresa($pdo, (int)$_SESSION['usuario_id'], (int)$_SESSION['empresa_id']);
+            $_SESSION['empleado_id'] = $empleado_id; // puede ser NULL si no está vinculado
+        }
+
+        // Cargar permisos (manteniendo tu diseño)
         cargar_permisos_sesion((int)$_SESSION['usuario_id']);
 
-        header('Location: index.php');
-        exit;
+        // Si quieres forzar que siempre exista empleado_id, descomenta:
+        /*
+        if (empty($_SESSION['empleado_id'])) {
+            $error = 'Tu usuario no está vinculado a un empleado para esta empresa. Contacta al administrador.';
+        } else {
+            header('Location: index.php');
+            exit;
+        }
+        */
+
+        if (!$error) {
+            header('Location: index.php');
+            exit;
+        }
     }
 }
 
+// Auto-selección si solo hay una empresa y aún no hay empresa activa
 if (count($empresas) === 1 && empty($_SESSION['empresa_id'])) {
+
     $_SESSION['empresa_id'] = (int)$empresas[0]['empresa_id'];
     $_SESSION['empresa_nombre'] = $empresas[0]['nombre'];
     $_SESSION['empresa_alias'] = $empresas[0]['alias'];
     $_SESSION['es_admin_empresa'] = (int)$empresas[0]['es_admin'];
+
+    // NUEVO: empleado_id por empresa (modelo multi-empresa)
+    if (isset($pdo)) {
+        $empleado_id = obtener_empleado_id_por_empresa($pdo, (int)$_SESSION['usuario_id'], (int)$_SESSION['empresa_id']);
+        $_SESSION['empleado_id'] = $empleado_id;
+    } else {
+        $_SESSION['empleado_id'] = null;
+    }
 
     cargar_permisos_sesion((int)$_SESSION['usuario_id']);
 
@@ -67,7 +126,7 @@ include __DIR__ . '/../includes/layout/head.php';
             </div>
 
             <?php if ($error): ?>
-              <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+              <div class="alert alert-danger"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
             <?php endif; ?>
 
             <div class="form-group">
@@ -75,7 +134,10 @@ include __DIR__ . '/../includes/layout/head.php';
                 <option value="">-- Selecciona --</option>
                 <?php foreach ($empresas as $e): ?>
                   <option value="<?php echo (int)$e['empresa_id']; ?>">
-                    <?php echo htmlspecialchars($e['alias'] ?: $e['nombre']); ?>
+                    <?php
+                      $label = !empty($e['alias']) ? $e['alias'] : $e['nombre'];
+                      echo htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
+                    ?>
                   </option>
                 <?php endforeach; ?>
               </select>

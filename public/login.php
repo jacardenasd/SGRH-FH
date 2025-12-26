@@ -41,6 +41,7 @@ include __DIR__ . '/../includes/layout/head.php';
         <div class="card mb-0">
           <div class="card-body">
             <div class="text-center mb-3">
+							<i class="icon-reading icon-2x text-secondary border-secondary border-3 rounded-pill p-3 mb-3 mt-1"></i>
               <h5 class="mb-0">Acceso al sistema</h5>
               <span class="d-block text-muted">RFC (sin homoclave) + No. empleado</span>
             </div>
@@ -74,7 +75,11 @@ include __DIR__ . '/../includes/layout/head.php';
 
 
             <div class="text-center mt-3">
-              <a href="recuperar_contrasena.php">¿Olvidaste tu contraseña?</a>
+              <a href="recuperar_contrasena.php">¿Olvidaste tu contraseña?</a>  
+            </div>
+
+            <div class="text-center mt-3">
+              <a href="terminos.php">Términos del Servicio.</a>
             </div>
 
           </div>

@@ -49,7 +49,8 @@ function login_intento($rfc_raw, $no_emp, $password) {
     $_SESSION['usuario_id'] = (int)$u['usuario_id'];
     $_SESSION['no_emp'] = $u['no_emp'];
     $_SESSION['rfc_base'] = $u['rfc_base'];
-    $_SESSION['nombre_usuario'] = trim($u['nombre'] . ' ' . ($u['apellido_paterno'] ?? '') . ' ' . ($u['apellido_materno'] ?? ''));
+    $_SESSION['nombre_usuario'] = $u['nombre'];
+    $_SESSION['nombre_usuario_completo'] = trim($u['nombre'] . ' ' . ($u['apellido_paterno'] ?? '') . ' ' . ($u['apellido_materno'] ?? ''));
 
     $_SESSION['debe_cambiar_pass'] = (int)$u['debe_cambiar_pass'];
 
