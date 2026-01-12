@@ -12,6 +12,7 @@ require_once __DIR__ . '/../includes/conexion.php';
 require_login();
 require_empresa();
 require_password_change_redirect();
+require_demograficos_redirect();
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
@@ -333,25 +334,37 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                 if (isset($resp_map[$rid])) $sel = (int)$resp_map[$rid];
               ?>
               <div class="mb-3 p-3 border rounded">
-                <div class="mb-2">
+                <div class="mb-3">
                   <strong><?php echo (int)$rx['orden']; ?>.</strong> <?php echo h($rx['texto']); ?>
                 </div>
 
-                <div class="row">
-                  <?php foreach ($likert as $k => $label): ?>
-                    <?php $checked = ($sel === (int)$k) ? 'checked' : ''; ?>
-                    <div class="col-md-4 col-lg-3 mb-2">
-                      <label class="mb-0" style="font-weight: normal;">
-                        <input type="radio"
-                               name="r_<?php echo $rid; ?>"
-                               value="<?php echo (int)$k; ?>"
-                               <?php echo $checked; ?>
-                               class="radLikert"
-                               data-reactivo="<?php echo $rid; ?>">
-                        <?php echo h($label); ?>
-                      </label>
-                    </div>
-                  <?php endforeach; ?>
+                <div class="table-responsive">
+                  <table class="table table-bordered table-sm mb-2">
+                    <thead class="bg-light">
+                      <tr>
+                        <?php foreach ($likert as $k => $label): ?>
+                          <th class="text-center" style="width: 20%;"><?php echo h($label); ?></th>
+                        <?php endforeach; ?>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <?php foreach ($likert as $k => $label): ?>
+                          <?php $checked = ($sel === (int)$k) ? 'checked' : ''; ?>
+                          <td class="text-center">
+                            <label class="mb-0">
+                              <input type="radio"
+                                     name="r_<?php echo $rid; ?>"
+                                     value="<?php echo (int)$k; ?>"
+                                     <?php echo $checked; ?>
+                                     class="radLikert"
+                                     data-reactivo="<?php echo $rid; ?>">
+                            </label>
+                          </td>
+                        <?php endforeach; ?>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
 
                 <div class="text-muted" style="font-size: 12px;" id="st_<?php echo $rid; ?>"></div>

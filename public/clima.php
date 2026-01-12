@@ -12,65 +12,14 @@ require_once __DIR__ . '/../includes/conexion.php';
 require_login();
 require_empresa();
 require_password_change_redirect();
+require_demograficos_redirect();
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 $empresa_id = isset($_SESSION['empresa_id']) ? (int)$_SESSION['empresa_id'] : 0;
 $usuario_id = isset($_SESSION['usuario_id']) ? (int)$_SESSION['usuario_id'] : 0;
-$es_admin = can('organizacion.admin');
 
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
-
-// =======================
-// ESTADÍSTICAS RÁPIDAS
-// =======================
-$stats = array(
-    'periodos_activos' => 0,
-    'total_respuestas' => 0,
-    'promedio_general' => 0.0,
-    'planes_pendientes' => 0
-);
-
-if ($empresa_id > 0) {
-    // Periodos publicados o en borrador
-    $stmt1 = $pdo->prepare("SELECT COUNT(*) FROM clima_periodos WHERE empresa_id=? AND estatus IN ('borrador','publicado')");
-    $stmt1->execute([$empresa_id]);
-    $stats['periodos_activos'] = (int)$stmt1->fetchColumn();
-
-    // Total respuestas en periodos activos
-    $stmt2 = $pdo->prepare("
-        SELECT COUNT(*)
-        FROM clima_respuestas cr
-        INNER JOIN clima_periodos cp ON cp.periodo_id = cr.periodo_id
-        INNER JOIN clima_elegibles ce ON ce.periodo_id = cr.periodo_id AND ce.empleado_id = cr.empleado_id
-        WHERE ce.empresa_id = ?
-          AND cp.estatus IN ('borrador','publicado')
-          AND ce.elegible = 1
-    ");
-    $stmt2->execute([$empresa_id]);
-    $stats['total_respuestas'] = (int)$stmt2->fetchColumn();
-
-    // Promedio general (último periodo publicado)
-    $stmt3 = $pdo->prepare("
-        SELECT AVG(cr.valor)
-        FROM clima_respuestas cr
-        INNER JOIN clima_periodos cp ON cp.periodo_id = cr.periodo_id
-        INNER JOIN clima_elegibles ce ON ce.periodo_id = cr.periodo_id AND ce.empleado_id = cr.empleado_id
-        WHERE ce.empresa_id = ?
-          AND cp.estatus = 'publicado'
-          AND ce.elegible = 1
-        ORDER BY cp.anio DESC
-        LIMIT 1
-    ");
-    $stmt3->execute([$empresa_id]);
-    $prom = $stmt3->fetchColumn();
-    $stats['promedio_general'] = $prom ? round((float)$prom, 2) : 0.0;
-
-    // Planes pendientes
-    $stmt4 = $pdo->prepare("SELECT COUNT(*) FROM clima_planes WHERE empresa_id=? AND estatus IN ('pendiente','en_proceso')");
-    $stmt4->execute([$empresa_id]);
-    $stats['planes_pendientes'] = (int)$stmt4->fetchColumn();
-}
 
 // =======================
 // PERIODO ACTIVO
@@ -108,10 +57,11 @@ if ($empresa_id > 0 && $usuario_id > 0 && $periodo_activo) {
             $soy_elegible = true;
             $periodo_contestar = $periodo_activo;
 
-            // Verificar si ya respondió
-            $stmt_resp = $pdo->prepare("SELECT COUNT(*) FROM clima_respuestas WHERE periodo_id=? AND empleado_id=?");
+            // Verificar si ya finalizó la encuesta (no solo si tiene respuestas)
+            $stmt_resp = $pdo->prepare("SELECT completado FROM clima_envios WHERE periodo_id=? AND empleado_id=? LIMIT 1");
             $stmt_resp->execute([(int)$periodo_activo['periodo_id'], $empleado_id]);
-            $ya_respondio = ((int)$stmt_resp->fetchColumn() > 0);
+            $row_envio = $stmt_resp->fetch(PDO::FETCH_ASSOC);
+            $ya_respondio = ($row_envio && (int)$row_envio['completado'] === 1);
         }
     }
 }
@@ -143,41 +93,61 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
 <div class="content">
 
-  <!-- Estadísticas rápidas -->
-  <div class="row">
-    <div class="col-md-3">
-      <div class="card text-center">
-        <div class="card-body">
-          <i class="icon-calendar3 icon-3x text-primary mb-3"></i>
-          <h3 class="font-weight-bold mb-0"><?php echo (int)$stats['periodos_activos']; ?></h3>
-          <span class="text-muted">Periodos activos</span>
+  <!-- ¿Por qué es importante tu participación? -->
+  <div class="card border-left-3 border-left-primary">
+    <div class="card-header bg-transparent">
+      <h5 class="card-title font-weight-semibold">
+        <i class="icon-lifebuoy mr-2"></i>¿Por qué es importante tu participación?
+      </h5>
+    </div>
+    <div class="card-body">
+      <p class="mb-3">
+        La <strong>Encuesta de Clima Laboral</strong> es una herramienta fundamental para conocer tu percepción 
+        sobre el ambiente de trabajo, las condiciones laborales y las relaciones dentro de la organización.
+      </p>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <div class="media">
+            <div class="mr-3">
+              <i class="icon-mic icon-2x text-primary"></i>
+            </div>
+            <div class="media-body">
+              <h6 class="font-weight-semibold mb-1">Tu voz cuenta</h6>
+              <p class="text-muted mb-0">Tus respuestas son confidenciales y nos permiten identificar áreas de oportunidad.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="media">
+            <div class="mr-3">
+              <i class="icon-chart icon-2x text-success"></i>
+            </div>
+            <div class="media-body">
+              <h6 class="font-weight-semibold mb-1">Mejora continua</h6>
+              <p class="text-muted mb-0">Los resultados guían planes de acción concretos para mejorar nuestro entorno.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="media">
+            <div class="mr-3">
+              <i class="icon-users icon-2x text-info"></i>
+            </div>
+            <div class="media-body">
+              <h6 class="font-weight-semibold mb-1">Construimos juntos</h6>
+              <p class="text-muted mb-0">Tu participación contribuye a crear un mejor lugar para trabajar para todos.</p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-center">
-        <div class="card-body">
-          <i class="icon-comment-discussion icon-3x text-success mb-3"></i>
-          <h3 class="font-weight-bold mb-0"><?php echo number_format($stats['total_respuestas']); ?></h3>
-          <span class="text-muted">Respuestas totales</span>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-center">
-        <div class="card-body">
-          <i class="icon-graph icon-3x text-info mb-3"></i>
-          <h3 class="font-weight-bold mb-0"><?php echo number_format($stats['promedio_general'], 2); ?></h3>
-          <span class="text-muted">Promedio general</span>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-center">
-        <div class="card-body">
-          <i class="icon-file-text2 icon-3x text-warning mb-3"></i>
-          <h3 class="font-weight-bold mb-0"><?php echo (int)$stats['planes_pendientes']; ?></h3>
-          <span class="text-muted">Planes pendientes</span>
+      <div class="alert alert-info border-0 mb-0">
+        <div class="d-flex align-items-center">
+          <i class="icon-shield-check icon-2x mr-3"></i>
+          <div>
+            <strong>Confidencialidad garantizada:</strong> Todas las respuestas son anónimas y se analizan 
+            de forma agregada. Los reportes se generan únicamente cuando hay suficientes participantes para 
+            proteger tu identidad.
+          </div>
         </div>
       </div>
     </div>
@@ -231,6 +201,33 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
   </div>
   <?php endif; ?>
 
+  <!-- Leyenda sobre Planes de Acción -->
+  <div class="card border-left-3 border-left-info">
+    <div class="card-header bg-transparent">
+      <h5 class="card-title font-weight-semibold">
+        <i class="icon-clipboard3 mr-2"></i>Planes de Acción
+      </h5>
+    </div>
+    <div class="card-body">
+      <p class="mb-2">
+        Los <strong>Planes de Acción</strong> son la respuesta de la organización a los resultados de la encuesta de clima laboral.
+      </p>
+      <div class="alert alert-light border mb-3">
+        <strong>¿Cómo funcionan?</strong>
+        <ol class="mb-0 mt-2 pl-3">
+          <li>Los resultados se analizan por Dirección para identificar áreas de mejora</li>
+          <li>Los líderes de cada Dirección crean planes específicos con acciones concretas</li>
+          <li>Cada plan define responsables, fechas compromiso e indicadores de éxito</li>
+          <li>El progreso se monitorea y los colaboradores pueden ver los planes de su Dirección</li>
+        </ol>
+      </div>
+      <div class="text-muted">
+        <i class="icon-info22 mr-1"></i>
+        <strong>Nota para líderes:</strong> Si eres responsable de un equipo, puedes crear y gestionar planes de acción para tu Dirección desde el menú de Clima Laboral.
+      </div>
+    </div>
+  </div>
+
   <?php if ($soy_elegible && $periodo_contestar && $ya_respondio): ?>
   <div class="card bg-success text-white">
     <div class="card-body">
@@ -247,113 +244,8 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
   </div>
   <?php endif; ?>
 
-  <!-- Módulos administrativos (solo admin) -->
-  <?php if ($es_admin): ?>
-  <div class="card">
-    <div class="card-header">
-      <h5 class="card-title">Administración</h5>
-    </div>
-    <div class="card-body">
-      <div class="row">
-        <!-- Periodos -->
-        <div class="col-md-4 mb-3">
-          <div class="card bg-light">
-            <div class="card-body text-center">
-              <i class="icon-calendar3 icon-3x text-primary mb-3"></i>
-              <h6 class="font-weight-semibold mb-2">Periodos</h6>
-              <p class="text-muted mb-3">Crear y gestionar periodos de evaluación</p>
-              <a href="clima_periodos.php" class="btn btn-primary btn-sm btn-block">Acceder</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Generar elegibles -->
-        <div class="col-md-4 mb-3">
-          <div class="card bg-light">
-            <div class="card-body text-center">
-              <i class="icon-users4 icon-3x text-success mb-3"></i>
-              <h6 class="font-weight-semibold mb-2">Generar elegibles</h6>
-              <p class="text-muted mb-3">Definir empleados que participarán</p>
-              <a href="clima_generar_elegibles.php" class="btn btn-success btn-sm btn-block">Acceder</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Participación -->
-        <div class="col-md-4 mb-3">
-          <div class="card bg-light">
-            <div class="card-body text-center">
-              <i class="icon-stats-bars2 icon-3x text-info mb-3"></i>
-              <h6 class="font-weight-semibold mb-2">Participación</h6>
-              <p class="text-muted mb-3">Monitorear participación y publicar</p>
-              <a href="clima_participacion.php" class="btn btn-info btn-sm btn-block">Acceder</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Dimensiones y reactivos -->
-        <div class="col-md-4 mb-3">
-          <div class="card bg-light">
-            <div class="card-body text-center">
-              <i class="icon-lan2 icon-3x text-purple mb-3"></i>
-              <h6 class="font-weight-semibold mb-2">Dimensiones y reactivos</h6>
-              <p class="text-muted mb-3">Configurar encuesta (dimensiones/preguntas)</p>
-              <a href="clima_dimensiones.php" class="btn btn-purple btn-sm btn-block">Acceder</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Resultados -->
-        <div class="col-md-4 mb-3">
-          <div class="card bg-light">
-            <div class="card-body text-center">
-              <i class="icon-graph icon-3x text-teal mb-3"></i>
-              <h6 class="font-weight-semibold mb-2">Resultados</h6>
-              <p class="text-muted mb-3">Dashboard ejecutivo por Dirección</p>
-              <a href="clima_resultados.php" class="btn btn-teal btn-sm btn-block">Acceder</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Planes de acción -->
-        <div class="col-md-4 mb-3">
-          <div class="card bg-light">
-            <div class="card-body text-center">
-              <i class="icon-file-text2 icon-3x text-warning mb-3"></i>
-              <h6 class="font-weight-semibold mb-2">Planes de acción</h6>
-              <p class="text-muted mb-3">Gestionar planes de mejora continua</p>
-              <a href="clima_planes.php" class="btn btn-warning btn-sm btn-block">Acceder</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <?php endif; ?>
-
-  <!-- Ayuda -->
-  <?php if ($es_admin): ?>
-  <div class="card">
-    <div class="card-header bg-info text-white">
-      <h5 class="card-title">Guía rápida del flujo administrativo</h5>
-    </div>
-    <div class="card-body">
-      <h6 class="font-weight-semibold">Flujo del módulo:</h6>
-      <ol class="mb-3">
-        <li><strong>Crear periodo</strong>: Define año, fechas y fecha de corte de elegibilidad</li>
-        <li><strong>Configurar encuesta</strong>: Administra dimensiones y reactivos (preguntas)</li>
-        <li><strong>Generar elegibles</strong>: Define qué empleados participarán según fecha de corte</li>
-        <li><strong>Publicar</strong>: Cambia estatus a "Publicado" para que empleados puedan contestar</li>
-        <li><strong>Monitorear participación</strong>: Revisa avance por Dirección</li>
-        <li><strong>Publicar resultados</strong>: Habilita visibilidad cuando participación >= 90%</li>
-        <li><strong>Analizar resultados</strong>: Dashboard ejecutivo con promedios y ranking</li>
-        <li><strong>Crear planes de acción</strong>: Define acciones de mejora por dimensión/Dirección</li>
-      </ol>
-    </div>
-  </div>
-  <?php endif; ?>
-
-  <?php if (!$es_admin && !$soy_elegible): ?>
+  <!-- Ayuda para empleados no elegibles -->
+  <?php if (!$soy_elegible): ?>
   <div class="card">
     <div class="card-header bg-light">
       <h5 class="card-title">Información</h5>

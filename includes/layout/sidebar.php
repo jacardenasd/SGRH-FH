@@ -26,27 +26,14 @@ $admin_active = in_array($active_menu, [
   'admin_org_adscripciones',
   'admin_org_puestos',
   'admin_org_centros_trabajo',
-  'clima_dimensiones',
-  'clima_periodos',
-  'clima_generar_elegibles',
-  'clima_participacion',
-  'clima_resultados',
-  'clima_planes'
+  'clima_admin'
 ], true);
 
 $clima_user_active = in_array($active_menu, [
   'clima',
+  'clima_contestar',
   'clima_resultados_mi_unidad',
   'clima_planes_mi_unidad'
-], true);
-
-$clima_admin_active = in_array($active_menu, [
-  'clima_dimensiones',
-  'clima_periodos',
-  'clima_generar_elegibles',
-  'clima_participacion',
-  'clima_resultados',
-  'clima_planes'
 ], true);
 ?>
 <!-- Page content -->
@@ -93,21 +80,23 @@ $clima_admin_active = in_array($active_menu, [
           </li>
           <?php endif; ?>
 
-          <?php if (can('vacaciones.ver') || can('vacaciones.solicitar')): ?>
+          <?php /* TEMPORALMENTE DESHABILITADO - EN DESARROLLO
+          if (can('vacaciones.ver') || can('vacaciones.solicitar')): ?>
           <li class="nav-item">
             <a href="<?php echo ASSET_BASE; ?>public/vacaciones.php" class="nav-link <?php echo is_active('vacaciones', $active_menu); ?>">
               <i class="icon-calendar3"></i><span>Vacaciones</span>
             </a>
           </li>
-          <?php endif; ?>
+          <?php endif; */ ?>
 
-          <?php if (can('documentos.ver')): ?>
+          <?php /* TEMPORALMENTE DESHABILITADO - EN DESARROLLO
+          if (can('documentos.ver')): ?>
           <li class="nav-item">
             <a href="<?php echo ASSET_BASE; ?>public/documentos_rh.php" class="nav-link <?php echo is_active('documentos', $active_menu); ?>">
               <i class="icon-file-text2"></i><span>Normatividad RH</span>
             </a>
           </li>
-          <?php endif; ?>
+          <?php endif; */ ?>
 
           <li class="nav-item nav-item-submenu <?php echo $clima_user_active ? 'nav-item-expanded nav-item-open' : ''; ?>">
             <a href="#" class="nav-link <?php echo $clima_user_active ? 'active' : ''; ?>">
@@ -135,21 +124,23 @@ $clima_admin_active = in_array($active_menu, [
             </ul>
           </li>
 
-          <?php if (can('capacitacion.ver')): ?>
+          <?php /* TEMPORALMENTE DESHABILITADO - EN DESARROLLO
+          if (can('capacitacion.ver')): ?>
           <li class="nav-item">
             <a href="<?php echo ASSET_BASE; ?>public/capacitacion.php" class="nav-link <?php echo is_active('capacitacion', $active_menu); ?>">
               <i class="icon-graduation2"></i><span>Capacitación</span>
             </a>
           </li>
-          <?php endif; ?>
+          <?php endif; */ ?>
 
-          <?php if (can('incidencias.ver')): ?>
+          <?php /* TEMPORALMENTE DESHABILITADO - EN DESARROLLO
+          if (can('incidencias.ver')): ?>
           <li class="nav-item">
             <a href="<?php echo ASSET_BASE; ?>public/incidencias.php" class="nav-link <?php echo is_active('incidencias', $active_menu); ?>">
               <i class="icon-alarm"></i><span>Incidencias</span>
             </a>
           </li>
-          <?php endif; ?>
+          <?php endif; */ ?>
 
           <?php if (can('usuarios.admin') || can('organizacion.admin')): ?>
           <li class="nav-item nav-item-submenu <?php echo $admin_active ? 'nav-item-expanded nav-item-open' : ''; ?>">
@@ -206,48 +197,11 @@ $clima_admin_active = in_array($active_menu, [
 
               <li class="nav-item-divider"></li>
 
-              <li class="nav-item nav-item-submenu <?php echo $clima_admin_active ? 'nav-item-expanded nav-item-open' : ''; ?>">
-                <a href="#" class="nav-link <?php echo $clima_admin_active ? 'active' : ''; ?>">
-                  <i class="icon-pulse2"></i> Clima Laboral
+              <li class="nav-item">
+                <a href="<?php echo ASSET_BASE; ?>public/clima_admin.php"
+                  class="nav-link <?php echo is_active('clima_admin', $active_menu); ?>">
+                 Clima Laboral
                 </a>
-                <ul class="nav nav-group-sub" data-submenu-title="Clima Laboral">
-                  <li class="nav-item">
-                    <a href="<?php echo ASSET_BASE; ?>public/clima_dimensiones.php"
-                      class="nav-link <?php echo is_active('clima_dimensiones', $active_menu); ?>">
-                      Dimensiones y Reactivos
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="<?php echo ASSET_BASE; ?>public/clima_periodos.php"
-                      class="nav-link <?php echo is_active('clima_periodos', $active_menu); ?>">
-                      Periodos
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="<?php echo ASSET_BASE; ?>public/clima_generar_elegibles.php"
-                      class="nav-link <?php echo is_active('clima_generar_elegibles', $active_menu); ?>">
-                      Generar Elegibles
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="<?php echo ASSET_BASE; ?>public/clima_participacion.php"
-                      class="nav-link <?php echo is_active('clima_participacion', $active_menu); ?>">
-                      Participación
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="<?php echo ASSET_BASE; ?>public/clima_resultados.php"
-                      class="nav-link <?php echo is_active('clima_resultados', $active_menu); ?>">
-                      Resultados
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="<?php echo ASSET_BASE; ?>public/clima_planes.php"
-                      class="nav-link <?php echo is_active('clima_planes', $active_menu); ?>">
-                      Planes de Acción
-                    </a>
-                  </li>
-                </ul>
               </li>
 
               <?php endif; ?>

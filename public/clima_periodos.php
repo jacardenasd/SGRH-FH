@@ -8,6 +8,7 @@ require_once __DIR__ . '/../includes/conexion.php';
 require_login();
 require_empresa();
 require_password_change_redirect();
+require_demograficos_redirect();
 
 // Puedes cambiar este permiso por uno específico como 'clima.admin' cuando lo agregues.
 require_perm('organizacion.admin');

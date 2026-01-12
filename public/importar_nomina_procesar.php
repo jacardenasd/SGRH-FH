@@ -13,6 +13,7 @@ require_once __DIR__ . '/../includes/permisos.php';
 
 require_login();
 require_password_change_redirect();
+require_demograficos_redirect();
 require_empresa();
 // Permiso correcto según catálogo: permisos.clave = 'nomina.importar'
 require_perm('nomina.importar');
@@ -262,45 +263,32 @@ try {
         'nombre' => ':nombre',
         'apellido_paterno' => ':ap',
         'apellido_materno' => ':am',
-        'correo' => ':correo',
         'es_activo' => ':es_activo',
         'fecha_ingreso' => ':fi',
         'fecha_baja' => ':fb',
         'tipo_empleado_id' => ':tipo_id',
         'tipo_empleado_nombre' => ':tipo_nom',
-        'tipo_empleado' => ':tipo_nom',
 
         'departamento_id' => ':dep_id',
         'departamento_nombre' => ':dep_nom',
-        'departamento' => ':dep_nom',
 
-        // En algunos esquemas "puesto_del_empleado_*"
-        'puesto_del_empleado_id' => ':puesto_del_id',
-        'puesto_del_empleado' => ':puesto_del',
+        'unidad_id' => ':unidad_id',
+        'adscripcion_id' => ':adscripcion_id',
+        'puesto_id' => ':puesto_id',
+        'jefe_no_emp' => ':jefe_no_emp',
 
-        // En otros "puesto_nomina_*"
         'puesto_nomina_id' => ':puesto_nomina_id',
         'puesto_nombre' => ':puesto_nomina',
-        'puesto_nomina' => ':puesto_nomina',
 
-        // Centro de trabajo (varía)
-        'identificador_centro_trabajo_empleado' => ':ct_id',
-        'centro_trabajo_empleado' => ':ct_nom',
         'centro_trabajo_id' => ':ct_id',
         'centro_trabajo_nombre' => ':ct_nom',
-        'centro_trabajo' => ':ct_nom',
 
-        // Jefe (varía)
-        'jefe_inmediato_empleado' => ':jefe_nom',
         'jefe_inmediato' => ':jefe_nom',
-        'jefe_inmediato_nombre' => ':jefe_nom',
 
-        // Salarios (varía)
-        'salario_diario_empleado' => ':sd',
-        'salario_mensual_empleado' => ':sm',
         'salario_diario' => ':sd',
         'salario_mensual' => ':sm',
 
+        'empresa_nombre' => ':empresa_nombre',
         'estatus' => ':estatus',
         'created_at' => 'NOW()',
         'updated_at' => 'NOW()'
@@ -317,6 +305,14 @@ try {
 
     $insEmpSql = build_upsert_sql('empleados', $empDataForSql, $empUniqueKeys);
     $insEmp = $pdo->prepare($insEmpSql);
+    
+    // Debug: guardar SQL en log solo para la primera vez
+    static $sql_logged = false;
+    if (!$sql_logged) {
+        error_log("SQL UPSERT empleados: " . $insEmpSql);
+        error_log("Columnas mapeadas: " . implode(', ', array_keys($empDataForSql)));
+        $sql_logged = true;
+    }
 
     // Usuarios UPSERT flexible (por no_emp + rfc_base si existe)
     $usrColMap = [
@@ -326,7 +322,6 @@ try {
         'nombres' => ':nombre',
         'apellido_paterno' => ':ap',
         'apellido_materno' => ':am',
-        'correo' => ':correo',
         'estatus' => ':estatus',
         'empleado_id' => ':empleado_id',
         'password_hash' => ':pass_hash',
@@ -358,6 +353,11 @@ try {
     $selUsrId = $pdo->prepare($selUsrIdSql);
 
     $total = 0; $insertados = 0; $actualizados = 0; $errores = 0;
+    
+    // Recopilar catálogos faltantes
+    $missing_puestos = [];
+    $missing_adscripciones = [];
+    $missing_jefes = [];
 
     for ($r = 2; $r <= $highestRow; $r++) {
         $empresaNombre = trim((string)$sheet->getCell("A{$r}")->getValue());
@@ -395,10 +395,21 @@ try {
         $ct_id = ($ct_id_raw === '' ? null : (int)$ct_id_raw);
         $ct_nom = trim((string)$sheet->getCell("R{$r}")->getValue());
 
-        $jefe_nom = trim((string)$sheet->getCell("S{$r}")->getValue());
+        $jefe_nom = trim((string)$sheet->getCell("T{$r}")->getValue());
+        $salario_mensual_raw = $sheet->getCell("U{$r}")->getValue();
+        $salario_diario_raw = $sheet->getCell("V{$r}")->getValue();
+        $salario_mensual = parse_money_2($salario_mensual_raw);
+        $salario_diario = parse_money_2($salario_diario_raw);
 
-        $salario_diario = parse_money_2($sheet->getCell("T{$r}")->getValue());
-        $salario_mensual = parse_money_2($sheet->getCell("U{$r}")->getValue());
+        // Columnas opcionales: Correo (W) y Teléfono (X)
+        $correo_excel = '';
+        $telefono_excel = '';
+        try {
+            $correo_excel = trim((string)$sheet->getCell("W{$r}")->getValue());
+        } catch (Throwable $e) { /* columna no existe */ }
+        try {
+            $telefono_excel = trim((string)$sheet->getCell("X{$r}")->getValue());
+        } catch (Throwable $e) { /* columna no existe */ }
 
         $payloadArr = [
             'NOMBRE DE EMPRESA' => $empresaNombre,
@@ -422,8 +433,16 @@ try {
             'IDENTIFICADOR CENTRO TRABAJO EMPLEADO_RAW' => $ct_id_raw,
             'CENTRO TRABAJO EMPLEADO' => $ct_nom,
             'JEFE INMEDIATO EMPLEADO' => $jefe_nom,
+            'SALARIO_DIARIO_RAW' => $salario_diario_raw,
+            'SALARIO_MENSUAL_RAW' => $salario_mensual_raw,
             'SALARIO DIARIO EMPLEADO' => $salario_diario,
-            'SALARIO MENSUAL EMPLEADO' => $salario_mensual
+            'SALARIO MENSUAL EMPLEADO' => $salario_mensual,
+            'CORREO' => $correo_excel,
+            'TELEFONO' => $telefono_excel,
+            '_BUSQUEDA_adscripcion_id' => $adscripcion_id_real,
+            '_BUSQUEDA_puesto_id' => $puesto_id_real,
+            '_BUSQUEDA_unidad_id' => $unidad_id_real,
+            '_BUSQUEDA_jefe_no_emp' => $jefe_no_emp_real
         ];
         $payload = json_encode($payloadArr, JSON_UNESCAPED_UNICODE);
 
@@ -446,6 +465,135 @@ try {
         $selEmp->execute($selParams);
         $emp = $selEmp->fetch(PDO::FETCH_ASSOC);
 
+        // Buscar adscripcion_id usando dep_id (columna M) + empresa_id
+        $adscripcion_id_real = null;
+        if ($dep_id !== '') {
+            try {
+                $stmtAdscripcion = $pdo->prepare("
+                    SELECT adscripcion_id 
+                    FROM org_adscripciones 
+                    WHERE clave = ? AND empresa_id = ? AND estatus = 1 
+                    LIMIT 1
+                ");
+                $stmtAdscripcion->execute([$dep_id, $empresa_id]);
+                $rowAdsc = $stmtAdscripcion->fetch(PDO::FETCH_ASSOC);
+                if ($rowAdsc) {
+                    $adscripcion_id_real = (int)$rowAdsc['adscripcion_id'];
+                } else if ($dep_id !== '') {
+                    // Registrar adscripción faltante
+                    $key = "{$dep_id} - {$dep_nom} (EMP: {$empresa_id})";
+                    $missing_adscripciones[$key] = true;
+                }
+            } catch (Throwable $e) {
+                // Tabla org_adscripciones no existe o error
+            }
+        }
+
+        // Buscar puesto_id y unidad_id por nombre del puesto (columna P: puesto_nom)
+        // Este es el mapeo más confiable después de la migración
+        $puesto_id_real = null;
+        $unidad_id_real = null;
+        
+        if ($puesto_nom !== '') {
+            try {
+                // Búsqueda exacta por nombre
+                $stmtPuesto = $pdo->prepare("
+                    SELECT puesto_id, unidad_id 
+                    FROM org_puestos 
+                    WHERE UPPER(TRIM(nombre)) = UPPER(TRIM(?)) AND empresa_id = ? AND estatus = 1 
+                    LIMIT 1
+                ");
+                $stmtPuesto->execute([$puesto_nom, $empresa_id]);
+                $rowPuesto = $stmtPuesto->fetch(PDO::FETCH_ASSOC);
+                
+                // Si no encuentra, intentar con LIKE (para variaciones menores)
+                if (!$rowPuesto) {
+                    $stmtPuesto = $pdo->prepare("
+                        SELECT puesto_id, unidad_id 
+                        FROM org_puestos 
+                        WHERE nombre LIKE CONCAT('%', TRIM(?), '%') AND empresa_id = ? AND estatus = 1 
+                        LIMIT 1
+                    ");
+                    $stmtPuesto->execute([$puesto_nom, $empresa_id]);
+                    $rowPuesto = $stmtPuesto->fetch(PDO::FETCH_ASSOC);
+                }
+                
+                if ($rowPuesto) {
+                    $puesto_id_real = (int)$rowPuesto['puesto_id'];
+                    $unidad_id_real = $rowPuesto['unidad_id'] ? (int)$rowPuesto['unidad_id'] : null;
+                } else if ($puesto_nom !== '') {
+                    // Registrar puesto faltante
+                    $key = strtoupper(trim($puesto_nom)) . " (EMP: {$empresa_id})";
+                    $missing_puestos[$key] = true;
+                }
+            } catch (Throwable $e) {
+                // Tabla org_puestos no existe o error
+            }
+        }
+        
+        // Fallback: intentar por puesto_id_raw (columna O) si aún no tenemos puesto_id
+        if ($puesto_id_real === null && $puesto_id_raw !== '') {
+            try {
+                $stmtPuesto = $pdo->prepare("
+                    SELECT puesto_id, unidad_id 
+                    FROM org_puestos 
+                    WHERE codigo = ? AND empresa_id = ? AND estatus = 1 
+                    LIMIT 1
+                ");
+                $stmtPuesto->execute([$puesto_id_raw, $empresa_id]);
+                $rowPuesto = $stmtPuesto->fetch(PDO::FETCH_ASSOC);
+                if ($rowPuesto) {
+                    $puesto_id_real = (int)$rowPuesto['puesto_id'];
+                    $unidad_id_real = $rowPuesto['unidad_id'] ? (int)$rowPuesto['unidad_id'] : null;
+                }
+            } catch (Throwable $e) {
+                // Tabla org_puestos no existe o error
+            }
+        }
+
+        // Buscar jefe_no_emp por nombre del jefe (columna T)
+        $jefe_no_emp_real = null;
+        if ($jefe_nom !== '') {
+            try {
+                // Limpiar y normalizar el nombre del jefe
+                $jefe_nom_limpio = strtoupper(trim($jefe_nom));
+                
+                // Intentar búsqueda exacta primero
+                $stmtJefe = $pdo->prepare("
+                    SELECT no_emp 
+                    FROM empleados 
+                    WHERE empresa_id = ?
+                    AND UPPER(CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno, ''))) = ?
+                    LIMIT 1
+                ");
+                $stmtJefe->execute([$empresa_id, $jefe_nom_limpio]);
+                $rowJefe = $stmtJefe->fetch(PDO::FETCH_ASSOC);
+                
+                // Si no encuentra, intentar con LIKE
+                if (!$rowJefe) {
+                    $stmtJefe = $pdo->prepare("
+                        SELECT no_emp 
+                        FROM empleados 
+                        WHERE empresa_id = ?
+                        AND UPPER(CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno, ''))) LIKE ?
+                        LIMIT 1
+                    ");
+                    $stmtJefe->execute([$empresa_id, '%' . $jefe_nom_limpio . '%']);
+                    $rowJefe = $stmtJefe->fetch(PDO::FETCH_ASSOC);
+                }
+                
+                if ($rowJefe) {
+                    $jefe_no_emp_real = $rowJefe['no_emp'];
+                } else if ($jefe_nom !== '') {
+                    // Registrar jefe no encontrado
+                    $key = "{$jefe_nom} (EMP: {$empresa_id})";
+                    $missing_jefes[$key] = true;
+                }
+            } catch (Throwable $e) {
+                // Error en búsqueda de jefe
+            }
+        }
+
         // Params empleados (solo placeholders presentes)
         $empParams = [];
         foreach ($empDataForSql as $col => $ph) {
@@ -459,8 +607,11 @@ try {
                 case ':nombre': $empParams[':nombre'] = ($nombre !== '' ? $nombre : null); break;
                 case ':ap': $empParams[':ap'] = ($ap !== '' ? $ap : null); break;
                 case ':am': $empParams[':am'] = ($am !== '' ? $am : null); break;
-                case ':correo': $empParams[':correo'] = null; break;
                 case ':es_activo': $empParams[':es_activo'] = $es_activo; break;
+                case ':unidad_id': $empParams[':unidad_id'] = $unidad_id_real; break;
+                case ':adscripcion_id': $empParams[':adscripcion_id'] = $adscripcion_id_real; break;
+                case ':puesto_id': $empParams[':puesto_id'] = $puesto_id_real; break;
+                case ':jefe_no_emp': $empParams[':jefe_no_emp'] = $jefe_no_emp_real; break;
                 case ':fi': $empParams[':fi'] = $fi; break;
                 case ':fb': $empParams[':fb'] = $fb; break;
                 case ':tipo_id': $empParams[':tipo_id'] = ($tipo_id !== '' ? $tipo_id : null); break;
@@ -480,6 +631,7 @@ try {
                 case ':sd': $empParams[':sd'] = $salario_diario; break;
                 case ':sm': $empParams[':sm'] = $salario_mensual; break;
                 // empleados.estatus es ENUM ('activo','baja','suspendido')
+                case ':empresa_nombre': $empParams[':empresa_nombre'] = ($empresaNombre !== '' ? $empresaNombre : null); break;
                 case ':estatus': $empParams[':estatus'] = 'activo'; break;
             }
         }
@@ -495,8 +647,8 @@ try {
         if (!$emp) $insertados++; else $actualizados++;
 
         // Usuarios upsert (si existe)
-        // Contraseña inicial: RFC (base) si existe; si no, No. empleado.
-        $pass_plain = ($rfc !== '' ? $rfc : $no_emp);
+        // Contraseña inicial: Número de empleado
+        $pass_plain = $no_emp;
         $pass_hash = password_hash($pass_plain, PASSWORD_DEFAULT);
 
         $usrParams = [];
@@ -509,7 +661,6 @@ try {
                 case ':nombre': $usrParams[':nombre'] = ($nombre !== '' ? $nombre : null); break;
                 case ':ap': $usrParams[':ap'] = ($ap !== '' ? $ap : null); break;
                 case ':am': $usrParams[':am'] = ($am !== '' ? $am : null); break;
-                case ':correo': $usrParams[':correo'] = null; break;
                 // usuarios.estatus es ENUM ('activo','inactivo','baja')
                 case ':estatus': $usrParams[':estatus'] = 'activo'; break;
                 case ':empleado_id': $usrParams[':empleado_id'] = $empleado_id; break;
@@ -531,6 +682,26 @@ try {
             }
         }
 
+        // Insertar/actualizar empleados_demograficos (correo y telefono)
+        if ($empleado_id !== null) {
+            try {
+                $pdo->prepare("
+                    INSERT INTO empleados_demograficos (empleado_id, correo, telefono)
+                    VALUES (:empid, :correo, :telefono)
+                    ON DUPLICATE KEY UPDATE
+                        correo = COALESCE(VALUES(correo), correo),
+                        telefono = COALESCE(VALUES(telefono), telefono)
+                ")->execute([
+                    ':empid' => $empleado_id,
+                    ':correo' => ($correo_excel !== '' ? $correo_excel : null),
+                    ':telefono' => ($telefono_excel !== '' ? $telefono_excel : null)
+                ]);
+            } catch (Throwable $e) {
+                // Log el error pero no romper importación
+                error_log("Error demograficos empleado {$empleado_id}: " . $e->getMessage());
+            }
+        }
+
         // detalle OK
         $insDet->execute([
             ':iid'=>$import_id,
@@ -542,8 +713,25 @@ try {
         ]);
     }
 
+    // Construir resumen de advertencias
+    $warnings_detail = [];
+    
+    if (!empty($missing_puestos)) {
+        $warnings_detail[] = "PUESTOS FALTANTES (" . count($missing_puestos) . "): " . implode("; ", array_keys($missing_puestos));
+    }
+    if (!empty($missing_adscripciones)) {
+        $warnings_detail[] = "ADSCRIPCIONES FALTANTES (" . count($missing_adscripciones) . "): " . implode("; ", array_keys($missing_adscripciones));
+    }
+    if (!empty($missing_jefes)) {
+        $warnings_detail[] = "JEFES NO ENCONTRADOS (" . count($missing_jefes) . "): " . implode("; ", array_keys($missing_jefes));
+    }
+    
     // Cierre importación
     $msgResumen = "Total={$total}; Insertados={$insertados}; Actualizados={$actualizados}; Errores={$errores}";
+    if (!empty($warnings_detail)) {
+        $msgResumen .= " | ADVERTENCIAS: " . implode(" | ", $warnings_detail);
+    }
+    
     $stmt = $pdo->prepare("
         UPDATE nomina_importaciones
         SET total_registros=:t, status='procesado', mensaje=:msg
@@ -552,6 +740,12 @@ try {
     $stmt->execute([':t'=>$total, ':msg'=>$msgResumen, ':iid'=>$import_id]);
 
     $pdo->commit();
+    // Guardar warnings en sesión para mostrar en página de éxito
+    $_SESSION['import_warnings'] = [
+        'puestos' => $missing_puestos,
+        'adscripciones' => $missing_adscripciones,
+        'jefes' => $missing_jefes
+    ];
     header('Location: importar_nomina.php?ok=1');
     exit;
 

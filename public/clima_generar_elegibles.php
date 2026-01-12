@@ -149,23 +149,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                               ?,
                               e.empleado_id,
                               e.empresa_id,
-                              e.unidad_id,
+                              COALESCE(e.unidad_id, p.unidad_id) AS unidad_id,
                               CASE
                                 WHEN e.es_activo = 1
                                  AND e.fecha_ingreso IS NOT NULL
-                                 AND e.fecha_ingreso <= DATE_SUB(?, INTERVAL 3 MONTH)
+                                 AND e.fecha_ingreso <= DATE_SUB(?, INTERVAL 1 MONTH)
                                 THEN 1 ELSE 0
                               END,
                               CASE
                                 WHEN e.es_activo <> 1 THEN 'INACTIVO/BAJA'
                                 WHEN e.fecha_ingreso IS NULL THEN 'SIN_FECHA_INGRESO'
-                                WHEN e.fecha_ingreso > DATE_SUB(?, INTERVAL 3 MONTH) THEN 'ANTIGUEDAD_MENOR_3_MESES'
+                                WHEN e.fecha_ingreso > DATE_SUB(?, INTERVAL 1 MONTH) THEN 'ANTIGUEDAD_MENOR_1_MES'
                                 ELSE NULL
                               END,
                               NOW()
                             FROM empleados e
+                            LEFT JOIN org_puestos p ON p.puesto_id = e.puesto_id
                             WHERE e.empresa_id = ?
-                              AND e.unidad_id IS NOT NULL
+                              AND COALESCE(e.unidad_id, p.unidad_id) IS NOT NULL
                             ON DUPLICATE KEY UPDATE
                               empresa_id = VALUES(empresa_id),
                               unidad_id  = VALUES(unidad_id),
@@ -225,6 +226,28 @@ if ($periodo && $empresa_id > 0) {
     $dst = $pdo->prepare($sql_detalle);
     $dst->execute([$periodo_id, $empresa_id]);
     $detalle = $dst->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Lista detallada de empleados elegibles
+    $sql_lista = "
+        SELECT
+          ce.empleado_id,
+          CONCAT(e.nombre, ' ', e.apellido_paterno, ' ', COALESCE(e.apellido_materno, '')) AS nombre_completo,
+          e.no_emp,
+          u.nombre AS unidad_nombre,
+          e.fecha_ingreso,
+          ce.elegible,
+          ce.motivo_no_elegible
+        FROM clima_elegibles ce
+        LEFT JOIN empleados e ON e.empleado_id = ce.empleado_id
+        LEFT JOIN org_unidades u ON u.unidad_id = ce.unidad_id
+        WHERE ce.periodo_id=? AND ce.empresa_id=?
+        ORDER BY u.nombre ASC, e.nombre ASC
+    ";
+    $lst = $pdo->prepare($sql_lista);
+    $lst->execute([$periodo_id, $empresa_id]);
+    $lista_empleados = $lst->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $lista_empleados = [];
 }
 
 // Layout UI
@@ -290,7 +313,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
     <div class="card">
       <div class="card-header header-elements-inline">
-        <h5 class="card-title">Generar snapshot de elegibilidad (≥ 3 meses)</h5>
+        <h5 class="card-title">Generar snapshot de elegibilidad (≥ 1 mes)</h5>
         <div class="header-elements">
           <div class="list-icons">
             <a class="list-icons-item" data-action="collapse"></a>
@@ -354,7 +377,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
             </div>
 
             <small class="text-muted d-block mt-2">
-              El snapshot congela el universo para el cálculo del 90%. Empleados sin <code>unidad_id</code> se excluyen.
+              El snapshot congela el universo para el cálculo del 90%. Solo incluye activos con ≥1 mes de antigüedad. Empleados sin <code>unidad_id</code> se excluyen.
             </small>
           </div>
         <?php endif; ?>
@@ -404,6 +427,53 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
       </div>
     </div>
 
+    <!-- Lista detallada de empleados -->
+    <?php if (!empty($lista_empleados)): ?>
+    <div class="card">
+      <div class="card-header header-elements-inline">
+        <h5 class="card-title">Lista detallada de empleados en snapshot</h5>
+        <div class="header-elements">
+          <div class="list-icons">
+            <a class="list-icons-item" data-action="collapse"></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table datatable-basic" id="tbl_lista_empleados">
+          <thead>
+            <tr>
+              <th>No. Empleado</th>
+              <th>Nombre</th>
+              <th>Unidad</th>
+              <th>Fecha Ingreso</th>
+              <th>Elegible</th>
+              <th>Motivo no elegible</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($lista_empleados as $emp): ?>
+              <tr>
+                <td><?=h($emp['no_emp'])?></td>
+                <td><?=h($emp['nombre_completo'])?></td>
+                <td><?=h($emp['unidad_nombre'] ?: 'Sin unidad')?></td>
+                <td><?=h($emp['fecha_ingreso'] ?: 'N/A')?></td>
+                <td>
+                  <?php if ((int)$emp['elegible'] === 1): ?>
+                    <span class="badge badge-success">Elegible</span>
+                  <?php else: ?>
+                    <span class="badge badge-secondary">No elegible</span>
+                  <?php endif; ?>
+                </td>
+                <td><small class="text-muted"><?=h($emp['motivo_no_elegible'] ?: '-')?></small></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <?php endif; ?>
+
   <?php endif; ?>
 
 </div>
@@ -448,16 +518,25 @@ require_once __DIR__ . '/../includes/layout/scripts.php';
 <script>
 (function() {
   if (typeof $ !== 'undefined' && $.fn.DataTable) {
+    var dtLangConfig = {
+      search: "Buscar:",
+      lengthMenu: "Mostrar _MENU_",
+      info: "Mostrando _START_ a _END_ de _TOTAL_",
+      paginate: { first:"Primero", last:"Último", next:"Siguiente", previous:"Anterior" },
+      zeroRecords: "Sin registros"
+    };
+    
     $('#tbl_detalle').DataTable({
       autoWidth: false,
       order: [[0,'asc']],
-      language: {
-        search: "Buscar:",
-        lengthMenu: "Mostrar _MENU_",
-        info: "Mostrando _START_ a _END_ de _TOTAL_",
-        paginate: { first:"Primero", last:"Último", next:"Siguiente", previous:"Anterior" },
-        zeroRecords: "Sin registros"
-      }
+      language: dtLangConfig
+    });
+    
+    $('#tbl_lista_empleados').DataTable({
+      autoWidth: false,
+      order: [[1,'asc']],
+      pageLength: 25,
+      language: dtLangConfig
     });
   }
 })();

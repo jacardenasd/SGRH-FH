@@ -73,7 +73,7 @@ function login_intento($rfc_raw, $password) {
 
     // Cargar empresas a sesión
     $stmt2 = $pdo->prepare("
-        SELECT ue.empresa_id, e.nombre, e.alias, ue.es_admin
+        SELECT ue.empresa_id, ue.empleado_id, e.nombre, e.alias, ue.es_admin
         FROM usuario_empresas ue
         INNER JOIN empresas e ON e.empresa_id = ue.empresa_id
         WHERE ue.usuario_id = :uid AND ue.estatus = 1 AND e.estatus = 1
@@ -90,8 +90,7 @@ function login_intento($rfc_raw, $password) {
         $_SESSION['empresa_nombre'] = $empresas[0]['nombre'];
         $_SESSION['empresa_alias'] = $empresas[0]['alias'];
         $_SESSION['es_admin_empresa'] = (int)$empresas[0]['es_admin'];
-        $_SESSION['empleado_id'] = $usuario['empleado_id'];
-
+        $_SESSION['empleado_id'] = $empresas[0]['empleado_id'] ? (int)$empresas[0]['empleado_id'] : null;
 
         // Cargar permisos
         cargar_permisos_sesion((int)$u_match['usuario_id']);

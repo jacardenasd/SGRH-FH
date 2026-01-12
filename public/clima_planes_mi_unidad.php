@@ -12,6 +12,7 @@ require_once __DIR__ . '/../includes/conexion.php';
 require_login();
 require_empresa();
 require_password_change_redirect();
+require_demograficos_redirect();
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
@@ -66,13 +67,11 @@ if ($mi_empleado_data) {
     }
 }
 
-if (!$mi_liderazgo) {
-    http_response_code(403);
-    die('<div class="alert alert-warning">No tienes permisos para gestionar planes de acción. Esta función está disponible solo para líderes de unidad.</div>');
-}
+// Permitir acceso a todos - mostrar mensaje informativo si no es líder
+$es_lider = ($mi_liderazgo !== null);
 
-$mi_unidad_id = (int)$mi_liderazgo['unidad_id'];
-$mi_unidad_nombre = $mi_liderazgo['unidad_nombre'];
+$mi_unidad_id = $mi_liderazgo ? (int)$mi_liderazgo['unidad_id'] : 0;
+$mi_unidad_nombre = $mi_liderazgo ? $mi_liderazgo['unidad_nombre'] : '';
 
 $flash = null;
 $flash_type = 'info';
@@ -296,6 +295,26 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
     </div>
   <?php endif; ?>
 
+  <?php if (!$es_lider): ?>
+    <!-- Mensaje informativo para usuarios no líderes -->
+    <div class="alert alert-info border-left-3 border-left-info">
+      <div class="d-flex align-items-start">
+        <i class="icon-info22 icon-2x mr-3"></i>
+        <div>
+          <h6 class="font-weight-semibold mb-2">Visualización de Planes de Acción</h6>
+          <p class="mb-2">
+            Esta sección muestra los planes de acción creados por los líderes de tu Dirección en respuesta 
+            a los resultados de la encuesta de clima laboral.
+          </p>
+          <p class="mb-0 text-muted">
+            <strong>Nota:</strong> La creación y edición de planes está disponible únicamente para líderes de unidad. 
+            Si eres responsable de un equipo y no puedes crear planes, contacta a Recursos Humanos.
+          </p>
+        </div>
+      </div>
+    </div>
+  <?php endif; ?>
+
   <!-- Info de mi unidad -->
   <div class="card bg-light">
     <div class="card-body">
@@ -307,7 +326,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
             <span class="text-muted">Mi Dirección</span>
           </div>
         </div>
-        <?php if (!empty($periodos)): ?>
+        <?php if ($es_lider && !empty($periodos)): ?>
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCrearPlan">
           <i class="icon-plus2 mr-2"></i> Crear Plan de Acción
         </button>
@@ -432,6 +451,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
               <td><?php echo $plan['fecha_compromiso'] ? date('d/m/Y', strtotime($plan['fecha_compromiso'])) : '-'; ?></td>
               <td><span class="badge badge-<?php echo $estatus_clase; ?>"><?php echo $estatus_texto; ?></span></td>
               <td class="text-center">
+                <?php if ($es_lider): ?>
                 <div class="btn-group">
                   <button type="button" class="btn btn-sm btn-light" onclick="editarPlan(<?php echo (int)$plan['plan_id']; ?>)" title="Editar">
                     <i class="icon-pencil7"></i>
@@ -440,6 +460,9 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                     <i class="icon-trash"></i>
                   </button>
                 </div>
+                <?php else: ?>
+                  <span class="text-muted">-</span>
+                <?php endif; ?>
               </td>
             </tr>
             <?php endforeach; ?>

@@ -65,8 +65,9 @@ $stmt = $pdo->prepare("
         ue.empresa_id, ue.es_admin, ue.estatus AS ue_estatus,
         ue.empleado_id,
         e.nombre, e.apellido_paterno, e.apellido_materno,
-        e.correo, e.telefono, e.es_activo, e.estatus AS estatus_empleado,
-        e.foto_path
+        e.es_activo, e.estatus AS estatus_empleado,
+        e.foto_path,
+        ed.correo, ed.telefono
     FROM usuarios u
     JOIN usuario_empresas ue
       ON ue.usuario_id = u.usuario_id
@@ -74,6 +75,8 @@ $stmt = $pdo->prepare("
      AND ue.estatus = 1
     LEFT JOIN empleados e
       ON e.empleado_id = ue.empleado_id
+    LEFT JOIN empleados_demograficos ed
+      ON ed.empleado_id = ue.empleado_id
     WHERE u.usuario_id = :usuario_id
     LIMIT 1
 ");
@@ -89,6 +92,22 @@ if (!$row) {
 
 // Determinar si se puede editar (requiere empleado_id vinculado)
 $puede_editar = (!empty($row['empleado_id']) && (int)$row['empleado_id'] > 0);
+
+// Cargar datos demográficos (si existen)
+$demograficos = null;
+if ($puede_editar) {
+    $stmt = $pdo->prepare("
+        SELECT sexo, fecha_nacimiento, escolaridad, estado_civil, num_hijos
+        FROM empleados_demograficos
+        WHERE empleado_id = :empleado_id
+        LIMIT 1
+    ");
+    $stmt->execute([':empleado_id' => (int)$row['empleado_id']]);
+    $demograficos = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Detectar si viene del redirect de guard.php
+$requiere_demograficos = isset($_GET['completar_demograficos']) && (int)$_GET['completar_demograficos'] === 1;
 
 $mensaje = '';
 $errores = [];
@@ -235,9 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 SET
                     nombre = :nombre,
                     apellido_paterno = :ap_paterno,
-                    apellido_materno = :ap_materno,
-                    correo = :correo,
-                    telefono = :telefono
+                    apellido_materno = :ap_materno
                 WHERE empleado_id = :empleado_id
                   AND empresa_id = :empresa_id
                 LIMIT 1
@@ -246,14 +263,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':nombre' => $nombre,
                 ':ap_paterno' => ($apellido_paterno === '' ? null : $apellido_paterno),
                 ':ap_materno' => ($apellido_materno === '' ? null : $apellido_materno),
-                ':correo' => ($correo === '' ? null : $correo),
-                ':telefono' => ($telefono === '' ? null : $telefono),
                 ':empleado_id' => (int)$row['empleado_id'],
                 ':empresa_id' => $empresa_id
             ]);
 
             if (!$ok_emp) {
                 $errores[] = 'No se pudo actualizar la información del empleado.';
+            }
+
+            // 1.5) GUARDAR DATOS DEMOGRÁFICOS
+            if (count($errores) === 0) {
+                $sexo            = isset($_POST['sexo']) ? trim((string)$_POST['sexo']) : '';
+                $fecha_nac       = isset($_POST['fecha_nacimiento']) ? trim((string)$_POST['fecha_nacimiento']) : '';
+                $escolaridad     = isset($_POST['escolaridad']) ? trim((string)$_POST['escolaridad']) : '';
+                $estado_civil    = isset($_POST['estado_civil']) ? trim((string)$_POST['estado_civil']) : '';
+                $num_hijos_raw   = isset($_POST['num_hijos']) ? trim((string)$_POST['num_hijos']) : '';
+                $num_hijos       = ($num_hijos_raw === '') ? 0 : (int)$num_hijos_raw;
+
+                // Validar campos requeridos demográficos
+                if ($sexo === '' || $fecha_nac === '' || $escolaridad === '' || $estado_civil === '') {
+                    $errores[] = 'Los datos demográficos son obligatorios (sexo, fecha de nacimiento, escolaridad, estado civil).';
+                }
+
+                // Validar sexo enum
+                if ($sexo !== '' && !in_array($sexo, ['M', 'F', 'X'])) {
+                    $errores[] = 'El sexo debe ser M, F o X.';
+                }
+
+                // Validar fecha de nacimiento
+                if ($fecha_nac !== '') {
+                    $fecha_valida = DateTime::createFromFormat('Y-m-d', $fecha_nac);
+                    if (!$fecha_valida || $fecha_valida->format('Y-m-d') !== $fecha_nac) {
+                        $errores[] = 'La fecha de nacimiento no es válida.';
+                    } else {
+                        // Verificar edad razonable (entre 18 y 100 años)
+                        $hoy = new DateTime();
+                        $edad = $hoy->diff($fecha_valida)->y;
+                        if ($edad < 18 || $edad > 100) {
+                            $errores[] = 'La fecha de nacimiento debe corresponder a una edad entre 18 y 100 años.';
+                        }
+                    }
+                }
+
+                if (count($errores) === 0) {
+                    // Verificar si ya existe registro demográfico
+                    $stmt = $pdo->prepare("
+                        SELECT COUNT(*) FROM empleados_demograficos WHERE empleado_id = :empleado_id
+                    ");
+                    $stmt->execute([':empleado_id' => (int)$row['empleado_id']]);
+                    $existe = (int)$stmt->fetchColumn() > 0;
+
+                    if ($existe) {
+                        // UPDATE
+                        $stmt = $pdo->prepare("
+                            UPDATE empleados_demograficos
+                            SET
+                                sexo = :sexo,
+                                fecha_nacimiento = :fecha_nac,
+                                escolaridad = :escolaridad,
+                                estado_civil = :estado_civil,
+                                num_hijos = :num_hijos,
+                                correo = :correo,
+                                telefono = :telefono,
+                                updated_at = NOW()
+                            WHERE empleado_id = :empleado_id
+                            LIMIT 1
+                        ");
+                    } else {
+                        // INSERT
+                        $stmt = $pdo->prepare("
+                            INSERT INTO empleados_demograficos
+                            (empleado_id, sexo, fecha_nacimiento, escolaridad, estado_civil, num_hijos, correo, telefono, created_at, updated_at)
+                            VALUES
+                            (:empleado_id, :sexo, :fecha_nac, :escolaridad, :estado_civil, :num_hijos, :correo, :telefono, NOW(), NOW())
+                        ");
+                    }
+
+                    $ok_demo = $stmt->execute([
+                        ':empleado_id' => (int)$row['empleado_id'],
+                        ':sexo' => $sexo,
+                        ':fecha_nac' => ($fecha_nac === '' ? null : $fecha_nac),
+                        ':escolaridad' => $escolaridad,
+                        ':estado_civil' => $estado_civil,
+                        ':num_hijos' => $num_hijos,
+                        ':correo' => ($correo === '' ? null : $correo),
+                        ':telefono' => ($telefono === '' ? null : $telefono)
+                    ]);
+
+                    if (!$ok_demo) {
+                        $errores[] = 'No se pudo guardar la información demográfica.';
+                    }
+                }
             }
 
             // 2) Actualizar PASSWORD (si aplica) en USUARIOS
@@ -308,8 +408,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ue.empresa_id, ue.es_admin, ue.estatus AS ue_estatus,
                     ue.empleado_id,
                     e.nombre, e.apellido_paterno, e.apellido_materno,
-                    e.correo, e.telefono, e.es_activo, e.estatus AS estatus_empleado,
-                    e.foto_path
+                    e.es_activo, e.estatus AS estatus_empleado,
+                    e.foto_path,
+                    ed.correo, ed.telefono
                 FROM usuarios u
                 JOIN usuario_empresas ue
                   ON ue.usuario_id = u.usuario_id
@@ -317,6 +418,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  AND ue.estatus = 1
                 LEFT JOIN empleados e
                   ON e.empleado_id = ue.empleado_id
+                LEFT JOIN empleados_demograficos ed
+                  ON ed.empleado_id = ue.empleado_id
                 WHERE u.usuario_id = :usuario_id
                 LIMIT 1
             ");
@@ -326,6 +429,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             $puede_editar = (!empty($row['empleado_id']) && (int)$row['empleado_id'] > 0);
+
+            // Recargar datos demográficos
+            if ($puede_editar) {
+                $stmt = $pdo->prepare("
+                    SELECT sexo, fecha_nacimiento, escolaridad, estado_civil, num_hijos
+                    FROM empleados_demograficos
+                    WHERE empleado_id = :empleado_id
+                    LIMIT 1
+                ");
+                $stmt->execute([':empleado_id' => (int)$row['empleado_id']]);
+                $demograficos = $stmt->fetch(PDO::FETCH_ASSOC);
+            }
         } else {
             $mensaje = alert_html('danger', '<strong>Revisa lo siguiente:</strong><br>' . implode('<br>', $errores));
         }
@@ -340,12 +455,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 include __DIR__ . '/../includes/layout/head.php';
 include __DIR__ . '/../includes/layout/navbar.php';
 include __DIR__ . '/../includes/layout/sidebar.php';
-include __DIR__ . '/../includes/layout/page_header.php';
+include __DIR__ . '/../includes/layout/content_open.php';
 ?>
+
+<!-- Page header -->
+<div class="page-header page-header-light">
+    <div class="page-header-content header-elements-md-inline">
+        <div class="page-title d-flex">
+            <h4><i class="icon-user mr-2"></i> <span class="font-weight-semibold"><?php echo h($page_title); ?></span></h4>
+            <a href="#" class="header-elements-toggle text-default d-md-none"><i class="icon-more"></i></a>
+        </div>
+    </div>
+    <div class="breadcrumb-line breadcrumb-line-light header-elements-md-inline">
+        <div class="d-flex">
+            <div class="breadcrumb">
+                <a href="index.php" class="breadcrumb-item"><i class="icon-home2 mr-2"></i> <?php echo h($breadcrumb_home); ?></a>
+                <?php if ($breadcrumb_lvl1): ?>
+                    <a href="#" class="breadcrumb-item"><?php echo h($breadcrumb_lvl1); ?></a>
+                <?php endif; ?>
+                <span class="breadcrumb-item active"><?php echo h($page_title); ?></span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page header -->
 
 <div class="content">
 
     <?php echo $mensaje; ?>
+
+    <?php if ($requiere_demograficos && !$demograficos): ?>
+        <div class="alert alert-danger alert-styled-left alert-arrow-left">
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+            <span class="font-weight-semibold">¡Atención!</span>
+            Para continuar usando el sistema, es necesario que completes tus <strong>datos demográficos</strong> en este formulario.
+            Esta información es confidencial y se utiliza únicamente para análisis estadísticos.
+        </div>
+    <?php endif; ?>
 
     <?php if (!$puede_editar): ?>
         <div class="alert alert-warning">
@@ -359,7 +505,7 @@ include __DIR__ . '/../includes/layout/page_header.php';
             <h5 class="card-title">Mi perfil (Empresa: <?php echo h(isset($_SESSION['empresa_alias']) && $_SESSION['empresa_alias'] ? $_SESSION['empresa_alias'] : (isset($_SESSION['empresa_nombre']) ? $_SESSION['empresa_nombre'] : '')); ?>)</h5>
         </div>
 
-        <div class="card-body">
+        <div class="card-body" style="max-height: none; overflow: visible;">
 
             <div class="row mb-4">
                 <div class="col-md-3 text-center">
@@ -464,6 +610,79 @@ include __DIR__ . '/../includes/layout/page_header.php';
 
                 <hr>
 
+                <!-- SECCIÓN: DATOS DEMOGRÁFICOS -->
+                <h6 class="font-weight-semibold">Datos demográficos</h6>
+                <p class="text-muted mb-3">
+                    <i class="icon-info22 mr-1"></i>
+                    Esta información es <strong>confidencial</strong> y se utiliza únicamente para análisis estadísticos del clima laboral.
+                </p>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Sexo *</label>
+                            <select name="sexo" class="form-control" required <?php echo $puede_editar ? '' : 'disabled'; ?>>
+                                <option value="">-- Selecciona --</option>
+                                <option value="M" <?php echo ($demograficos && $demograficos['sexo'] === 'M') ? 'selected' : ''; ?>>Masculino</option>
+                                <option value="F" <?php echo ($demograficos && $demograficos['sexo'] === 'F') ? 'selected' : ''; ?>>Femenino</option>
+                                <option value="X" <?php echo ($demograficos && $demograficos['sexo'] === 'X') ? 'selected' : ''; ?>>Otro / Prefiero no especificar</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Fecha de nacimiento *</label>
+                            <input type="date" name="fecha_nacimiento" class="form-control" required
+                                   value="<?php echo $demograficos ? h($demograficos['fecha_nacimiento']) : ''; ?>"
+                                   <?php echo $puede_editar ? '' : 'disabled'; ?>>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Número de hijos</label>
+                            <input type="number" name="num_hijos" class="form-control" min="0" max="20"
+                                   value="<?php echo $demograficos ? (int)$demograficos['num_hijos'] : 0; ?>"
+                                   <?php echo $puede_editar ? '' : 'disabled'; ?>>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Escolaridad *</label>
+                            <select name="escolaridad" class="form-control" required <?php echo $puede_editar ? '' : 'disabled'; ?>>
+                                <option value="">-- Selecciona --</option>
+                                <option value="Primaria" <?php echo ($demograficos && $demograficos['escolaridad'] === 'Primaria') ? 'selected' : ''; ?>>Primaria</option>
+                                <option value="Secundaria" <?php echo ($demograficos && $demograficos['escolaridad'] === 'Secundaria') ? 'selected' : ''; ?>>Secundaria</option>
+                                <option value="Preparatoria" <?php echo ($demograficos && $demograficos['escolaridad'] === 'Preparatoria') ? 'selected' : ''; ?>>Preparatoria / Bachillerato</option>
+                                <option value="Técnico" <?php echo ($demograficos && $demograficos['escolaridad'] === 'Técnico') ? 'selected' : ''; ?>>Técnico / TSU</option>
+                                <option value="Licenciatura" <?php echo ($demograficos && $demograficos['escolaridad'] === 'Licenciatura') ? 'selected' : ''; ?>>Licenciatura / Ingeniería</option>
+                                <option value="Maestría" <?php echo ($demograficos && $demograficos['escolaridad'] === 'Maestría') ? 'selected' : ''; ?>>Maestría</option>
+                                <option value="Doctorado" <?php echo ($demograficos && $demograficos['escolaridad'] === 'Doctorado') ? 'selected' : ''; ?>>Doctorado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Estado civil *</label>
+                            <select name="estado_civil" class="form-control" required <?php echo $puede_editar ? '' : 'disabled'; ?>>
+                                <option value="">-- Selecciona --</option>
+                                <option value="Soltero(a)" <?php echo ($demograficos && $demograficos['estado_civil'] === 'Soltero(a)') ? 'selected' : ''; ?>>Soltero(a)</option>
+                                <option value="Casado(a)" <?php echo ($demograficos && $demograficos['estado_civil'] === 'Casado(a)') ? 'selected' : ''; ?>>Casado(a)</option>
+                                <option value="Unión libre" <?php echo ($demograficos && $demograficos['estado_civil'] === 'Unión libre') ? 'selected' : ''; ?>>Unión libre</option>
+                                <option value="Divorciado(a)" <?php echo ($demograficos && $demograficos['estado_civil'] === 'Divorciado(a)') ? 'selected' : ''; ?>>Divorciado(a)</option>
+                                <option value="Viudo(a)" <?php echo ($demograficos && $demograficos['estado_civil'] === 'Viudo(a)') ? 'selected' : ''; ?>>Viudo(a)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
                 <div class="form-group">
                     <div class="form-check">
                         <label class="form-check-label">
@@ -509,6 +728,17 @@ include __DIR__ . '/../includes/layout/page_header.php';
     </div>
 
 </div>
+<!-- Espacio adicional al final para permitir scroll completo -->
+<div style="height: 100px;"></div>
+
+<style>
+/* Asegurar que el contenido sea completamente scrolleable */
+.content {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+}
+</style>
 
 <script>
 (function () {
@@ -522,5 +752,7 @@ include __DIR__ . '/../includes/layout/page_header.php';
 })();
 </script>
 
-<?php include __DIR__ . '/../includes/layout/footer.php'; ?>
-<?php include __DIR__ . '/../includes/layout/scripts.php'; ?>
+<?php 
+require_once __DIR__ . '/../includes/layout/content_close.php';
+require_once __DIR__ . '/../includes/layout/scripts.php';
+?>

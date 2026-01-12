@@ -37,9 +37,11 @@ $stmt->execute([
 ]);
 $foto_path = $stmt->fetchColumn();
 
-if (!$foto_path) {
-    http_response_code(404);
-    exit;
+// Placeholder por defecto cuando no hay foto
+$placeholder = realpath(__DIR__ . '/../global_assets/images/placeholders/user.png');
+if ($placeholder === false || !is_file($placeholder)) {
+    // Fallback secundario
+    $placeholder = realpath(__DIR__ . '/../global_assets/images/placeholders/placeholder.jpg');
 }
 
 $storage_base = realpath(__DIR__ . '/../storage');
@@ -48,18 +50,25 @@ if ($storage_base === false) {
     exit;
 }
 
-$path = $storage_base . '/' . $foto_path;
-$real = realpath($path);
+$real = null;
+if ($foto_path) {
+    $path = $storage_base . '/' . $foto_path;
+    $candidate = realpath($path);
+    // Anti-traversal: asegurar que está dentro de storage
+    if ($candidate !== false && strpos($candidate, $storage_base) === 0 && is_file($candidate)) {
+        $real = $candidate;
+    }
+}
 
-// Anti-traversal: asegurar que está dentro de storage
-if ($real === false || strpos($real, $storage_base) !== 0 || !is_file($real)) {
-    http_response_code(404);
-    exit;
+// Si no hay foto válida, usar placeholder
+if ($real === null) {
+    $real = $placeholder;
 }
 
 $info = @getimagesize($real);
 if ($info === false) {
-    http_response_code(415);
+    // Si incluso el placeholder falla, devolver 404
+    http_response_code(404);
     exit;
 }
 

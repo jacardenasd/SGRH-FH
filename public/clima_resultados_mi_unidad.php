@@ -12,6 +12,7 @@ require_once __DIR__ . '/../includes/conexion.php';
 require_login();
 require_empresa();
 require_password_change_redirect();
+require_demograficos_redirect();
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
@@ -307,8 +308,15 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
   <?php else: ?>
   <div class="alert alert-info">
     <i class="icon-info22 mr-2"></i>
-    <strong>Sin resultados publicados:</strong> Actualmente no hay resultados de clima laboral disponibles para tu Dirección.
-    Los resultados se publicarán una vez que se complete el proceso de medición.
+    <strong>Resultados no disponibles:</strong> Los resultados de clima laboral de tu Dirección aún no han sido publicados por Recursos Humanos.
+    <div class="mt-2 text-muted" style="font-size: 0.9rem;">
+      Los resultados solo se muestran cuando:
+      <ul class="mb-0 mt-1">
+        <li>El periodo de medición ha concluido</li>
+        <li>La participación de tu Dirección alcanzó el umbral mínimo (90%)</li>
+        <li>El administrador habilitó la visualización de resultados</li>
+      </ul>
+    </div>
   </div>
   <?php endif; ?>
 
