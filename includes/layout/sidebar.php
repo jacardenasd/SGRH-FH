@@ -142,6 +142,14 @@ $clima_user_active = in_array($active_menu, [
           </li>
           <?php endif; */ ?>
 
+          <?php if (can('contratos.ver') || can('contratos.crear') || can('usuarios.admin')): ?>
+          <li class="nav-item">
+            <a href="<?php echo ASSET_BASE; ?>public/contratos_generar.php" class="nav-link <?php echo is_active('contratos_generar', $active_menu); ?>">
+              <i class="icon-briefcase"></i><span>Kit de Contratación</span>
+            </a>
+          </li>
+          <?php endif; ?>
+
           <?php if (can('usuarios.admin') || can('organizacion.admin')): ?>
           <li class="nav-item nav-item-submenu <?php echo $admin_active ? 'nav-item-expanded nav-item-open' : ''; ?>">
             <a href="#" class="nav-link <?php echo $admin_active ? 'active' : ''; ?>">

@@ -88,9 +88,7 @@ if ($ya && (int)$ya['completado'] === 1) {
     out_json(true, array('message' => 'Encuesta ya finalizada.'));
 }
 
-// Validación Likert: OPCIONAL - permitir finalizar parcialmente
-// Comentado para permitir que usuarios finalicen aunque no hayan contestado todo
-/*
+// Validación Likert: REQUERIDO - usuario debe contestar todas las preguntas de la escala
 $total_reactivos = 0;
 $stTR = $pdo->prepare("SELECT COUNT(*) FROM clima_reactivos WHERE activo = 1");
 $stTR->execute();
@@ -103,12 +101,11 @@ $contestados = (int)$stCR->fetchColumn();
 
 if ($total_reactivos > 0 && $contestados < $total_reactivos) {
     out_json(false, array(
-        'error' => 'Aún no has contestado todas las preguntas.',
+        'error' => 'Aún no has contestado todas las preguntas de la escala.',
         'total' => $total_reactivos,
         'contestados' => $contestados
     ));
 }
-*/
 
 // Validación abiertas obligatorias (si existen tablas)
 if (table_exists($pdo, 'clima_preguntas_abiertas') && table_exists($pdo, 'clima_respuestas_abiertas')) {

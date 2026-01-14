@@ -92,6 +92,15 @@ Sistema completo de evaluación de clima organizacional para Farmacéutica Hispa
 
 **Permisos:** `organizacion.admin`
 
+#### Excepciones de elegibilidad ✨ NUEVO
+- Tabla: `clima_excepciones` (ver `clima_excepciones.sql` en raíz)
+- Uso: permite incluir por excepción a empleados no elegibles (ej. recién ingresados), opcionalmente cambiando su `unidad_id` para contabilización.
+- UI: en la misma pantalla existe una tarjeta para:
+   - Agregar excepción por No. empleado
+   - Establecer override de Unidad (opcional)
+   - Listar y eliminar excepciones del periodo
+- Integración: al generar el snapshot, las excepciones marcan `elegible=1` y `motivo_no_elegible='EXCEPCION'`, con `unidad_id` usando `unidad_id_override` cuando se especifica.
+
 ---
 
 ### 5. Monitoreo de Participación (`clima_participacion.php`)

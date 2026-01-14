@@ -113,17 +113,19 @@ function ensure_min_access($usuario_id, $empresa_id) {
 }
 
 function reset_password_to_rfc($usuario_id) {
+    // Reset por admin: usar No. empleado si existe; de lo contrario, RFC base.
     global $pdo;
     $uid = (int)$usuario_id;
 
-    $stmt = $pdo->prepare("SELECT rfc_base FROM usuarios WHERE usuario_id = :uid LIMIT 1");
+    $stmt = $pdo->prepare("SELECT no_emp, rfc_base FROM usuarios WHERE usuario_id = :uid LIMIT 1");
     $stmt->execute([':uid' => $uid]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
         throw new RuntimeException('Usuario no encontrado');
     }
 
-    $new_plain = $row['rfc_base'];
+    // Preferir no_emp; si viene vacío, usa rfc_base.
+    $new_plain = !empty($row['no_emp']) ? $row['no_emp'] : $row['rfc_base'];
     $hash = password_hash($new_plain, PASSWORD_BCRYPT);
 
     $upd = $pdo->prepare("UPDATE usuarios
@@ -147,6 +149,27 @@ function toggle_usuario_estatus($usuario_id) {
     $nuevo = ($actual === 'activo') ? 'inactivo' : 'activo';
     $upd = $pdo->prepare("UPDATE usuarios SET estatus = :nuevo, updated_at = NOW() WHERE usuario_id = :uid");
     $upd->execute([':nuevo' => $nuevo, ':uid' => $uid]);
+    return $nuevo;
+}
+
+function toggle_usuario_admin($usuario_id, $empresa_id) {
+    global $pdo;
+    $uid = (int)$usuario_id;
+    $eid = (int)$empresa_id;
+
+    // Asegurar registro en usuario_empresas
+    ensure_min_access($uid, $eid);
+
+    $stmt = $pdo->prepare("SELECT es_admin FROM usuario_empresas WHERE usuario_id = :uid AND empresa_id = :eid LIMIT 1");
+    $stmt->execute([':uid' => $uid, ':eid' => $eid]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $actual = $row ? (int)$row['es_admin'] : 0;
+    $nuevo = $actual === 1 ? 0 : 1;
+
+    $upd = $pdo->prepare("UPDATE usuario_empresas SET es_admin = :nuevo WHERE usuario_id = :uid AND empresa_id = :eid");
+    $upd->execute([':nuevo' => $nuevo, ':uid' => $uid, ':eid' => $eid]);
+
     return $nuevo;
 }
 
@@ -175,11 +198,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } elseif ($action === 'reset_pass') {
                 $new_plain = reset_password_to_rfc($usuario_id_post);
                 bitacora('admin_usuarios', 'reset_pass', ['usuario_id' => $usuario_id_post]);
-                $flash = 'Contraseña reseteada a RFC_BASE: ' . $new_plain;
+                $flash = 'Contraseña reseteada al No. empleado (o RFC base si faltaba): ' . $new_plain;
+            } elseif ($action === 'toggle_admin') {
+                $nuevo = toggle_usuario_admin($usuario_id_post, $empresa_id);
+                bitacora('admin_usuarios', 'toggle_admin', ['usuario_id' => $usuario_id_post, 'nuevo' => $nuevo, 'empresa_id' => $empresa_id]);
+                $flash = 'Permiso de admin empresa: ' . ($nuevo ? 'Habilitado' : 'Deshabilitado');
             } elseif ($action === 'toggle_status') {
                 $nuevo = toggle_usuario_estatus($usuario_id_post);
                 bitacora('admin_usuarios', 'toggle_status', ['usuario_id' => $usuario_id_post, 'nuevo' => $nuevo]);
                 $flash = 'Estatus actualizado a: ' . $nuevo;
+            } elseif ($action === 'update_roles') {
+                $roles_sel = isset($_POST['roles']) && is_array($_POST['roles']) ? array_map('intval', $_POST['roles']) : [];
+
+                // Limpiar roles actuales
+                $del = $pdo->prepare("DELETE FROM usuario_roles WHERE usuario_id = :uid");
+                $del->execute([':uid' => $usuario_id_post]);
+
+                // Insertar roles seleccionados
+                if (!empty($roles_sel)) {
+                    $ins = $pdo->prepare("INSERT INTO usuario_roles (usuario_id, rol_id) VALUES (:uid, :rid)");
+                    foreach ($roles_sel as $rid) {
+                        $ins->execute([':uid' => $usuario_id_post, ':rid' => (int)$rid]);
+                    }
+                }
+
+                // Asegurar mínimo acceso (agrega Empleado si quedó sin roles)
+                ensure_min_access($usuario_id_post, $empresa_id);
+
+                bitacora('admin_usuarios', 'update_roles', ['usuario_id' => $usuario_id_post, 'roles' => $roles_sel]);
+                $flash = 'Roles actualizados.';
             } else {
                 $flash = 'Acción no reconocida.';
                 $flash_type = 'warning';
@@ -253,7 +300,8 @@ $sql = "
         ue.es_admin,
         ue.estatus AS ue_estatus,
         ue.empleado_id,
-        GROUP_CONCAT(DISTINCT r.nombre ORDER BY r.rol_id SEPARATOR ', ') AS roles
+        GROUP_CONCAT(DISTINCT r.nombre ORDER BY r.rol_id SEPARATOR ', ') AS roles,
+        GROUP_CONCAT(DISTINCT r.rol_id ORDER BY r.rol_id SEPARATOR ',') AS roles_ids
     FROM usuarios u
     LEFT JOIN usuario_empresas ue
         ON ue.usuario_id = u.usuario_id
@@ -442,6 +490,17 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                                         </button>
                                     </form>
 
+                                    <!-- Admin empresa: administrado vía roles; botón de toggle removido -->
+
+                                    <button type="button"
+                                            class="btn btn-outline-success btn-sm mr-1 btn-roles"
+                                            data-user-id="<?php echo (int)$u['usuario_id']; ?>"
+                                            data-user-name="<?php echo h($nombre); ?>"
+                                            data-role-ids="<?php echo h($u['roles_ids']); ?>"
+                                            title="Asignar/Quitar roles">
+                                      <i class="icon-list2"></i>
+                                    </button>
+
                                     <form method="post" action="" class="mr-1">
                                         <input type="hidden" name="csrf_token" value="<?php echo h($csrf_token); ?>">
                                         <input type="hidden" name="action" value="toggle_status">
@@ -470,6 +529,44 @@ require_once __DIR__ . '/../includes/layout/footer.php';
 require_once __DIR__ . '/../includes/layout/content_close.php';
 ?>
 
+<!-- Modal: Roles de usuario -->
+<div id="modal_roles" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" action="">
+                <input type="hidden" name="csrf_token" value="<?php echo h($csrf_token); ?>">
+                <input type="hidden" name="action" value="update_roles">
+                <input type="hidden" name="usuario_id" id="roles_usuario_id" value="">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Roles de <span id="roles_usuario_nombre" class="font-weight-semibold"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+
+                <div class="modal-body">
+                    <?php if (!empty($roles_list)): ?>
+                        <?php foreach ($roles_list as $rol): ?>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input chk-rol" name="roles[]" value="<?php echo (int)$rol['rol_id']; ?>">
+                                    <?php echo h($rol['nombre']); ?>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="alert alert-warning mb-0">No hay roles configurados.</div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar roles</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
   $(function(){
     if ($.fn.DataTable) {
@@ -486,6 +583,24 @@ require_once __DIR__ . '/../includes/layout/content_close.php';
         }
       });
     }
+
+        // Abrir modal de roles
+        $(document).on('click', '.btn-roles', function(){
+            var uid = $(this).data('user-id');
+            var uname = $(this).data('user-name');
+            var roles = ($(this).data('role-ids') || '').toString();
+            var arr = roles ? roles.split(',') : [];
+
+            $('#roles_usuario_id').val(uid);
+            $('#roles_usuario_nombre').text(uname);
+
+            $('.chk-rol').prop('checked', false);
+            arr.forEach(function(r){
+                $('.chk-rol[value="'+r+'"]').prop('checked', true);
+            });
+
+            $('#modal_roles').modal('show');
+        });
   });
 </script>
 

@@ -423,6 +423,17 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
       </div>
     </div>
 
+    <!-- Botón Finalizar encuesta (al final) -->
+    <?php if (!$ya_finalizo): ?>
+      <div class="card">
+        <div class="card-body text-right">
+          <button type="button" class="btn btn-primary" id="btnFinalizarFinal">
+            <i class="icon-checkmark3 mr-2"></i> Finalizar encuesta
+          </button>
+        </div>
+      </div>
+    <?php endif; ?>
+
   <?php endif; ?>
 
 </div>
@@ -527,8 +538,29 @@ $(function() {
     }, 250);
   });
 
+  // Función para mostrar alerta en HTML
+  function showAlertBox(message, type) {
+    type = type || 'danger'; // 'danger', 'success', 'warning', 'info'
+    
+    var alertHtml = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+                    '<button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">' +
+                    '<span aria-hidden="true">&times;</span></button>' +
+                    message +
+                    '</div>';
+    
+    // Insertar alerta al inicio del contenido
+    $('.content').prepend(alertHtml);
+    
+    // Auto-desaparecer en 8 segundos (opcional)
+    setTimeout(function() {
+      $('.alert.alert-' + type + ':first').fadeOut('slow', function() {
+        $(this).remove();
+      });
+    }, 8000);
+  }
+
   // Finalizar
-  $('#btnFinalizar').on('click', function(){
+  $('#btnFinalizar, #btnFinalizarFinal').on('click', function(){
     var $btn = $(this);
     $btn.prop('disabled', true);
 
@@ -539,14 +571,16 @@ $(function() {
       data: {}
     }).done(function(resp){
       if (resp && resp.ok) {
-        alert(resp.message ? resp.message : 'Encuesta finalizada.');
-        window.location.reload();
+        showAlertBox(resp.message ? resp.message : 'Encuesta finalizada.', 'success');
+        setTimeout(function() {
+          window.location.reload();
+        }, 1500);
       } else {
-        alert((resp && resp.error) ? resp.error : 'No fue posible finalizar. Revisa que hayas contestado todo.');
+        showAlertBox((resp && resp.error) ? resp.error : 'No fue posible finalizar. Revisa que hayas contestado todo.', 'danger');
         $btn.prop('disabled', false);
       }
     }).fail(function(){
-      alert('Error de comunicación al finalizar. Intenta nuevamente.');
+      showAlertBox('Error de comunicación al finalizar. Intenta nuevamente.', 'danger');
       $btn.prop('disabled', false);
     });
   });

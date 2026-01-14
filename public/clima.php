@@ -93,6 +93,43 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
 <div class="content">
 
+  <!-- Mensaje cuando ya ha respondido -->
+  <?php if ($soy_elegible && $periodo_contestar && $ya_respondio): ?>
+  <div class="card bg-success text-white">
+    <div class="card-body">
+      <div class="media">
+        <div class="mr-3">
+          <i class="icon-checkmark-circle2 icon-3x"></i>
+        </div>
+        <div class="media-body">
+          <h5 class="font-weight-semibold mb-1">Ya has respondido la encuesta</h5>
+          <p class="mb-0">¡Gracias por participar! Tu opinión nos ayuda a mejorar el clima laboral de la organización.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <?php endif; ?>
+
+  <!-- Encuesta para empleado -->
+  <?php if ($soy_elegible && $periodo_contestar && !$ya_respondio): ?>
+  <div class="card bg-primary text-white">
+    <div class="card-body">
+      <div class="media">
+        <div class="mr-3">
+          <i class="icon-checkmark-circle icon-3x"></i>
+        </div>
+        <div class="media-body">
+          <h5 class="font-weight-semibold mb-1">¡Eres elegible para contestar la encuesta!</h5>
+          <p class="mb-3">Tu opinión es importante para mejorar el ambiente laboral.</p>
+          <a href="clima_contestar.php" class="btn btn-light">
+            <i class="icon-play3 mr-2"></i> Contestar encuesta
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <?php endif; ?>
+
   <!-- ¿Por qué es importante tu participación? -->
   <div class="card border-left-3 border-left-primary">
     <div class="card-header bg-transparent">
@@ -181,26 +218,6 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
   </div>
   <?php endif; ?>
 
-  <!-- Encuesta para empleado -->
-  <?php if ($soy_elegible && $periodo_contestar && !$ya_respondio): ?>
-  <div class="card bg-primary text-white">
-    <div class="card-body">
-      <div class="media">
-        <div class="mr-3">
-          <i class="icon-checkmark-circle icon-3x"></i>
-        </div>
-        <div class="media-body">
-          <h5 class="font-weight-semibold mb-1">¡Eres elegible para contestar la encuesta!</h5>
-          <p class="mb-3">Tu opinión es importante para mejorar el ambiente laboral.</p>
-          <a href="clima_contestar.php" class="btn btn-light">
-            <i class="icon-play3 mr-2"></i> Contestar encuesta
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-  <?php endif; ?>
-
   <!-- Leyenda sobre Planes de Acción -->
   <div class="card border-left-3 border-left-info">
     <div class="card-header bg-transparent">
@@ -227,22 +244,6 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
       </div>
     </div>
   </div>
-
-  <?php if ($soy_elegible && $periodo_contestar && $ya_respondio): ?>
-  <div class="card bg-success text-white">
-    <div class="card-body">
-      <div class="media">
-        <div class="mr-3">
-          <i class="icon-check icon-3x"></i>
-        </div>
-        <div class="media-body">
-          <h5 class="font-weight-semibold mb-1">Ya has respondido la encuesta</h5>
-          <p class="mb-0">¡Gracias por participar! Tu opinión nos ayuda a mejorar el clima laboral de la organización.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <?php endif; ?>
 
   <!-- Ayuda para empleados no elegibles -->
   <?php if (!$soy_elegible): ?>

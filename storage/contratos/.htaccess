@@ -1,0 +1,8 @@
+# Bloquear acceso directo a PDFs desde navegador
+Order Deny,Allow
+Deny from all
+
+# Solo PHP puede leer estos archivos
+<FilesMatch "\.(pdf|doc|docx)$">
+    Deny from all
+</FilesMatch>
