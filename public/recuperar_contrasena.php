@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/password_reset.php';
-require_once __DIR__ . '/../includes/mailer.php';
+require_once __DIR__ . '/../includes/csrf.php';
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -12,52 +12,47 @@ $mensaje = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  csrf_validate();
     $rfc = $_POST['rfc'] ?? '';
     $no_emp = $_POST['no_emp'] ?? '';
 
     $u = pr_find_user_by_rfc_noemp($rfc, $no_emp);
 
+  if ($u && $u['estatus'] === 'activo') {
+    list($okReset, $msgReset) = pr_reset_to_no_emp((int)$u['usuario_id'], $no_emp);
+    if ($okReset) {
+      $mensaje = 'Contraseña restablecida a tu número de empleado. Inicia sesión y cámbiala de inmediato.';
+    } else {
+      $error = 'No se pudo restablecer la contraseña: ' . $msgReset;
+    }
+  } else {
     // Respuesta genérica (anti-enumeración)
-    $mensaje = 'Si la información es correcta, recibirás un correo con instrucciones para restablecer tu contraseña.';
-
-    if ($u && $u['estatus'] === 'activo' && !empty($u['correo'])) {
-        $token = pr_create_token((int)$u['usuario_id'], $_SERVER['REMOTE_ADDR'] ?? null);
-
-        $base = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
-        $link = $base . dirname($_SERVER['REQUEST_URI']) . '/resetear.php?token=' . urlencode($token);
-
-        $html = "
-          <p>Se solicitó un restablecimiento de contraseña para tu cuenta SGRH.</p>
-          <p>Da clic en el siguiente enlace (vigente por 60 minutos):</p>
-          <p><a href=\"{$link}\">Restablecer contraseña</a></p>
-          <p>Si no solicitaste esto, ignora este mensaje.</p>
-        ";
-
-        $okMail = enviar_correo($u['correo'], 'Restablecer contraseña | SGRH', $html);
-
-        
-        //if (APP_ENV === 'dev') {
-        //    $mensaje .= '<br><small class="text-muted">DEV: correo guardado en /storage/mails (' . ($okMail ? 'OK' : 'FALLÓ') . ')</small>';
-        //}
-        
-        // Si falla el envío, registrar en log pero mostrar mensaje genérico
-        if (!$okMail) {
-            @error_log('[SGRH] Error al enviar correo de recuperación para: ' . $rfc);
-        }
-
-
-      }
+    $mensaje = 'Si la información es correcta, tu contraseña ha sido restablecida a tu número de empleado.';
+  }
 }
 
 $page_title = 'Recuperar contraseña | SGRH';
 include __DIR__ . '/../includes/layout/head.php';
 ?>
 
+<style>
+  .login-bg {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.65), rgba(15, 118, 110, 0.65)),
+                url('<?php echo ASSET_BASE; ?>global_assets/images/backgrounds/user_bg1.png') center center / cover no-repeat;
+    min-height: 100vh;
+  }
+  .login-card {
+    box-shadow: 0 12px 45px rgba(0, 0, 0, 0.25);
+    border: 0;
+  }
+</style>
+
 <div class="page-content">
   <div class="content-wrapper">
-    <div class="content d-flex justify-content-center align-items-center">
+    <div class="content d-flex justify-content-center align-items-center login-bg">
 
       <form class="login-form" method="post" autocomplete="off">
+        <?php csrf_input(); ?>
         <div class="card mb-0">
           <div class="card-body">
             <div class="text-center mb-3">
@@ -80,7 +75,7 @@ include __DIR__ . '/../includes/layout/head.php';
               <input type="text" name="no_emp" class="form-control" placeholder="No. empleado" required>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Enviar enlace</button>
+            <button type="submit" class="btn btn-primary btn-block">Restablecer contraseña</button>
 
             <div class="text-center mt-3">
               <a href="login.php">Volver al login</a>

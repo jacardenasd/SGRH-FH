@@ -40,30 +40,44 @@ if ($empresa_id > 0) {
 // =======================
 // ELEGIBILIDAD USUARIO
 // =======================
+// Validación de elegibilidad y captura manual
 $soy_elegible = false;
 $ya_respondio = false;
+$capturado_manual = false;
 $periodo_contestar = null;
 if ($empresa_id > 0 && $usuario_id > 0 && $periodo_activo) {
-    // Resolver empleado_id
-    $stmt_emp = $pdo->prepare("SELECT empleado_id FROM usuario_empresas WHERE usuario_id=? AND empresa_id=? AND estatus=1 LIMIT 1");
-    $stmt_emp->execute([$usuario_id, $empresa_id]);
-    $empleado_id = (int)$stmt_emp->fetchColumn();
+  // Resolver empleado_id
+  $stmt_emp = $pdo->prepare("SELECT empleado_id FROM usuario_empresas WHERE usuario_id=? AND empresa_id=? AND estatus=1 LIMIT 1");
+  $stmt_emp->execute([$usuario_id, $empresa_id]);
+  $empleado_id = (int)$stmt_emp->fetchColumn();
 
-    if ($empleado_id > 0) {
-        $stmt_el = $pdo->prepare("SELECT elegible FROM clima_elegibles WHERE periodo_id=? AND empleado_id=? AND empresa_id=? LIMIT 1");
-        $stmt_el->execute([(int)$periodo_activo['periodo_id'], $empleado_id, $empresa_id]);
-        $row_el = $stmt_el->fetch(PDO::FETCH_ASSOC);
-        if ($row_el && (int)$row_el['elegible'] === 1) {
-            $soy_elegible = true;
-            $periodo_contestar = $periodo_activo;
+  if ($empleado_id > 0) {
+    $stmt_el = $pdo->prepare("SELECT elegible FROM clima_elegibles WHERE periodo_id=? AND empleado_id=? AND empresa_id=? LIMIT 1");
+    $stmt_el->execute([(int)$periodo_activo['periodo_id'], $empleado_id, $empresa_id]);
+    $row_el = $stmt_el->fetch(PDO::FETCH_ASSOC);
+    if ($row_el && (int)$row_el['elegible'] === 1) {
+      $soy_elegible = true;
+      $periodo_contestar = $periodo_activo;
 
-            // Verificar si ya finalizó la encuesta (no solo si tiene respuestas)
-            $stmt_resp = $pdo->prepare("SELECT completado FROM clima_envios WHERE periodo_id=? AND empleado_id=? LIMIT 1");
-            $stmt_resp->execute([(int)$periodo_activo['periodo_id'], $empleado_id]);
-            $row_envio = $stmt_resp->fetch(PDO::FETCH_ASSOC);
-            $ya_respondio = ($row_envio && (int)$row_envio['completado'] === 1);
-        }
+      // Verificar si ya finalizó la encuesta (no solo si tiene respuestas)
+      $stmt_resp = $pdo->prepare("SELECT completado FROM clima_envios WHERE periodo_id=? AND empleado_id=? LIMIT 1");
+      $stmt_resp->execute([(int)$periodo_activo['periodo_id'], $empleado_id]);
+      $row_envio = $stmt_resp->fetch(PDO::FETCH_ASSOC);
+      $ya_respondio = ($row_envio && (int)$row_envio['completado'] === 1);
+
+      // Verificar si tiene respuestas capturadas manualmente en clima_respuestas
+      // Considerar "capturado" solo si están todas las respuestas de la escala
+      $stmt_total_rx = $pdo->prepare("SELECT COUNT(*) FROM clima_reactivos WHERE activo = 1");
+      $stmt_total_rx->execute();
+      $total_rx = (int)$stmt_total_rx->fetchColumn();
+
+      $stmt_manual = $pdo->prepare("SELECT COUNT(DISTINCT reactivo_id) FROM clima_respuestas WHERE periodo_id=? AND empleado_id=?");
+      $stmt_manual->execute([(int)$periodo_activo['periodo_id'], $empleado_id]);
+      $manual_contestados = (int)$stmt_manual->fetchColumn();
+
+      $capturado_manual = ($total_rx > 0 && $manual_contestados >= $total_rx);
     }
+  }
 }
 
 // =======================
@@ -94,7 +108,8 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 <div class="content">
 
   <!-- Mensaje cuando ya ha respondido -->
-  <?php if ($soy_elegible && $periodo_contestar && $ya_respondio): ?>
+
+  <?php if ($soy_elegible && $periodo_contestar && ($ya_respondio || $capturado_manual)): ?>
   <div class="card bg-success text-white">
     <div class="card-body">
       <div class="media">
@@ -104,6 +119,11 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
         <div class="media-body">
           <h5 class="font-weight-semibold mb-1">Ya has respondido la encuesta</h5>
           <p class="mb-0">¡Gracias por participar! Tu opinión nos ayuda a mejorar el clima laboral de la organización.</p>
+          <?php if ($capturado_manual): ?>
+            <div class="mt-2" style="font-size: 13px; color: #fff;">
+              <i class="icon-clipboard2 mr-1"></i> Esta respuesta fue capturada manualmente por Recursos Humanos.
+            </div>
+          <?php endif; ?>
         </div>
       </div>
     </div>
@@ -111,8 +131,8 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
   <?php endif; ?>
 
   <!-- Encuesta para empleado -->
-  <?php if ($soy_elegible && $periodo_contestar && !$ya_respondio): ?>
-  <div class="card bg-primary text-white">
+  <?php if ($soy_elegible && $periodo_contestar && !$ya_respondio && !$capturado_manual): ?>
+  <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
     <div class="card-body">
       <div class="media">
         <div class="mr-3">
@@ -124,6 +144,23 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
           <a href="clima_contestar.php" class="btn btn-light">
             <i class="icon-play3 mr-2"></i> Contestar encuesta
           </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <?php endif; ?>
+
+  <!-- Mensaje para empleado no elegible (mismo lugar que elegible) -->
+  <?php if (!$soy_elegible && $periodo_activo): ?>
+  <div class="card border-left-3 border-left-warning">
+    <div class="card-body">
+      <div class="media">
+        <div class="mr-3">
+          <i class="icon-info22 icon-3x text-warning"></i>
+        </div>
+        <div class="media-body">
+          <h5 class="font-weight-semibold mb-1">No eres elegible para esta encuesta, debido a tu antiguedad.</h5>
+          <p class="mb-0">Si consideras que deberías participar, contacta a Recursos Humanos para validar tu elegibilidad.</p>
         </div>
       </div>
     </div>
@@ -146,7 +183,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
         <div class="col-md-4 mb-3">
           <div class="media">
             <div class="mr-3">
-              <i class="icon-mic icon-2x text-primary"></i>
+              <i class="icon-megaphone icon-2x text-primary"></i>
             </div>
             <div class="media-body">
               <h6 class="font-weight-semibold mb-1">Tu voz cuenta</h6>
@@ -190,36 +227,8 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
     </div>
   </div>
 
-  <!-- Periodo activo -->
-  <?php if ($periodo_activo): ?>
-  <div class="card">
-    <div class="card-header">
-      <h5 class="card-title">Periodo activo</h5>
-    </div>
-    <div class="card-body">
-      <div class="media">
-        <div class="mr-3">
-          <i class="icon-calendar5 icon-3x text-success"></i>
-        </div>
-        <div class="media-body">
-          <h5 class="font-weight-semibold mb-1">Clima <?php echo h($periodo_activo['anio']); ?></h5>
-          <p class="mb-0">
-            <strong>Periodo:</strong> <?php echo h($periodo_activo['fecha_inicio']); ?> al <?php echo h($periodo_activo['fecha_fin']); ?><br>
-            <strong>Estatus:</strong>
-            <?php if ($periodo_activo['estatus'] === 'publicado'): ?>
-              <span class="badge badge-success">Publicado</span>
-            <?php else: ?>
-              <span class="badge badge-secondary">Borrador</span>
-            <?php endif; ?>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <?php endif; ?>
-
   <!-- Leyenda sobre Planes de Acción -->
-  <div class="card border-left-3 border-left-info">
+  <div class="card border-left-3 border-left-primary">
     <div class="card-header bg-transparent">
       <h5 class="card-title font-weight-semibold">
         <i class="icon-clipboard3 mr-2"></i>Planes de Acción
@@ -246,20 +255,6 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
   </div>
 
   <!-- Ayuda para empleados no elegibles -->
-  <?php if (!$soy_elegible): ?>
-  <div class="card">
-    <div class="card-header bg-light">
-      <h5 class="card-title">Información</h5>
-    </div>
-    <div class="card-body">
-      <div class="alert alert-light border-left-3 border-left-info mb-0">
-        <i class="icon-info22 mr-2"></i>
-        <strong>Nota:</strong> No eres elegible para contestar la encuesta actual. Contacta al área de Recursos Humanos si consideras que deberías participar.
-      </div>
-    </div>
-  </div>
-  <?php endif; ?>
-
 </div>
 
 <?php

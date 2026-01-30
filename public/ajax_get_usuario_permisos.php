@@ -1,7 +1,7 @@
 <?php
 /**
  * ajax_get_usuario_permisos.php
- * Obtiene los permisos especiales de un usuario
+ * Obtiene el alcance organizacional de un usuario (unidades y departamentos permitidos)
  */
 
 require_once __DIR__ . '/../includes/config.php';
@@ -24,8 +24,9 @@ if ($usuario_id <= 0 || $empresa_id <= 0) {
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT permisos_especiales FROM usuarios WHERE usuario_id = :uid AND empresa_id = :eid");
-    $stmt->execute([':uid' => $usuario_id, ':eid' => $empresa_id]);
+    // Nota: la tabla `usuarios` no tiene `empresa_id`; el alcance se guarda por usuario.
+    $stmt = $pdo->prepare("SELECT permisos_especiales FROM usuarios WHERE usuario_id = :uid LIMIT 1");
+    $stmt->execute([':uid' => $usuario_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$user) {
@@ -33,17 +34,17 @@ try {
         exit;
     }
     
-    $permisos_data = [];
+    $alcance_data = [];
     if (!empty($user['permisos_especiales'])) {
-        $permisos_data = json_decode($user['permisos_especiales'], true);
-        if (!is_array($permisos_data)) {
-            $permisos_data = [];
+        $alcance_data = json_decode($user['permisos_especiales'], true);
+        if (!is_array($alcance_data)) {
+            $alcance_data = [];
         }
     }
     
     $response = [
-        'permisos' => isset($permisos_data['permisos']) && is_array($permisos_data['permisos']) ? $permisos_data['permisos'] : [],
-        'unidades' => isset($permisos_data['unidades']) && is_array($permisos_data['unidades']) ? $permisos_data['unidades'] : []
+        'unidades_permitidas' => isset($alcance_data['unidades_permitidas']) && is_array($alcance_data['unidades_permitidas']) ? $alcance_data['unidades_permitidas'] : [],
+        'adscripciones_permitidas' => isset($alcance_data['adscripciones_permitidas']) && is_array($alcance_data['adscripciones_permitidas']) ? $alcance_data['adscripciones_permitidas'] : []
     ];
     
     echo json_encode($response, JSON_UNESCAPED_UNICODE);

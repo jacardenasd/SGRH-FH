@@ -89,12 +89,20 @@ if ($periodo_id > 0) {
 }
 
 // =======================
-// DIMENSIONES
+// DIMENSIONES Y SUPERDIMENSIONES
 // =======================
 $dimensiones = $pdo->query("SELECT * FROM clima_dimensiones WHERE activo=1 ORDER BY orden")->fetchAll(PDO::FETCH_ASSOC);
 
+// Obtener lista de superdimensiones únicas
+$superdimensiones = array();
+foreach ($dimensiones as $d) {
+    if (!empty($d['superdimension']) && !in_array($d['superdimension'], $superdimensiones)) {
+        $superdimensiones[] = $d['superdimension'];
+    }
+}
+
 // =======================
-// DATOS GENERALES DE LA ENCUESTA
+// DATOS GENERALES DE LA ENCUESTA (MI UNIDAD)
 // =======================
 $datos_encuesta = array(
     'universo_aplicable' => 0,
@@ -104,25 +112,25 @@ $datos_encuesta = array(
     'fecha_fin' => null
 );
 
-if ($periodo) {
-    // Total de elegibles en la empresa
+if ($periodo && $mi_unidad_id > 0) {
+    // Total de elegibles en MI UNIDAD
     $stmt_uni = $pdo->prepare("
         SELECT COUNT(DISTINCT empleado_id) as total
         FROM clima_elegibles
-        WHERE periodo_id = ? AND empresa_id = ? AND elegible = 1
+        WHERE periodo_id = ? AND empresa_id = ? AND unidad_id = ? AND elegible = 1
     ");
-    $stmt_uni->execute([$periodo_id, $empresa_id]);
+    $stmt_uni->execute([$periodo_id, $empresa_id, $mi_unidad_id]);
     $row_uni = $stmt_uni->fetch(PDO::FETCH_ASSOC);
     $datos_encuesta['universo_aplicable'] = (int)$row_uni['total'];
     
-    // Total de respuestas únicas
+    // Total de respuestas únicas de MI UNIDAD
     $stmt_resp = $pdo->prepare("
         SELECT COUNT(DISTINCT cr.empleado_id) as total
         FROM clima_respuestas cr
         INNER JOIN clima_elegibles ce ON ce.periodo_id = cr.periodo_id AND ce.empleado_id = cr.empleado_id
-        WHERE cr.periodo_id = ? AND ce.empresa_id = ? AND ce.elegible = 1
+        WHERE cr.periodo_id = ? AND ce.empresa_id = ? AND ce.unidad_id = ? AND ce.elegible = 1
     ");
-    $stmt_resp->execute([$periodo_id, $empresa_id]);
+    $stmt_resp->execute([$periodo_id, $empresa_id, $mi_unidad_id]);
     $row_resp = $stmt_resp->fetch(PDO::FETCH_ASSOC);
     $datos_encuesta['encuestas_respondidas'] = (int)$row_resp['total'];
     
@@ -146,6 +154,8 @@ $resultados_empresa = null;
 $resultados_unidad = null;
 $promedios_dimensiones_empresa = array();
 $promedios_dimensiones_unidad = array();
+$promedios_superdimensiones_empresa = array();
+$promedios_superdimensiones_unidad = array();
 
 if ($periodo) {
     // =======================
@@ -166,8 +176,8 @@ if ($periodo) {
     $row_e = $stmt_e->fetch(PDO::FETCH_ASSOC);
     
     if ($row_e && (int)$row_e['total_respondieron'] > 0) {
-        $prom_1_5 = (float)$row_e['promedio_empresa'];
-        $prom_0_100 = $prom_1_5 > 0 ? (($prom_1_5 - 1) / 4) * 100 : 0.0;
+        $prom_1_3 = (float)$row_e['promedio_empresa'];
+        $prom_0_100 = $prom_1_3 > 0 ? min(100, max(0, (($prom_1_3 - 1) / 2) * 100)) : 0.0;
         
         $resultados_empresa = array(
             'total_respondieron' => (int)$row_e['total_respondieron'],
@@ -191,13 +201,37 @@ if ($periodo) {
             $stmt_d_e = $pdo->prepare($sql_dim_empresa);
             $stmt_d_e->execute([$periodo_id, $empresa_id, $did]);
             $row_d_e = $stmt_d_e->fetch(PDO::FETCH_ASSOC);
-            $prom_dim_1_5 = $row_d_e ? (float)$row_d_e['promedio'] : 0.0;
-            $prom_dim_0_100 = $prom_dim_1_5 > 0 ? (($prom_dim_1_5 - 1) / 4) * 100 : 0.0;
+            $prom_dim_1_3 = $row_d_e ? (float)$row_d_e['promedio'] : 0.0;
+            $prom_dim_0_100 = $prom_dim_1_3 > 0 ? min(100, max(0, (($prom_dim_1_3 - 1) / 2) * 100)) : 0.0;
 
             $promedios_dimensiones_empresa[] = array(
                 'dimension_id' => $did,
                 'dimension_nombre' => $dim['nombre'],
+                'superdimension' => $dim['superdimension'],
                 'promedio' => round($prom_dim_0_100, 2)
+            );
+        }
+
+        // Calcular promedios por superdimensión - Empresa
+        foreach ($superdimensiones as $superdim) {
+            $sql_superdim_empresa = "SELECT AVG(cr.valor) AS promedio
+                FROM clima_respuestas cr
+                INNER JOIN clima_reactivos crt ON crt.reactivo_id = cr.reactivo_id
+                INNER JOIN clima_dimensiones d ON d.dimension_id = crt.dimension_id
+                INNER JOIN clima_elegibles ce ON ce.periodo_id = cr.periodo_id AND ce.empleado_id = cr.empleado_id
+                WHERE cr.periodo_id = ?
+                  AND ce.empresa_id = ?
+                  AND ce.elegible = 1
+                  AND d.superdimension = ?";
+            $stmt_sd_e = $pdo->prepare($sql_superdim_empresa);
+            $stmt_sd_e->execute([$periodo_id, $empresa_id, $superdim]);
+            $row_sd_e = $stmt_sd_e->fetch(PDO::FETCH_ASSOC);
+            $prom_sd_1_3 = $row_sd_e ? (float)$row_sd_e['promedio'] : 0.0;
+            $prom_sd_0_100 = $prom_sd_1_3 > 0 ? min(100, max(0, (($prom_sd_1_3 - 1) / 2) * 100)) : 0.0;
+
+            $promedios_superdimensiones_empresa[] = array(
+                'superdimension' => $superdim,
+                'promedio' => round($prom_sd_0_100, 2)
             );
         }
     }
@@ -222,8 +256,8 @@ if ($periodo) {
         $row_u = $stmt_u->fetch(PDO::FETCH_ASSOC);
         
         if ($row_u && (int)$row_u['total_respondieron'] > 0) {
-            $prom_1_5 = (float)$row_u['promedio_unidad'];
-            $prom_0_100 = $prom_1_5 > 0 ? (($prom_1_5 - 1) / 4) * 100 : 0.0;
+            $prom_1_3 = (float)$row_u['promedio_unidad'];
+            $prom_0_100 = $prom_1_3 > 0 ? min(100, max(0, (($prom_1_3 - 1) / 2) * 100)) : 0.0;
             
             $resultados_unidad = array(
                 'total_respondieron' => (int)$row_u['total_respondieron'],
@@ -248,13 +282,38 @@ if ($periodo) {
                 $stmt_d_u = $pdo->prepare($sql_dim_unidad);
                 $stmt_d_u->execute([$periodo_id, $empresa_id, $mi_unidad_id, $did]);
                 $row_d_u = $stmt_d_u->fetch(PDO::FETCH_ASSOC);
-                $prom_dim_1_5 = $row_d_u ? (float)$row_d_u['promedio'] : 0.0;
-                $prom_dim_0_100 = $prom_dim_1_5 > 0 ? (($prom_dim_1_5 - 1) / 4) * 100 : 0.0;
+                $prom_dim_1_3 = $row_d_u ? (float)$row_d_u['promedio'] : 0.0;
+                $prom_dim_0_100 = $prom_dim_1_3 > 0 ? min(100, max(0, (($prom_dim_1_3 - 1) / 2) * 100)) : 0.0;
 
                 $promedios_dimensiones_unidad[] = array(
                     'dimension_id' => $did,
                     'dimension_nombre' => $dim['nombre'],
+                    'superdimension' => $dim['superdimension'],
                     'promedio' => round($prom_dim_0_100, 2)
+                );
+            }
+
+            // Calcular promedios por superdimensión - Unidad
+            foreach ($superdimensiones as $superdim) {
+                $sql_superdim_unidad = "SELECT AVG(cr.valor) AS promedio
+                    FROM clima_respuestas cr
+                    INNER JOIN clima_reactivos crt ON crt.reactivo_id = cr.reactivo_id
+                    INNER JOIN clima_dimensiones d ON d.dimension_id = crt.dimension_id
+                    INNER JOIN clima_elegibles ce ON ce.periodo_id = cr.periodo_id AND ce.empleado_id = cr.empleado_id
+                    WHERE cr.periodo_id = ?
+                      AND ce.empresa_id = ?
+                      AND ce.unidad_id = ?
+                      AND ce.elegible = 1
+                      AND d.superdimension = ?";
+                $stmt_sd_u = $pdo->prepare($sql_superdim_unidad);
+                $stmt_sd_u->execute([$periodo_id, $empresa_id, $mi_unidad_id, $superdim]);
+                $row_sd_u = $stmt_sd_u->fetch(PDO::FETCH_ASSOC);
+                $prom_sd_1_3 = $row_sd_u ? (float)$row_sd_u['promedio'] : 0.0;
+                $prom_sd_0_100 = $prom_sd_1_3 > 0 ? min(100, max(0, (($prom_sd_1_3 - 1) / 2) * 100)) : 0.0;
+
+                $promedios_superdimensiones_unidad[] = array(
+                    'superdimension' => $superdim,
+                    'promedio' => round($prom_sd_0_100, 2)
                 );
             }
         }
@@ -487,19 +546,40 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
       <?php endif; ?>
     </div>
 
-    <!-- Gráfico comparativo por dimensiones -->
+    <!-- Gráfico comparativo por SUPERDIMENSIONES -->
+    <?php if (!empty($promedios_superdimensiones_empresa)): ?>
     <div class="card mt-3">
       <div class="card-body" style="padding: 15px;">
-        <h6 class="font-weight-semibold mb-3">Resultados por Dimensión</h6>
-        <div id="chart-comparativa" style="height: 280px;"></div>
+        <h6 class="font-weight-semibold mb-3">
+          <i class="icon-stack2 mr-1"></i>Resultados por Superdimensión
+          <small class="text-muted d-block mt-1" style="font-weight: normal; font-size: 0.85rem;">Vista agregada de las 4 áreas principales</small>
+        </h6>
+        <div id="chart-superdimensiones" style="height: 300px;"></div>
       </div>
     </div>
+    <?php endif; ?>
 
-    <!-- Detalle tabla -->
+    <!-- Gráfico comparativo por dimensiones -->
+    <?php if (!empty($promedios_dimensiones_empresa)): ?>
     <div class="card mt-3">
       <div class="card-body" style="padding: 15px;">
+        <h6 class="font-weight-semibold mb-3">
+          <i class="icon-list3 mr-1"></i>Resultados por Dimensión
+          <small class="text-muted d-block mt-1" style="font-weight: normal; font-size: 0.85rem;">Vista detallada de las 12 dimensiones</small>
+        </h6>
+        <div id="chart-comparativa" style="height: 350px;"></div>
+      </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Detalle tabla agrupada por Superdimensión -->
+    <div class="card mt-3">
+      <div class="card-body" style="padding: 15px;">
+        <h6 class="font-weight-semibold mb-3">
+          <i class="icon-table2 mr-1"></i>Detalle Comparativo
+        </h6>
         <div class="table-responsive">
-          <table class="table table-sm table-borderless mb-0">
+          <table class="table table-sm mb-0">
             <thead style="background-color: #f8f9fa;">
               <tr>
                 <th style="width: 40%;">Dimensión</th>
@@ -520,30 +600,55 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                 $dim_area_map[$d['dimension_id']] = $d;
               }
 
-              // Mostrar todas las dimensiones
-              $all_dims = array_unique(array_merge(array_keys($dim_empresa_map), array_keys($dim_area_map)));
-              sort($all_dims);
+              // Agrupar por superdimensión
+              $orden_super = array(
+                'Relación con el Jefe Inmediato',
+                'Relación con los Compañeros',
+                'Relación con la Empresa',
+                'Relación con el Trabajo'
+              );
 
-              foreach ($all_dims as $dim_id):
+              foreach ($orden_super as $superdim):
+                // Buscar dimensiones de esta superdimensión
+                $dims_en_super = array();
+                foreach ($dimensiones as $d) {
+                  if ($d['superdimension'] === $superdim) {
+                    $dims_en_super[] = $d;
+                  }
+                }
+                
+                if (empty($dims_en_super)) continue;
+              ?>
+              <!-- Header de Superdimensión -->
+              <tr style="background-color: #e3f2fd;">
+                <td colspan="4" class="font-weight-bold" style="padding: 8px 12px;">
+                  <i class="icon-folder-open mr-1" style="font-size: 0.9rem;"></i>
+                  <?php echo h($superdim); ?>
+                </td>
+              </tr>
+              
+              <?php foreach ($dims_en_super as $dim):
+                $dim_id = $dim['dimension_id'];
                 $empresa_data = isset($dim_empresa_map[$dim_id]) ? $dim_empresa_map[$dim_id] : null;
                 $area_data = isset($dim_area_map[$dim_id]) ? $dim_area_map[$dim_id] : null;
                 
                 $emp_val = $empresa_data ? $empresa_data['promedio'] : 0;
                 $area_val = $area_data ? $area_data['promedio'] : 0;
                 $diff = $area_val - $emp_val;
-                
-                $dim_nombre = $empresa_data ? $empresa_data['dimension_nombre'] : ($area_data ? $area_data['dimension_nombre'] : 'N/A');
               ?>
               <tr>
-                <td class="font-weight-500"><?php echo h($dim_nombre); ?></td>
+                <td style="padding-left: 30px;">
+                  <i class="icon-primitive-dot mr-1" style="font-size: 0.7rem; color: #999;"></i>
+                  <?php echo h($dim['nombre']); ?>
+                </td>
                 <td class="text-center">
-                  <span class="badge" style="background-color: <?php echo $emp_val >= 70 ? '#29B6F6' : ($emp_val >= 50 ? '#66BB6A' : ($emp_val >= 30 ? '#FFA726' : '#EF5350')); ?>; color: white;">
+                  <span class="badge badge-flat" style="background-color: <?php echo $emp_val >= 70 ? '#29B6F6' : ($emp_val >= 50 ? '#66BB6A' : ($emp_val >= 30 ? '#FFA726' : '#EF5350')); ?>; color: white; font-size: 0.85rem;">
                     <?php echo number_format($emp_val, 1); ?>%
                   </span>
                 </td>
                 <td class="text-center">
                   <?php if ($area_val > 0): ?>
-                  <span class="badge" style="background-color: <?php echo $area_val >= 70 ? '#29B6F6' : ($area_val >= 50 ? '#66BB6A' : ($area_val >= 30 ? '#FFA726' : '#EF5350')); ?>; color: white;">
+                  <span class="badge badge-flat" style="background-color: <?php echo $area_val >= 70 ? '#29B6F6' : ($area_val >= 50 ? '#66BB6A' : ($area_val >= 30 ? '#FFA726' : '#EF5350')); ?>; color: white; font-size: 0.85rem;">
                     <?php echo number_format($area_val, 1); ?>%
                   </span>
                   <?php else: ?>
@@ -553,9 +658,15 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                 <td class="text-center">
                   <?php if ($area_val > 0): ?>
                     <?php if ($diff > 0): ?>
-                      <span class="text-success font-weight-600">+<?php echo number_format($diff, 1); ?>%</span>
+                      <span class="text-success font-weight-600">
+                        <i class="icon-arrow-up12" style="font-size: 0.8rem;"></i>
+                        <?php echo number_format($diff, 1); ?>%
+                      </span>
                     <?php elseif ($diff < 0): ?>
-                      <span class="text-danger font-weight-600"><?php echo number_format($diff, 1); ?>%</span>
+                      <span class="text-danger font-weight-600">
+                        <i class="icon-arrow-down12" style="font-size: 0.8rem;"></i>
+                        <?php echo number_format(abs($diff), 1); ?>%
+                      </span>
                     <?php else: ?>
                       <span class="text-muted">=</span>
                     <?php endif; ?>
@@ -564,6 +675,8 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                   <?php endif; ?>
                 </td>
               </tr>
+              <?php endforeach; ?>
+              
               <?php endforeach; ?>
             </tbody>
           </table>
@@ -686,9 +799,143 @@ $(document).ready(function() {
 
 <?php endif; ?>
 
-<?php if ($periodo && $resultados_empresa): ?>
+<?php if ($periodo && $resultados_empresa && !empty($promedios_superdimensiones_empresa)): ?>
 
-  // ======================== GRÁFICO COMPARATIVO ========================
+  // ======================== GRÁFICO SUPERDIMENSIONES ========================
+  if (document.getElementById('chart-superdimensiones')) {
+    var chartSuperdim = echarts.init(document.getElementById('chart-superdimensiones'));
+    
+    var labelsSuper = [];
+    var datosEmpresaSuper = [];
+    var datosAreaSuper = [];
+    
+    <?php 
+    // Crear mapas para acceso rápido
+    $super_empresa_map = array();
+    foreach ($promedios_superdimensiones_empresa as $sd) {
+      $super_empresa_map[$sd['superdimension']] = $sd['promedio'];
+    }
+    
+    $super_area_map = array();
+    foreach ($promedios_superdimensiones_unidad as $sd) {
+      $super_area_map[$sd['superdimension']] = $sd['promedio'];
+    }
+    
+    // Orden deseado de superdimensiones
+    $orden_super = array(
+      'Relación con el Jefe Inmediato',
+      'Relación con los Compañeros',
+      'Relación con la Empresa',
+      'Relación con el Trabajo'
+    );
+    
+    foreach ($orden_super as $superdim):
+      if (isset($super_empresa_map[$superdim])):
+    ?>
+    labelsSuper.push('<?php echo addslashes($superdim); ?>');
+    datosEmpresaSuper.push(<?php echo $super_empresa_map[$superdim]; ?>);
+    datosAreaSuper.push(<?php echo isset($super_area_map[$superdim]) ? $super_area_map[$superdim] : 0; ?>);
+    <?php 
+      endif;
+    endforeach; 
+    ?>
+    
+    var optionSuperdim = {
+      grid: {
+        left: '5%',
+        right: '5%',
+        bottom: '15%',
+        top: '5%',
+        containLabel: true
+      },
+      legend: {
+        data: ['Empresa', 'Mi Área'],
+        bottom: 0,
+        textStyle: { fontSize: 11 }
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: function(params) {
+          var str = '<strong>' + params[0].name + '</strong><br/>';
+          for (var i = 0; i < params.length; i++) {
+            str += params[i].marker + ' ' + params[i].seriesName + ': <strong>' + params[i].value.toFixed(1) + '%</strong><br/>';
+          }
+          return str;
+        }
+      },
+      xAxis: {
+        type: 'category',
+        data: labelsSuper,
+        axisLabel: {
+          interval: 0,
+          fontSize: 10,
+          rotate: 25,
+          formatter: function(value) {
+            // Acortar nombres largos
+            if (value.length > 30) {
+              return value.substring(0, 27) + '...';
+            }
+            return value;
+          }
+        }
+      },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        max: 100,
+        axisLabel: {
+          formatter: '{value}%',
+          fontSize: 10
+        }
+      },
+      series: [
+        {
+          name: 'Empresa',
+          type: 'bar',
+          data: datosEmpresaSuper,
+          itemStyle: { 
+            color: '#5C6BC0',
+            borderRadius: [4, 4, 0, 0]
+          },
+          barGap: '10%',
+          label: {
+            show: true,
+            position: 'top',
+            formatter: '{c}%',
+            fontSize: 10,
+            fontWeight: 'bold'
+          }
+        },
+        {
+          name: 'Mi Área',
+          type: 'bar',
+          data: datosAreaSuper,
+          itemStyle: { 
+            color: '#26A69A',
+            borderRadius: [4, 4, 0, 0]
+          },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: function(params) {
+              // Solo mostrar label si el valor es mayor que 0
+              return params.value > 0 ? params.value.toFixed(1) + '%' : '';
+            },
+            fontSize: 10,
+            fontWeight: 'bold'
+          }
+        }
+      ]
+    };
+    chartSuperdim.setOption(optionSuperdim);
+  }
+
+<?php endif; ?>
+
+<?php if ($periodo && $resultados_empresa && !empty($promedios_dimensiones_empresa)): ?>
+
+  // ======================== GRÁFICO COMPARATIVO DIMENSIONES ========================
   if (document.getElementById('chart-comparativa')) {
     var chartComparativa = echarts.init(document.getElementById('chart-comparativa'));
     
@@ -769,7 +1016,7 @@ $(document).ready(function() {
           type: 'bar',
           data: datosEmpresa,
           itemStyle: { color: '#29B6F6' },
-          barWidth: '40%',
+          barGap: '10%',
           label: {
             show: false
           }

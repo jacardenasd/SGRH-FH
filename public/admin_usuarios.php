@@ -228,28 +228,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 bitacora('admin_usuarios', 'update_roles', ['usuario_id' => $usuario_id_post, 'roles' => $roles_sel]);
                 $flash = 'Roles actualizados.';
-            } elseif ($action === 'update_permisos_usuario') {
-                $permisos_sel = isset($_POST['permisos']) && is_array($_POST['permisos']) ? $_POST['permisos'] : [];
+            } elseif ($action === 'update_alcance_usuario') {
                 $unidades_sel = isset($_POST['unidades_permitidas']) && is_array($_POST['unidades_permitidas']) ? array_map('intval', $_POST['unidades_permitidas']) : [];
+                $adscripciones_sel = isset($_POST['adscripciones_permitidas']) && is_array($_POST['adscripciones_permitidas']) ? array_map('intval', $_POST['adscripciones_permitidas']) : [];
 
-                // Limpiar permisos actuales del usuario (tabla: usuario_permisos_directos si existe, o crear lógica)
-                // Por simplicidad, guardaremos en una tabla nueva o en un campo JSON en usuarios
-                
-                // Opción 1: Guardar en campo JSON en tabla usuarios
-                $permisos_data = [
-                    'permisos' => $permisos_sel,
-                    'unidades' => $unidades_sel
+                // Guardar alcance en campo JSON en tabla usuarios
+                $alcance_data = [
+                    'unidades_permitidas' => $unidades_sel,
+                    'adscripciones_permitidas' => $adscripciones_sel
                 ];
                 
-                $update = $pdo->prepare("UPDATE usuarios SET permisos_especiales = :permisos WHERE usuario_id = :uid AND empresa_id = :eid");
+                $update = $pdo->prepare("UPDATE usuarios SET permisos_especiales = :alcance WHERE usuario_id = :uid");
                 $update->execute([
-                    ':permisos' => json_encode($permisos_data, JSON_UNESCAPED_UNICODE),
-                    ':uid' => $usuario_id_post,
-                    ':eid' => $empresa_id
+                    ':alcance' => json_encode($alcance_data, JSON_UNESCAPED_UNICODE),
+                    ':uid' => $usuario_id_post
                 ]);
 
-                bitacora('admin_usuarios', 'update_permisos', ['usuario_id' => $usuario_id_post, 'permisos' => $permisos_sel, 'unidades' => $unidades_sel]);
-                $flash = 'Permisos actualizados correctamente.';
+                bitacora('admin_usuarios', 'update_alcance', ['usuario_id' => $usuario_id_post, 'unidades' => $unidades_sel, 'adscripciones' => $adscripciones_sel]);
+                $flash = 'Alcance organizacional actualizado correctamente.';
             } else {
                 $flash = 'Acción no reconocida.';
                 $flash_type = 'warning';
@@ -283,6 +279,15 @@ $permisos_disponibles = get_permisos_disponibles();
 $unidades_stmt = $pdo->prepare("SELECT unidad_id, nombre FROM org_unidades WHERE empresa_id = :empresa_id AND estatus = 1 ORDER BY nombre");
 $unidades_stmt->execute([':empresa_id' => $empresa_id]);
 $unidades_lista = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Obtener adscripciones para filtros de alcance
+$adscripciones_stmt = $pdo->prepare("SELECT a.adscripcion_id, a.nombre, a.unidad_id, u.nombre AS unidad_nombre 
+                                      FROM org_adscripciones a 
+                                      INNER JOIN org_unidades u ON u.unidad_id = a.unidad_id
+                                      WHERE a.empresa_id = :empresa_id AND a.estatus = 1 
+                                      ORDER BY u.nombre, a.nombre");
+$adscripciones_stmt->execute([':empresa_id' => $empresa_id]);
+$adscripciones_lista = $adscripciones_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Users list
 $where = [];
@@ -376,6 +381,21 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
     </div>
     <div class="breadcrumb-line breadcrumb-line-light header-elements-lg-inline">
         <div class="d-flex">
+            <div class="breadcrumb">
+                <a href="<?php echo ASSET_BASE; ?>public/index.php" class="breadcrumb-item"><i class="icon-home2 mr-2"></i> Inicio</a>
+                <span class="breadcrumb-item">Administración</span>
+                <span class="breadcrumb-item active">Usuarios</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="card">
+        <div class="card-header">
+            <h6 class="card-title">Filtros de búsqueda</h6>
+        </div>
+        <div class="card-body">
             <form method="get" action="" class="row">
                 <div class="col-md-4">
                     <label>Búsqueda</label>
@@ -417,7 +437,9 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
             </form>
         </div>
     </div>
+</div>
 
+<div class="content">
     <div class="card">
         <div class="card-header header-elements-inline">
             <h5 class="card-title">Usuarios</h5>
@@ -432,7 +454,6 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                         <th>No. Emp</th>
                         <th>RFC</th>
                         <th>Nombre</th>
-                        <th>Correo</th>
                         <th>Roles</th>
                         <th>Asignado a empresa</th>
                         <th>Admin empresa</th>
@@ -451,7 +472,6 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                             <td><?php echo h($u['no_emp']); ?></td>
                             <td><?php echo h($u['rfc_base']); ?></td>
                             <td><?php echo h($nombre); ?></td>
-                            <td><?php echo h($u['correo']); ?></td>
                             <td><?php echo h($u['roles'] ?: ''); ?></td>
                             <td>
                                 <?php if ($asignado): ?>
@@ -487,16 +507,23 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                                         </button>
                                     </form>
 
+                                    <button type="button"
+                                            class="btn btn-outline-warning btn-sm mr-1 btn-reset-pass"
+                                            data-user-id="<?php echo (int)$u['usuario_id']; ?>"
+                                            data-user-name="<?php echo h($nombre); ?>"
+                                            title="Restablecer contraseña (confirmación requerida)">
+                                        <i class="icon-key"></i>
+                                    </button>
+
+                                    <!-- Admin empresa: toggle directo -->
                                     <form method="post" action="" class="mr-1">
                                         <input type="hidden" name="csrf_token" value="<?php echo h($csrf_token); ?>">
-                                        <input type="hidden" name="action" value="reset_pass">
+                                        <input type="hidden" name="action" value="toggle_admin">
                                         <input type="hidden" name="usuario_id" value="<?php echo (int)$u['usuario_id']; ?>">
-                                        <button type="submit" class="btn btn-outline-warning btn-sm" title="Resetear contraseña a RFC_BASE (obliga cambio)">
-                                            <i class="icon-key"></i>
+                                        <button type="submit" class="btn btn-outline-warning btn-sm" title="Activar / inactivar admin empresa">
+                                            <i class="icon-crown"></i>
                                         </button>
                                     </form>
-
-                                    <!-- Admin empresa: administrado vía roles; botón de toggle removido -->
 
                                     <button type="button"
                                             class="btn btn-outline-success btn-sm mr-1 btn-roles"
@@ -508,11 +535,11 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                                     </button>
 
                                     <button type="button"
-                                            class="btn btn-outline-info btn-sm mr-1 btn-permisos"
+                                            class="btn btn-outline-info btn-sm mr-1 btn-alcance"
                                             data-user-id="<?php echo (int)$u['usuario_id']; ?>"
                                             data-user-name="<?php echo h($nombre); ?>"
-                                            title="Gestionar permisos específicos">
-                                      <i class="icon-key"></i> Permisos
+                                            title="Gestionar alcance organizacional">
+                                      <i class="icon-tree7"></i> Alcance
                                     </button>
 
                                     <form method="post" action="" class="mr-1">
@@ -581,68 +608,96 @@ require_once __DIR__ . '/../includes/layout/content_close.php';
     </div>
 </div>
 
-<!-- Modal: Permisos de usuario -->
-<div id="modal_permisos" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display:none;">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+<!-- Modal: Alcance Organizacional -->
+<div id="modal_alcance" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display:none;">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form method="post" action="" id="form_permisos">
+            <form method="post" action="" id="form_alcance">
                 <input type="hidden" name="csrf_token" value="<?php echo h($csrf_token); ?>">
-                <input type="hidden" name="action" value="update_permisos_usuario">
-                <input type="hidden" name="usuario_id" id="permisos_usuario_id" value="">
+                <input type="hidden" name="action" value="update_alcance_usuario">
+                <input type="hidden" name="usuario_id" id="alcance_usuario_id" value="">
 
-                <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title">Permisos de <span id="permisos_usuario_nombre" class="font-weight-semibold"></span></h5>
+                <div class="modal-header bg-teal text-white">
+                    <h5 class="modal-title"><i class="icon-tree7 mr-2"></i>Alcance de <span id="alcance_usuario_nombre" class="font-weight-semibold"></span></h5>
                     <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
                 </div>
 
                 <div class="modal-body">
                     <div class="alert alert-info">
                         <i class="icon-info22 mr-2"></i>
-                        Los permisos específicos se suman a los permisos heredados de los roles asignados.
+                        Define qué unidades y departamentos puede ver/administrar este usuario.
+                        <strong>Si no seleccionas nada, podrá ver TODO de su empresa.</strong>
                     </div>
 
-                    <div style="max-height: 400px; overflow-y: auto;">
-                        <?php foreach ($permisos_disponibles as $modulo => $permisos): ?>
-                        <div class="card mb-2">
-                            <div class="card-header bg-light">
-                                <h6 class="mb-0 font-weight-semibold text-uppercase"><?php echo h($modulo); ?></h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <?php foreach ($permisos as $clave => $descripcion): ?>
-                                    <div class="col-md-6 mb-2">
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                                <input type="checkbox" class="form-check-input" name="permisos[]" value="<?php echo h($clave); ?>">
-                                                <strong><?php echo h(str_replace($modulo . '.', '', $clave)); ?></strong>
-                                            </label>
-                                            <div class="form-text text-muted ml-4 small"><?php echo h($descripcion); ?></div>
-                                        </div>
-                                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="font-weight-semibold"><i class="icon-office mr-2"></i>Unidades</label>
+                                <select name="unidades_permitidas[]" id="alcance_unidades" class="form-control" multiple size="8">
+                                    <?php foreach ($unidades_lista as $unidad): ?>
+                                        <option value="<?php echo (int)$unidad['unidad_id']; ?>"><?php echo h($unidad['nombre']); ?></option>
                                     <?php endforeach; ?>
-                                </div>
+                                </select>
+                                <small class="form-text text-muted">
+                                    Vacío = todas las unidades. Ctrl+clic para múltiples.
+                                </small>
                             </div>
                         </div>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <div class="form-group mt-3">
-                        <label class="font-weight-semibold">Filtrar por Unidades <span class="text-muted">(opcional)</span></label>
-                        <select name="unidades_permitidas[]" id="permisos_unidades" class="form-control" multiple size="5">
-                            <?php foreach ($unidades_lista as $unidad): ?>
-                                <option value="<?php echo (int)$unidad['unidad_id']; ?>"><?php echo h($unidad['nombre']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <small class="form-text text-muted">
-                            Si no selecciona ninguna, podrá ver todas las unidades de su empresa.
-                            Mantén presionada la tecla Ctrl (Cmd en Mac) para seleccionar múltiples.
-                        </small>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="font-weight-semibold"><i class="icon-tree6 mr-2"></i>Departamentos</label>
+                                <select name="adscripciones_permitidas[]" id="alcance_adscripciones" class="form-control" multiple size="8">
+                                    <?php foreach ($adscripciones_lista as $adsc): ?>
+                                        <option value="<?php echo (int)$adsc['adscripcion_id']; ?>">
+                                            <?php echo h($adsc['unidad_nombre'] . ' - ' . $adsc['nombre']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <small class="form-text text-muted">
+                                    Vacío = todos los departamentos. Ctrl+clic para múltiples.
+                                </small>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-info">Guardar permisos</button>
+                    <button type="submit" class="btn btn-teal"><i class="icon-checkmark3 mr-2"></i>Guardar alcance</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Confirmar reseteo de contraseña -->
+<div id="modal_reset_pass" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display:none;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" action="" id="form_reset_pass">
+                <input type="hidden" name="csrf_token" value="<?php echo h($csrf_token); ?>">
+                <input type="hidden" name="action" value="reset_pass">
+                <input type="hidden" name="usuario_id" id="reset_usuario_id" value="">
+
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title"><i class="icon-key mr-2"></i>Restablecer contraseña</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="mb-2">La contraseña se restablecerá al <strong>No. empleado</strong> o, si no existe, al <strong>RFC base</strong> del usuario.</p>
+                    <p class="mb-0">El usuario deberá cambiarla al iniciar sesión.</p>
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="icon-info22 mr-2"></i>
+                        Usuario: <span id="reset_usuario_nombre" class="font-weight-semibold"></span>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning" id="btn_reset_confirm">
+                        <i class="icon-checkmark3 mr-2"></i>Sí, restablecer
+                    </button>
                 </div>
             </form>
         </div>
@@ -650,27 +705,27 @@ require_once __DIR__ . '/../includes/layout/content_close.php';
 </div>
 
 <script>
-  $(function(){
-    if ($.fn.DataTable) {
-      $('#tabla_usuarios').DataTable({
-      pageLength: 25,
-      order: [],
-      language: {
-        search: 'Buscar:',
-        lengthMenu: 'Mostrar _MENU_',
-        info: 'Mostrando _START_ a _END_ de _TOTAL_',
-        paginate: { previous: 'Anterior', next: 'Siguiente' },
-        zeroRecords: 'No se encontraron registros',
-        infoEmpty: 'Sin registros'
+    $(function() {
+        if ($.fn.DataTable) {
+            $('#tabla_usuarios').DataTable({
+                pageLength: 25,
+                order: [],
+                language: {
+                    search: 'Buscar:',
+                    lengthMenu: 'Mostrar _MENU_',
+                    info: 'Mostrando _START_ a _END_ de _TOTAL_',
+                    paginate: { previous: 'Anterior', next: 'Siguiente' },
+                    zeroRecords: 'No se encontraron registros',
+                    infoEmpty: 'Sin registros'
+                }
+            });
         }
-      });
-    }
 
-                // Asegurar que los modales arranquen ocultos
-                $('#modal_roles, #modal_permisos').modal({ show: false });
+        // Asegurar que los modales arranquen ocultos
+        $('#modal_roles, #modal_alcance, #modal_reset_pass').modal({ show: false });
 
         // Abrir modal de roles
-        $(document).on('click', '.btn-roles', function(){
+        $(document).on('click', '.btn-roles', function() {
             var uid = $(this).data('user-id');
             var uname = $(this).data('user-name');
             var roles = ($(this).data('role-ids') || '').toString();
@@ -680,49 +735,58 @@ require_once __DIR__ . '/../includes/layout/content_close.php';
             $('#roles_usuario_nombre').text(uname);
 
             $('.chk-rol').prop('checked', false);
-            arr.forEach(function(r){
-                $('.chk-rol[value="'+r+'"]').prop('checked', true);
+            arr.forEach(function(r) {
+                $('.chk-rol[value="' + r + '"]').prop('checked', true);
             });
 
             $('#modal_roles').modal('show');
         });
 
-        // Abrir modal de permisos
-        $(document).on('click', '.btn-permisos', function(){
+        // Abrir modal de alcance
+        $(document).on('click', '.btn-alcance', function() {
             var uid = $(this).data('user-id');
             var uname = $(this).data('user-name');
 
-            $('#permisos_usuario_id').val(uid);
-            $('#permisos_usuario_nombre').text(uname);
+            $('#alcance_usuario_id').val(uid);
+            $('#alcance_usuario_nombre').text(uname);
 
-            // Resetear checkboxes y select
-            $('#form_permisos input[type="checkbox"]').prop('checked', false);
-            $('#permisos_unidades').val([]);
+            // Resetear selects
+            $('#alcance_unidades').val([]);
+            $('#alcance_adscripciones').val([]);
 
-            // Cargar permisos actuales del usuario via AJAX
+            // Cargar alcance actual del usuario via AJAX
             $.ajax({
                 url: 'ajax_get_usuario_permisos.php',
                 method: 'GET',
                 data: { usuario_id: uid },
                 dataType: 'json',
                 success: function(data) {
-                    if (data.permisos && Array.isArray(data.permisos)) {
-                        data.permisos.forEach(function(perm) {
-                            $('#form_permisos input[value="' + perm + '"]').prop('checked', true);
-                        });
+                    if (data.unidades_permitidas && Array.isArray(data.unidades_permitidas)) {
+                        $('#alcance_unidades').val(data.unidades_permitidas);
                     }
-                    if (data.unidades && Array.isArray(data.unidades)) {
-                        $('#permisos_unidades').val(data.unidades);
+                    if (data.adscripciones_permitidas && Array.isArray(data.adscripciones_permitidas)) {
+                        $('#alcance_adscripciones').val(data.adscripciones_permitidas);
                     }
                 },
                 error: function() {
-                    console.log('No se pudieron cargar los permisos actuales');
+                    console.log('No se pudo cargar el alcance actual');
                 }
             });
 
-            $('#modal_permisos').modal('show');
+            $('#modal_alcance').modal('show');
         });
-  });
+
+        // Abrir modal de confirmación para reseteo de contraseña
+        $(document).on('click', '.btn-reset-pass', function() {
+            var uid = $(this).data('user-id');
+            var uname = $(this).data('user-name');
+
+            $('#reset_usuario_id').val(uid);
+            $('#reset_usuario_nombre').text(uname);
+
+            $('#modal_reset_pass').modal('show');
+        });
+    });
 </script>
 
 <?php require_once __DIR__ . '/../includes/layout/scripts.php'; ?>

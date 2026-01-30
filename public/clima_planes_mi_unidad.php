@@ -29,7 +29,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 // Verificar si el usuario es líder de alguna unidad
 // (comprobando si otros empleados tienen su no_emp como jefe_no_emp)
 $stmt_lider = $pdo->prepare("
-    SELECT DISTINCT e.unidad_id, u.nombre as unidad_nombre, e.no_emp
+    SELECT DISTINCT e.unidad_id, u.nombre as unidad_nombre
     FROM usuario_empresas ue
     INNER JOIN empleados e ON e.empleado_id = ue.empleado_id
     LEFT JOIN org_unidades u ON u.unidad_id = e.unidad_id
@@ -180,24 +180,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // =======================
 // DATOS
 // =======================
-// Periodos publicados para mi unidad
+// Todos los periodos de la empresa (para el selector de filtro)
 $periodos_stmt = $pdo->prepare("
-    SELECT DISTINCT p.periodo_id, p.anio, p.estatus, p.fecha_inicio, p.fecha_fin
-    FROM clima_periodos p
-    INNER JOIN clima_publicacion cp ON cp.periodo_id = p.periodo_id 
-        AND cp.empresa_id = p.empresa_id 
-        AND cp.unidad_id = ?
-    WHERE p.empresa_id = ?
-      AND cp.habilitado = 1
-    ORDER BY p.anio DESC
+    SELECT periodo_id, anio, estatus, fecha_inicio, fecha_fin
+    FROM clima_periodos
+    WHERE empresa_id = ?
+    ORDER BY anio DESC
 ");
-$periodos_stmt->execute([$mi_unidad_id, $empresa_id]);
+$periodos_stmt->execute([$empresa_id]);
 $periodos = $periodos_stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Filtro de periodo opcional - por defecto mostrar TODOS los planes
 $periodo_id_filtro = isset($_GET['periodo_id']) ? (int)$_GET['periodo_id'] : 0;
-if ($periodo_id_filtro <= 0 && !empty($periodos)) {
-    $periodo_id_filtro = (int)$periodos[0]['periodo_id'];
-}
 
 // Dimensiones
 $dimensiones = $pdo->query("SELECT * FROM clima_dimensiones WHERE activo=1 ORDER BY orden")->fetchAll(PDO::FETCH_ASSOC);
@@ -221,8 +215,8 @@ if ($periodo_id_filtro > 0) {
         $stmt_d = $pdo->prepare($sql_dim);
         $stmt_d->execute([$periodo_id_filtro, $empresa_id, $mi_unidad_id, $did]);
         $row_d = $stmt_d->fetch(PDO::FETCH_ASSOC);
-        $prom_dim_1_5 = $row_d ? (float)$row_d['promedio'] : 0.0;
-        $prom_dim_0_100 = $prom_dim_1_5 > 0 ? (($prom_dim_1_5 - 1) / 4) * 100 : 0.0;
+        $prom_dim_1_3 = $row_d ? (float)$row_d['promedio'] : 0.0;
+        $prom_dim_0_100 = $prom_dim_1_3 > 0 ? ((3 - $prom_dim_1_3) / 2) * 100 : 0.0;
 
         $promedios_dimensiones[$did] = round($prom_dim_0_100, 2);
     }
@@ -339,18 +333,34 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
   <!-- Filtro de periodo -->
   <div class="card">
+    <div class="card-header bg-light">
+      <h6 class="card-title mb-0"><i class="icon-filter3 mr-2"></i>Filtrar Planes</h6>
+    </div>
     <div class="card-body">
       <form method="get" class="form-inline">
-        <label class="mr-2">Periodo:</label>
+        <label class="mr-2 font-weight-semibold">Periodo:</label>
         <select name="periodo_id" class="form-control mr-2" onchange="this.form.submit()">
-          <option value="0">Todos los periodos</option>
+          <option value="0" <?php echo ($periodo_id_filtro === 0) ? 'selected' : ''; ?>>📋 Todos los periodos</option>
           <?php foreach ($periodos as $p): ?>
           <option value="<?php echo (int)$p['periodo_id']; ?>" <?php echo ((int)$p['periodo_id'] === $periodo_id_filtro) ? 'selected' : ''; ?>>
-            <?php echo h($p['anio']); ?>
+            📅 <?php echo h($p['anio']); ?>
           </option>
           <?php endforeach; ?>
         </select>
+        <?php if ($periodo_id_filtro > 0): ?>
+        <a href="?" class="btn btn-light btn-sm ml-2">
+          <i class="icon-cross2 mr-1"></i> Limpiar filtro
+        </a>
+        <?php endif; ?>
       </form>
+      <small class="text-muted d-block mt-2">
+        <i class="icon-info22 mr-1"></i>
+        <?php if ($periodo_id_filtro > 0): ?>
+          Mostrando planes del periodo seleccionado.
+        <?php else: ?>
+          Mostrando <strong>todos los planes de acción</strong> de tu Dirección.
+        <?php endif; ?>
+      </small>
     </div>
   </div>
 
@@ -412,8 +422,13 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
   <!-- Tabla de planes -->
   <div class="card">
-    <div class="card-header">
-      <h5 class="card-title">Mis Planes de Acción</h5>
+    <div class="card-header bg-white">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">
+          <i class="icon-clipboard3 mr-2"></i>Planes de Acción de <?php echo h($mi_unidad_nombre); ?>
+        </h5>
+        <span class="badge badge-pill badge-primary"><?php echo count($planes); ?> planes</span>
+      </div>
     </div>
     <div class="table-responsive">
       <table class="table datatable-basic">
@@ -621,7 +636,13 @@ var planesData = <?php echo json_encode($planes, JSON_UNESCAPED_UNICODE); ?>;
 $(document).ready(function() {
   $('.datatable-basic').DataTable({
     language: {
-      url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json'
+      search: 'Buscar:',
+      lengthMenu: 'Mostrar _MENU_ registros',
+      info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+      infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+      zeroRecords: 'No se encontraron registros',
+      emptyTable: 'No hay datos disponibles en la tabla',
+      paginate: { previous: 'Anterior', next: 'Siguiente' }
     },
     order: [[0, 'desc']]
   });

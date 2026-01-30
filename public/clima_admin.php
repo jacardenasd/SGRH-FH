@@ -67,9 +67,9 @@ if ($empresa_id > 0) {
         LIMIT 1
     ");
     $stmt3->execute([$empresa_id]);
-    $prom_1_5 = $stmt3->fetchColumn();
-    if ($prom_1_5) {
-        $prom_0_100 = (((float)$prom_1_5 - 1) / 4) * 100;
+    $prom_1_3 = $stmt3->fetchColumn();
+    if ($prom_1_3) {
+        $prom_0_100 = (((float)$prom_1_3 - 3) / 2) * -100;
         $stats['promedio_general'] = round($prom_0_100, 1);
     } else {
         $stats['promedio_general'] = 0.0;
@@ -270,6 +270,30 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
             </div>
           </div>
         </div>
+
+        <!-- Encuesta imprimible -->
+        <div class="col-md-4 mb-3">
+          <div class="card bg-light">
+            <div class="card-body text-center">
+              <i class="icon-printer icon-3x text-info mb-3"></i>
+              <h6 class="font-weight-semibold mb-2">Encuesta imprimible</h6>
+              <p class="text-muted mb-3">Generar PDF para aplicar en papel</p>
+              <a href="clima_encuesta_impresion.php" class="btn btn-info btn-sm btn-block" target="_blank" rel="noopener">Ver e imprimir</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Captura de respuestas en papel -->
+        <div class="col-md-4 mb-3">
+          <div class="card bg-light">
+            <div class="card-body text-center">
+              <i class="icon-clipboard4 icon-3x text-success mb-3"></i>
+              <h6 class="font-weight-semibold mb-2">Captura en papel</h6>
+              <p class="text-muted mb-3">Registrar respuestas de encuestas físicas</p>
+              <a href="clima_captura_respuestas.php" class="btn btn-success btn-sm btn-block">Capturar</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -286,6 +310,13 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
         <li><strong>Configurar encuesta</strong>: Administra dimensiones y reactivos (preguntas)</li>
         <li><strong>Generar elegibles</strong>: Define qué empleados participarán según fecha de corte</li>
         <li><strong>Publicar</strong>: Cambia estatus a "Publicado" para que empleados puedan contestar</li>
+        <li><strong>Aplicar en papel (opcional)</strong>:
+          <ul>
+            <li>Imprimir encuesta usando "Encuesta imprimible"</li>
+            <li>Distribuir al personal y recopilar respuestas</li>
+            <li>Capturar respuestas en el sistema usando "Captura en papel"</li>
+          </ul>
+        </li>
         <li><strong>Monitorear participación</strong>: Revisa avance por Dirección</li>
         <li><strong>Publicar resultados</strong>: Habilita visibilidad cuando participación >= 90%</li>
         <li><strong>Analizar resultados</strong>: Dashboard ejecutivo con promedios y ranking</li>
@@ -293,7 +324,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
       </ol>
       <div class="alert alert-info border-0 mb-0">
         <i class="icon-info22 mr-2"></i>
-        <strong>Nota:</strong> Los resultados se muestran en escala 0-100% en lugar de 1-5 para mejor interpretación.
+        <strong>Nota:</strong> Los resultados se muestran en escala 0-100% en lugar de 1-3 para mejor interpretación.
       </div>
     </div>
   </div>

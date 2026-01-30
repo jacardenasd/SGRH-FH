@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/guard.php';
 require_once __DIR__ . '/../includes/permisos.php';
+require_once __DIR__ . '/../includes/alcance.php';
 require_once __DIR__ . '/../includes/conexion.php';
 
 require_login();
@@ -21,6 +22,9 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $empresa_id = (int)$_SESSION['empresa_id'];
 $usuario_id = isset($_SESSION['usuario_id']) ? (int)$_SESSION['usuario_id'] : 0;
+
+// Obtener alcance organizacional del usuario
+$alcance = get_usuario_alcance($usuario_id, $empresa_id);
 
 // CSRF token
 if (empty($_SESSION['csrf_token'])) {
@@ -80,6 +84,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($unidad_id <= 0) throw new RuntimeException('Debes seleccionar una Unidad.');
                 if (empty($justificacion)) throw new RuntimeException('Debes proporcionar una justificación.');
+                
+                // Validar alcance: el usuario solo puede crear en unidades/adscripciones permitidas
+                if (!tiene_alcance($alcance, $unidad_id, $adscripcion_id)) {
+                    throw new RuntimeException('No tienes permiso para crear plazas en esta unidad/departamento.');
+                }
 
                 // Si no se proporciona código, generar uno automático
                 if (empty($codigo)) {
@@ -126,6 +135,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($plaza_id <= 0) throw new RuntimeException('Plaza inválida.');
                 if ($unidad_id <= 0) throw new RuntimeException('Debes seleccionar una Unidad.');
+                
+                // Validar alcance
+                if (!tiene_alcance($alcance, $unidad_id, $adscripcion_id)) {
+                    throw new RuntimeException('No tienes permiso para editar plazas en esta unidad/departamento.');
+                }
 
                 $sql = "UPDATE org_plantilla_autorizada 
                         SET unidad_id = :unidad_id,
@@ -329,6 +343,9 @@ $filtro_departamento = isset($_GET['adscripcion_id']) ? (int)$_GET['adscripcion_
 $where_parts = ['p.empresa_id = :empresa_id'];
 $params = [':empresa_id' => $empresa_id];
 
+// Aplicar filtros de alcance organizacional
+aplicar_filtro_alcance($where_parts, $params, 'p', $alcance);
+
 if ($filtro_estado !== 'todas') {
     $where_parts[] = 'p.estado = :estado';
     $params[':estado'] = $filtro_estado;
@@ -352,9 +369,7 @@ $sql = "SELECT
             u.nombre AS unidad_nombre,
             a.nombre AS adscripcion_nombre,
             pu.nombre AS puesto_nombre,
-            emp.nombre AS empleado_nombre,
-            emp.apellido_paterno AS empleado_apellido_paterno,
-            emp.no_emp AS empleado_no_emp,
+            emp.empleado_id AS empleado_id,
             CASE 
                 WHEN p.estado = 'cancelada' THEN 'Cancelada'
                 WHEN p.estado = 'congelada' THEN 'Congelada'
@@ -372,18 +387,9 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $plazas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Combos para formularios
-$unidades_stmt = $pdo->prepare("SELECT unidad_id, nombre FROM org_unidades WHERE empresa_id = :empresa_id AND estatus = 1 ORDER BY nombre");
-$unidades_stmt->execute([':empresa_id' => $empresa_id]);
-$unidades = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$adscripciones_stmt = $pdo->prepare("SELECT a.adscripcion_id, a.nombre, a.unidad_id, u.nombre AS unidad_nombre 
-                                      FROM org_adscripciones a 
-                                      INNER JOIN org_unidades u ON u.unidad_id = a.unidad_id
-                                      WHERE a.empresa_id = :empresa_id AND a.estatus = 1 
-                                      ORDER BY u.nombre, a.nombre");
-$adscripciones_stmt->execute([':empresa_id' => $empresa_id]);
-$adscripciones = $adscripciones_stmt->fetchAll(PDO::FETCH_ASSOC);
+// Combos para formularios (respetando alcance)
+$unidades = get_unidades_permitidas($usuario_id, $empresa_id);
+$adscripciones = get_adscripciones_permitidas($usuario_id, $empresa_id);
 
 $puestos_stmt = $pdo->prepare("SELECT MIN(puesto_id) as puesto_id, nombre FROM org_puestos WHERE empresa_id = :empresa_id AND estatus = 1 GROUP BY empresa_id, nombre ORDER BY nombre");
 $puestos_stmt->execute([':empresa_id' => $empresa_id]);
@@ -588,8 +594,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                             <td><span class="badge badge-<?php echo $badge_ocupacion; ?>"><?php echo h($p['estado_ocupacion']); ?></span></td>
                             <td>
                                 <?php if ($p['empleado_id']): ?>
-                                    <span class="font-weight-semibold"><?php echo h($p['empleado_no_emp']); ?></span><br>
-                                    <small><?php echo h($p['empleado_nombre'] . ' ' . $p['empleado_apellido_paterno']); ?></small>
+                                    <span class="font-weight-semibold">Emp ID: <?php echo h($p['empleado_id']); ?></span>
                                 <?php else: ?>
                                     <span class="text-muted">-</span>
                                 <?php endif; ?>
@@ -622,7 +627,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                                             
                                             <?php if ($p['estado'] === 'activa' && $p['empleado_id']): ?>
                                                 <a href="#" class="dropdown-item" data-toggle="modal" data-target="#modalDesasignarEmpleado"
-                                                   onclick='prepararDesasignar(<?php echo (int)$p['plaza_id']; ?>, "<?php echo h($p['codigo_plaza']); ?>", "<?php echo h($p['empleado_nombre'] . ' ' . $p['empleado_apellido_paterno']); ?>")'>
+                                                   onclick='prepararDesasignar(<?php echo (int)$p['plaza_id']; ?>, "<?php echo h($p['codigo_plaza']); ?>", "<?php echo h("Emp ID: " . $p['empleado_id']); ?>")'>
                                                     <i class="icon-user-minus"></i> Desasignar Empleado
                                                 </a>
                                             <?php endif; ?>
@@ -1058,6 +1063,21 @@ require_once __DIR__ . '/../includes/layout/scripts.php';
 <script>
 $(document).ready(function() {
     $('.datatable-basic').DataTable({
+      language: {
+        search: 'Buscar:',
+        lengthMenu: 'Mostrar _MENU_ registros',
+        info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+        infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+        infoFiltered: '(filtrado de _MAX_ registros totales)',
+        zeroRecords: 'No se encontraron registros',
+        emptyTable: 'No hay datos disponibles',
+        paginate: {
+          first: 'Primero',
+          previous: 'Anterior',
+          next: 'Siguiente',
+          last: 'Último'
+        }
+      },
         language: {
             url: '<?php echo ASSET_BASE; ?>global_assets/js/plugins/tables/datatables/es-ES.json'
         },
@@ -1207,7 +1227,7 @@ function verDetalle(p) {
     }
     
     if (p.empleado_id) {
-        html += '<tr class="table-info"><th>Empleado Asignado</th><td>' + (p.empleado_no_emp || '') + ' - ' + (p.empleado_nombre || '') + ' ' + (p.empleado_apellido_paterno || '') + '</td></tr>';
+        html += '<tr class="table-info"><th>Empleado ID</th><td>' + p.empleado_id + '</td></tr>';
         html += '<tr class="table-info"><th>Fecha Asignación</th><td>' + (p.fecha_asignacion || '') + '</td></tr>';
     }
     

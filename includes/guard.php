@@ -16,6 +16,28 @@ function require_empresa() {
         header('Location: seleccionar_empresa.php');
         exit;
     }
+
+    // Asegurar que es_admin_empresa y permisos estén cargados
+    if (!isset($_SESSION['es_admin_empresa']) || !isset($_SESSION['permisos'])) {
+        global $pdo;
+        if (!isset($pdo)) {
+            require_once __DIR__ . '/conexion.php';
+        }
+        
+        // Obtener es_admin de usuario_empresas
+        $stmt = $pdo->prepare("SELECT es_admin FROM usuario_empresas WHERE usuario_id = ? AND empresa_id = ? LIMIT 1");
+        $stmt->execute([(int)$_SESSION['usuario_id'], (int)$_SESSION['empresa_id']]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($row) {
+            $_SESSION['es_admin_empresa'] = (int)$row['es_admin'];
+        } else {
+            $_SESSION['es_admin_empresa'] = 0;
+        }
+        
+        // Cargar permisos
+        cargar_permisos_sesion((int)$_SESSION['usuario_id']);
+    }
 }
 
 function require_password_change_redirect() {

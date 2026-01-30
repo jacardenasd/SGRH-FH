@@ -4,11 +4,22 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-define('APP_ENV', 'dev'); // <-- debe ser dev para generar archivos
+// ✅ SEGURIDAD: APP_ENV por defecto es 'prod' para seguridad
+// Cambiar a 'dev' SOLO en desarrollo local
+define('APP_ENV', 'prod');
 
-ini_set('display_errors', APP_ENV === 'dev' ? '1' : '0');
-ini_set('display_startup_errors', APP_ENV === 'dev' ? '1' : '0');
+// ✅ SEGURIDAD: Nunca mostrar errores en producción
+ini_set('display_errors', '0');
+ini_set('display_startup_errors', '0');
 error_reporting(E_ALL);
+
+// ✅ SEGURIDAD: Configurar logging de errores
+ini_set('log_errors', '1');
+$log_dir = dirname(__DIR__) . '/storage/logs';
+if (!is_dir($log_dir)) {
+    @mkdir($log_dir, 0755, true);
+}
+ini_set('error_log', $log_dir . '/php_errors.log');
 
 
 define('APP_URL', 'http://localhost/'); // ajusta si tu ruta es distinta

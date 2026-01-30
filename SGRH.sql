@@ -11,7 +11,7 @@
  Target Server Version : 50724 (5.7.24)
  File Encoding         : 65001
 
- Date: 19/01/2026 18:15:22
+ Date: 21/01/2026 13:35:26
 */
 
 SET NAMES utf8mb4;
@@ -35,7 +35,7 @@ CREATE TABLE `bitacora`  (
   INDEX `idx_bit_usuario_fecha`(`usuario_id`, `created_at`) USING BTREE,
   CONSTRAINT `fk_bit_empresa` FOREIGN KEY (`empresa_id`) REFERENCES `empresas` (`empresa_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_bit_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`usuario_id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 39 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for cat_bancos
@@ -129,10 +129,12 @@ DROP TABLE IF EXISTS `clima_dimensiones`;
 CREATE TABLE `clima_dimensiones`  (
   `dimension_id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `superdimension` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `orden` int(11) NOT NULL DEFAULT 1,
   `activo` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`dimension_id`) USING BTREE,
-  UNIQUE INDEX `uq_clima_dimension_nombre`(`nombre`) USING BTREE
+  UNIQUE INDEX `uq_clima_dimension_nombre`(`nombre`) USING BTREE,
+  INDEX `idx_superdimension`(`superdimension`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -310,34 +312,38 @@ CREATE TABLE `clima_reactivos`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `clima_respuestas`;
 CREATE TABLE `clima_respuestas`  (
+  `respuesta_id` int(11) NOT NULL AUTO_INCREMENT,
   `periodo_id` int(11) NOT NULL,
-  `empleado_id` int(11) NOT NULL,
+  `empleado_id` int(11) NULL DEFAULT NULL,
   `reactivo_id` int(11) NOT NULL,
   `valor` tinyint(4) NOT NULL,
   `fecha_respuesta` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`periodo_id`, `empleado_id`, `reactivo_id`) USING BTREE,
+  PRIMARY KEY (`respuesta_id`) USING BTREE,
   INDEX `idx_clima_resp_reactivo`(`periodo_id`, `reactivo_id`) USING BTREE,
   INDEX `idx_clima_resp_empleado`(`periodo_id`, `empleado_id`) USING BTREE,
   INDEX `fk_clima_resp_empleado`(`empleado_id`) USING BTREE,
   INDEX `idx_clima_resp_reactivo_empleado`(`reactivo_id`, `empleado_id`) USING BTREE,
+  UNIQUE INDEX `idx_periodo_empleado_reactivo`(`periodo_id`, `empleado_id`, `reactivo_id`) USING BTREE,
   CONSTRAINT `fk_clima_resp_empleado` FOREIGN KEY (`empleado_id`) REFERENCES `empleados` (`empleado_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_clima_resp_periodo` FOREIGN KEY (`periodo_id`) REFERENCES `clima_periodos` (`periodo_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_clima_resp_reactivo` FOREIGN KEY (`reactivo_id`) REFERENCES `clima_reactivos` (`reactivo_id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7473 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for clima_respuestas_abiertas
 -- ----------------------------
 DROP TABLE IF EXISTS `clima_respuestas_abiertas`;
 CREATE TABLE `clima_respuestas_abiertas`  (
+  `respuesta_abierta_id` int(11) NOT NULL AUTO_INCREMENT,
   `periodo_id` int(11) NOT NULL,
-  `empleado_id` int(11) NOT NULL,
+  `empleado_id` int(11) NULL DEFAULT NULL,
   `empresa_id` int(11) NOT NULL,
   `unidad_id` int(11) NOT NULL,
   `pregunta_id` int(11) NOT NULL,
   `respuesta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `fecha_respuesta` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`periodo_id`, `empleado_id`, `pregunta_id`) USING BTREE,
+  PRIMARY KEY (`respuesta_abierta_id`) USING BTREE,
+  UNIQUE INDEX `idx_periodo_empleado_pregunta`(`periodo_id`, `empleado_id`, `pregunta_id`) USING BTREE,
   INDEX `idx_cra_seg`(`periodo_id`, `empresa_id`, `unidad_id`) USING BTREE,
   INDEX `idx_cra_pregunta`(`periodo_id`, `pregunta_id`) USING BTREE,
   INDEX `fk_cra_empleado`(`empleado_id`) USING BTREE,
@@ -349,7 +355,7 @@ CREATE TABLE `clima_respuestas_abiertas`  (
   CONSTRAINT `fk_cra_periodo` FOREIGN KEY (`periodo_id`) REFERENCES `clima_periodos` (`periodo_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_cra_pregunta` FOREIGN KEY (`pregunta_id`) REFERENCES `clima_preguntas_abiertas` (`pregunta_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_cra_unidad` FOREIGN KEY (`unidad_id`) REFERENCES `org_unidades` (`unidad_id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 31 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for clima_resultados_visibilidad
@@ -514,6 +520,26 @@ CREATE TABLE `contratos_notificaciones`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for documentos
+-- ----------------------------
+DROP TABLE IF EXISTS `documentos`;
+CREATE TABLE `documentos`  (
+  `documento_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `empresa_id` int(10) UNSIGNED NOT NULL,
+  `titulo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nombre del documento',
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Descripción breve del documento',
+  `archivo_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Ruta del archivo en storage',
+  `seccion` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Sección del sistema (clima, desempeño, perfil, admin, etc)',
+  `orden` int(11) NULL DEFAULT 0 COMMENT 'Orden de aparición en el dashboard',
+  `estatus` enum('activo','inactivo') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'activo',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`documento_id`) USING BTREE,
+  INDEX `idx_empresa_seccion`(`empresa_id`, `seccion`) USING BTREE,
+  INDEX `idx_estatus`(`estatus`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for empleados
 -- ----------------------------
 DROP TABLE IF EXISTS `empleados`;
@@ -622,11 +648,6 @@ CREATE TABLE `empleados_demograficos`  (
   `tiene_credito_infonavit` tinyint(1) NULL DEFAULT 0,
   `tiene_beneficiarios` tinyint(1) NULL DEFAULT 0,
   `tipo_contrato` enum('TEMPORAL','PERMANENTE') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'TEMPORAL',
-  `numero_contrato_actual` int(11) NULL DEFAULT 1 COMMENT '1,2,3 determinado; 0 indeterminado',
-  `fecha_inicio_contrato` date NULL DEFAULT NULL,
-  `fecha_termino_contrato` date NULL DEFAULT NULL COMMENT 'Fecha de t??rmino del contrato',
-  `fecha_fin_contrato` date NULL DEFAULT NULL,
-  `dias_contrato` int(11) NULL DEFAULT 90,
   `correo` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `datos_completos` tinyint(1) NULL DEFAULT 0 COMMENT '1 si RFC, CURP, NSS, sueldo y banco estan capturados',
   PRIMARY KEY (`empleado_id`) USING BTREE,
@@ -797,6 +818,27 @@ CREATE TABLE `nomina_importaciones`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 80 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for notificaciones
+-- ----------------------------
+DROP TABLE IF EXISTS `notificaciones`;
+CREATE TABLE `notificaciones`  (
+  `notificacion_id` int(11) NOT NULL AUTO_INCREMENT,
+  `usuario_destino_id` int(11) NOT NULL COMMENT 'Usuario que recibe la notificaci├│n',
+  `tipo` enum('contrato_vencimiento','evaluacion_pendiente','documento_generado','otro') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'otro',
+  `asunto` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mensaje` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Link a la acci├│n relacionada',
+  `leida` tinyint(1) NOT NULL DEFAULT 0,
+  `fecha_lectura` datetime NULL DEFAULT NULL,
+  `prioridad` enum('baja','normal','alta') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'normal',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`notificacion_id`) USING BTREE,
+  INDEX `idx_usuario_leida`(`usuario_destino_id`, `leida`) USING BTREE,
+  INDEX `idx_tipo`(`tipo`) USING BTREE,
+  INDEX `idx_created`(`created_at`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'Sistema de notificaciones internas' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for org_adscripciones
 -- ----------------------------
 DROP TABLE IF EXISTS `org_adscripciones`;
@@ -849,6 +891,46 @@ CREATE TABLE `org_centros_trabajo`  (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`empresa_id`, `centro_trabajo_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for org_plantilla_autorizada
+-- ----------------------------
+DROP TABLE IF EXISTS `org_plantilla_autorizada`;
+CREATE TABLE `org_plantilla_autorizada`  (
+  `plaza_id` int(11) NOT NULL AUTO_INCREMENT,
+  `codigo_plaza` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'C├│digo ├║nico de la plaza',
+  `empresa_id` int(11) NOT NULL COMMENT 'Empresa a la que pertenece',
+  `unidad_id` int(11) NOT NULL COMMENT 'Unidad organizacional',
+  `adscripcion_id` int(11) NULL DEFAULT NULL COMMENT 'Adscripci├│n opcional',
+  `puesto_id` int(11) NULL DEFAULT NULL COMMENT 'Puesto espec├¡fico opcional',
+  `fecha_creacion` date NOT NULL COMMENT 'Fecha de autorizaci├│n de la plaza',
+  `fecha_cancelacion` date NULL DEFAULT NULL COMMENT 'Fecha de cancelaci├│n',
+  `fecha_congelacion` date NULL DEFAULT NULL COMMENT 'Fecha de congelaci├│n',
+  `justificacion_creacion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Justificaci├│n de creaci├│n',
+  `justificacion_cancelacion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT 'Motivo de cancelaci├│n',
+  `justificacion_congelacion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT 'Motivo de congelaci├│n',
+  `observaciones` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT 'Notas adicionales',
+  `estado` enum('activa','congelada','cancelada') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'activa',
+  `empleado_id` int(11) NULL DEFAULT NULL COMMENT 'Empleado asignado',
+  `fecha_asignacion` date NULL DEFAULT NULL COMMENT 'Fecha de asignaci├│n',
+  `created_by` int(11) NULL DEFAULT NULL COMMENT 'Usuario creador',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`plaza_id`) USING BTREE,
+  UNIQUE INDEX `uq_codigo_plaza`(`empresa_id`, `codigo_plaza`) USING BTREE,
+  INDEX `idx_plaza_empresa_estado`(`empresa_id`, `estado`) USING BTREE,
+  INDEX `idx_plaza_unidad`(`unidad_id`) USING BTREE,
+  INDEX `idx_plaza_adscripcion`(`adscripcion_id`) USING BTREE,
+  INDEX `idx_plaza_puesto`(`puesto_id`) USING BTREE,
+  INDEX `idx_plaza_empleado`(`empleado_id`) USING BTREE,
+  INDEX `fk_plaza_created_by`(`created_by`) USING BTREE,
+  CONSTRAINT `fk_plaza_adscripcion` FOREIGN KEY (`adscripcion_id`) REFERENCES `org_adscripciones` (`adscripcion_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_plaza_created_by` FOREIGN KEY (`created_by`) REFERENCES `usuarios` (`usuario_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_plaza_empleado` FOREIGN KEY (`empleado_id`) REFERENCES `empleados` (`empleado_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_plaza_empresa` FOREIGN KEY (`empresa_id`) REFERENCES `empresas` (`empresa_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_plaza_puesto` FOREIGN KEY (`puesto_id`) REFERENCES `org_puestos` (`puesto_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_plaza_unidad` FOREIGN KEY (`unidad_id`) REFERENCES `org_unidades` (`unidad_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'Registro individual de plazas autorizadas' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for org_puestos
@@ -922,7 +1004,7 @@ CREATE TABLE `permisos`  (
   `modulo` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`permiso_id`) USING BTREE,
   UNIQUE INDEX `uq_perm_clave`(`clave`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for rh_documentos
@@ -1018,6 +1100,7 @@ CREATE TABLE `usuarios`  (
   `correo` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `pass_cambiada` tinyint(4) NOT NULL DEFAULT 0,
   `sidebar_state` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'normal',
+  `permisos_especiales` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT 'JSON con permisos espec├¡ficos del usuario: {permisos: [], unidades: []}',
   PRIMARY KEY (`usuario_id`) USING BTREE,
   UNIQUE INDEX `uq_usuario_noemp_rfc`(`no_emp`, `rfc_base`) USING BTREE,
   INDEX `idx_rfc`(`rfc_base`) USING BTREE,
@@ -1072,6 +1155,12 @@ CREATE TABLE `vacaciones_solicitudes`  (
 -- ----------------------------
 DROP VIEW IF EXISTS `v_contratos_por_vencer`;
 CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `v_contratos_por_vencer` AS select `c`.`contrato_id` AS `contrato_id`,`c`.`empleado_id` AS `empleado_id`,`c`.`empresa_id` AS `empresa_id`,`e`.`nombre` AS `nombre`,`e`.`apellido_paterno` AS `apellido_paterno`,`e`.`apellido_materno` AS `apellido_materno`,`c`.`tipo_contrato` AS `tipo_contrato`,`c`.`numero_contrato` AS `numero_contrato`,`c`.`fecha_inicio` AS `fecha_inicio`,`c`.`fecha_fin` AS `fecha_fin`,`c`.`dias_naturales` AS `dias_naturales`,(to_days(`c`.`fecha_fin`) - to_days(curdate())) AS `dias_restantes`,`c`.`estatus` AS `estatus`,`c`.`jefe_inmediato_id` AS `jefe_inmediato_id`,`jefe`.`nombre` AS `jefe_nombre`,`jefe`.`apellido_paterno` AS `jefe_apellido_paterno`,`c`.`notificacion_enviada` AS `notificacion_enviada`,`c`.`evaluacion_completada` AS `evaluacion_completada`,`emp`.`nombre` AS `empresa_nombre` from (((`contratos` `c` join `empleados` `e` on((`c`.`empleado_id` = `e`.`empleado_id`))) join `empresas` `emp` on((`c`.`empresa_id` = `emp`.`empresa_id`))) left join `empleados` `jefe` on((`c`.`jefe_inmediato_id` = `jefe`.`empleado_id`))) where ((`c`.`tipo_contrato` = 'temporal') and (`c`.`estatus` in ('activo','por_vencer')) and (`c`.`fecha_fin` is not null) and ((to_days(`c`.`fecha_fin`) - to_days(curdate())) <= 7) and ((to_days(`c`.`fecha_fin`) - to_days(curdate())) >= 0));
+
+-- ----------------------------
+-- View structure for v_plantilla_autorizada
+-- ----------------------------
+DROP VIEW IF EXISTS `v_plantilla_autorizada`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `v_plantilla_autorizada` AS select `p`.`plaza_id` AS `plaza_id`,`p`.`codigo_plaza` AS `codigo_plaza`,`p`.`empresa_id` AS `empresa_id`,`e`.`nombre` AS `empresa_nombre`,`p`.`unidad_id` AS `unidad_id`,`u`.`nombre` AS `unidad_nombre`,`p`.`adscripcion_id` AS `adscripcion_id`,`a`.`nombre` AS `adscripcion_nombre`,`p`.`puesto_id` AS `puesto_id`,`pu`.`nombre` AS `puesto_nombre`,`p`.`fecha_creacion` AS `fecha_creacion`,`p`.`fecha_cancelacion` AS `fecha_cancelacion`,`p`.`fecha_congelacion` AS `fecha_congelacion`,`p`.`justificacion_creacion` AS `justificacion_creacion`,`p`.`justificacion_cancelacion` AS `justificacion_cancelacion`,`p`.`justificacion_congelacion` AS `justificacion_congelacion`,`p`.`observaciones` AS `observaciones`,`p`.`estado` AS `estado`,`p`.`empleado_id` AS `empleado_id`,`p`.`fecha_asignacion` AS `fecha_asignacion`,`emp`.`nombre` AS `empleado_nombre`,`emp`.`apellido_paterno` AS `empleado_apellido_paterno`,`emp`.`apellido_materno` AS `empleado_apellido_materno`,`emp`.`no_emp` AS `empleado_no_emp`,`emp`.`estatus` AS `empleado_estatus`,(case when (`p`.`estado` = 'cancelada') then 'Cancelada' when (`p`.`estado` = 'congelada') then 'Congelada' when (`p`.`empleado_id` is not null) then 'Ocupada' else 'Vacante' end) AS `estado_ocupacion`,`p`.`created_by` AS `created_by`,concat_ws(' ',`usr`.`nombre`,`usr`.`apellido_paterno`,`usr`.`apellido_materno`) AS `creado_por_usuario`,`p`.`created_at` AS `created_at`,`p`.`updated_at` AS `updated_at` from ((((((`org_plantilla_autorizada` `p` join `empresas` `e` on((`e`.`empresa_id` = `p`.`empresa_id`))) join `org_unidades` `u` on((`u`.`unidad_id` = `p`.`unidad_id`))) left join `org_adscripciones` `a` on((`a`.`adscripcion_id` = `p`.`adscripcion_id`))) left join `org_puestos` `pu` on((`pu`.`puesto_id` = `p`.`puesto_id`))) left join `empleados` `emp` on((`emp`.`empleado_id` = `p`.`empleado_id`))) left join `usuarios` `usr` on((`usr`.`usuario_id` = `p`.`created_by`)));
 
 -- ----------------------------
 -- Procedure structure for generar_elegibles_clima
@@ -1139,20 +1228,16 @@ BEGIN
       -- Iterar sobre los 48 reactivos (4 por cada una de las 12 dimensiones)
       WHILE v_reactivo <= 48 DO
         
-        -- Generar valor aleatorio con distribución realista
+        -- Generar valor aleatorio con distribución realista (escala 1-3)
         SET v_random = RAND();
         
-        -- Distribución: 10% (1-2), 70% (3-4), 20% (5)
-        IF v_random < 0.05 THEN
-          SET v_valor = 1; -- 5% muy insatisfecho
-        ELSEIF v_random < 0.10 THEN
-          SET v_valor = 2; -- 5% insatisfecho
-        ELSEIF v_random < 0.40 THEN
-          SET v_valor = 3; -- 30% neutral
-        ELSEIF v_random < 0.80 THEN
-          SET v_valor = 4; -- 40% satisfecho
+        -- Distribución: 20% (1=desacuerdo), 50% (2=parcial), 30% (3=acuerdo)
+        IF v_random < 0.20 THEN
+          SET v_valor = 1; -- 20% En Desacuerdo
+        ELSEIF v_random < 0.70 THEN
+          SET v_valor = 2; -- 50% Parcialmente De acuerdo
         ELSE
-          SET v_valor = 5; -- 20% muy satisfecho
+          SET v_valor = 3; -- 30% Totalmente De acuerdo
         END IF;
         
         -- Insertar respuesta

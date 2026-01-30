@@ -1,10 +1,11 @@
 <?php
 // includes/conexion.php
+require_once __DIR__ . '/env.php';
 
-$host = 'localhost';
-$db   = 'sgrh';
-$user = 'root';
-$pass = 'root';
+$host = getenv('DB_HOST') ?: 'localhost';
+$db   = getenv('DB_NAME') ?: 'sgrh';
+$user = getenv('DB_USER') ?: 'root';
+$pass = getenv('DB_PASS') ?: 'root';
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";

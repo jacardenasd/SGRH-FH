@@ -48,10 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'El RFC debe tener entre 10 y 13 caracteres';
     } else {
         // Verificar si el RFC existe en empleados activos
-        $sqlCheck = "SELECT e.empleado_id, ed.nombre, ed.apellido_paterno, ed.apellido_materno, ed.rfc 
+        $sqlCheck = "SELECT e.empleado_id, u.nombre, u.apellido_paterno, u.apellido_materno, u.rfc_base as rfc 
                      FROM empleados e
-                     LEFT JOIN empleados_demograficos ed ON ed.empleado_id = e.empleado_id
-                     WHERE e.empresa_id = :emp AND e.es_activo = 1 AND ed.rfc = :rfc
+                     INNER JOIN usuario_empresas ue ON ue.empleado_id = e.empleado_id AND ue.empresa_id = e.empresa_id
+                     INNER JOIN usuarios u ON u.usuario_id = ue.usuario_id
+                     WHERE e.empresa_id = :emp AND e.es_activo = 1 AND u.rfc_base = :rfc
                      LIMIT 1";
         $stCheck = $pdo->prepare($sqlCheck);
         $stCheck->execute(array(':emp' => $empresa_id, ':rfc' => $rfc));
@@ -99,8 +100,10 @@ if ($accion === 'recuperar') {
     $empleado_id = isset($_GET['empleado_id']) ? (int)$_GET['empleado_id'] : 0;
     
     if ($empleado_id > 0) {
-        $sqlEmp = "SELECT e.empleado_id, ed.nombre, ed.apellido_paterno, ed.apellido_materno, ed.rfc, ed.curp, ed.nss
+        $sqlEmp = "SELECT e.empleado_id, u.nombre, u.apellido_paterno, u.apellido_materno, u.rfc_base as rfc, ed.curp, ed.nss
                    FROM empleados e
+                   INNER JOIN usuario_empresas ue ON ue.empleado_id = e.empleado_id AND ue.empresa_id = e.empresa_id
+                   INNER JOIN usuarios u ON u.usuario_id = ue.usuario_id
                    LEFT JOIN empleados_demograficos ed ON ed.empleado_id = e.empleado_id
                    WHERE e.empresa_id = :emp AND e.es_activo = 1 AND e.empleado_id = :eid
                    LIMIT 1";

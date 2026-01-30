@@ -9,6 +9,7 @@
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/guard.php';
 require_once __DIR__ . '/../includes/permisos.php';
+require_once __DIR__ . '/../includes/alcance.php';
 require_once __DIR__ . '/../includes/conexion.php';
 
 require_login();
@@ -27,6 +28,10 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $empresa_id = (int)$_SESSION['empresa_id'];
+$usuario_id = (int)$_SESSION['usuario_id'];
+
+// Obtener alcance organizacional del usuario
+$alcance = get_usuario_alcance($usuario_id, $empresa_id);
 
 // Helpers
 function h($s) {
@@ -47,21 +52,11 @@ $stmt_stats = $pdo->prepare($stats_sql);
 $stmt_stats->execute([':empresa_id' => $empresa_id]);
 $stats = $stmt_stats->fetch(PDO::FETCH_ASSOC);
 
-// Obtener unidades para filtro
-$unidades_sql = "SELECT unidad_id, nombre FROM org_unidades WHERE empresa_id = :empresa_id AND estatus = 1 ORDER BY nombre";
-$stmt_unidades = $pdo->prepare($unidades_sql);
-$stmt_unidades->execute([':empresa_id' => $empresa_id]);
-$unidades = $stmt_unidades->fetchAll(PDO::FETCH_ASSOC);
+// Obtener unidades para filtro (respetando alcance)
+$unidades = get_unidades_permitidas($usuario_id, $empresa_id);
 
-// Obtener adscripciones para filtro
-$adscripciones_sql = "SELECT a.adscripcion_id, a.nombre, a.unidad_id, u.nombre AS unidad_nombre
-                      FROM org_adscripciones a
-                      INNER JOIN org_unidades u ON u.unidad_id = a.unidad_id
-                      WHERE a.empresa_id = :empresa_id AND a.estatus = 1
-                      ORDER BY u.nombre, a.nombre";
-$stmt_adscripciones = $pdo->prepare($adscripciones_sql);
-$stmt_adscripciones->execute([':empresa_id' => $empresa_id]);
-$adscripciones = $stmt_adscripciones->fetchAll(PDO::FETCH_ASSOC);
+// Obtener adscripciones para filtro (respetando alcance)
+$adscripciones = get_adscripciones_permitidas($usuario_id, $empresa_id);
 
 // Filtros
 $filtro_estado = isset($_GET['estado']) ? trim($_GET['estado']) : 'todas';
@@ -71,6 +66,9 @@ $filtro_departamento = isset($_GET['adscripcion_id']) ? (int)$_GET['adscripcion_
 // Construir query con filtros
 $where_parts = ['p.empresa_id = :empresa_id'];
 $params = [':empresa_id' => $empresa_id];
+
+// Aplicar filtros de alcance organizacional
+aplicar_filtro_alcance($where_parts, $params, 'p', $alcance);
 
 if ($filtro_estado !== 'todas') {
     $where_parts[] = 'p.estado = :estado';
@@ -95,9 +93,7 @@ $sql = "SELECT
             u.nombre AS unidad_nombre,
             a.nombre AS adscripcion_nombre,
             pu.nombre AS puesto_nombre,
-            emp.no_emp AS empleado_no_emp,
-            emp.nombre AS empleado_nombre,
-            emp.apellido_paterno AS empleado_apellido_paterno,
+            emp.empleado_id AS empleado_id,
             CASE 
                 WHEN p.empleado_id IS NOT NULL THEN 'Ocupada'
                 WHEN p.estado = 'activa' THEN 'Vacante'
@@ -321,8 +317,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                             <td><span class="badge badge-<?php echo $badge_ocupacion; ?>"><?php echo h($p['estado_ocupacion']); ?></span></td>
                             <td>
                                 <?php if ($p['empleado_id']): ?>
-                                    <span class="font-weight-semibold"><?php echo h($p['empleado_no_emp']); ?></span><br>
-                                    <small><?php echo h($p['empleado_nombre'] . ' ' . $p['empleado_apellido_paterno']); ?></small>
+                                    <span class="font-weight-semibold">Emp ID: <?php echo h($p['empleado_id']); ?></span>
                                 <?php else: ?>
                                     <span class="text-muted">-</span>
                                 <?php endif; ?>
@@ -368,7 +363,21 @@ require_once __DIR__ . '/../includes/layout/content_close.php';
 $(document).ready(function() {
     $('.datatable-basic').DataTable({
         language: {
-            url: '<?php echo ASSET_BASE; ?>global_assets/js/plugins/tables/datatables/es-ES.json'
+            search: 'Buscar:',
+            lengthMenu: 'Mostrar _MENU_ registros',
+            info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+            infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+            infoFiltered: '(filtrado de _MAX_ registros totales)',
+            loadingRecords: 'Cargando...',
+            processing: 'Procesando...',
+            zeroRecords: 'No se encontraron registros',
+            emptyTable: 'No hay datos disponibles',
+            paginate: {
+                first: 'Primero',
+                previous: 'Anterior',
+                next: 'Siguiente',
+                last: 'Último'
+            }
         },
         order: [[4, 'desc']],
         columnDefs: [{ orderable: false, targets: [8] }]
@@ -425,7 +434,7 @@ function verDetalle(p) {
     }
     
     if (p.empleado_id) {
-        html += '<tr class="table-info"><th>Empleado Asignado</th><td>' + (p.empleado_no_emp || '') + ' - ' + (p.empleado_nombre || '') + ' ' + (p.empleado_apellido_paterno || '') + '</td></tr>';
+        html += '<tr class="table-info"><th>Empleado ID</th><td>' + p.empleado_id + '</td></tr>';
         html += '<tr class="table-info"><th>Fecha Asignación</th><td>' + (p.fecha_asignacion || '') + '</td></tr>';
     }
     

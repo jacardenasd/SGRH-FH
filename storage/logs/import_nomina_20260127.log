@@ -1,0 +1,1 @@
+[2026-01-27 17:14:16] SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`sgrh`.`nomina_importaciones`, CONSTRAINT `fk_imp_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`usuario_id`) ON DELETE SET NULL ON UPDATE CASCADE)

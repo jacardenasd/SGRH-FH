@@ -18,8 +18,8 @@ $sidebar_class = '';
 if (isset($_SESSION['usuario_id'])) {
   $stmt = $pdo->prepare("SELECT sidebar_state FROM usuarios WHERE usuario_id = ? LIMIT 1");
   $stmt->execute([(int)$_SESSION['usuario_id']]);
-  $row = $stmt->fetch(PDO::FETCH_ASSOC);
-  if ($row && $row['sidebar_state'] === 'resized') {
+  $row_sidebar = $stmt->fetch(PDO::FETCH_ASSOC);
+  if ($row_sidebar && $row_sidebar['sidebar_state'] === 'resized') {
     $sidebar_class = ' sidebar-main-resized';
   }
 }
@@ -33,6 +33,7 @@ $foto_url = ($empleado_id > 0)
 
 $admin_active = in_array($active_menu, [
   'admin_usuarios',
+  'admin_accesos',
   'import_nomina',
   'admin_org_unidades',
   'admin_org_adscripciones',
@@ -40,7 +41,15 @@ $admin_active = in_array($active_menu, [
   'admin_org_centros_trabajo',
   'admin_org_plantilla',
   'admin_documentos',
-  'clima_admin'
+  'clima_admin',
+  'clima_captura',
+  'clima_periodos',
+  'clima_generar_elegibles',
+  'clima_participacion',
+  'clima_dimensiones',
+  'clima_resultados',
+  'clima_planes',
+  'clima_captura_respuestas'
 ], true);
 
 $plantilla_active = ($active_menu === 'plantilla');
@@ -92,7 +101,7 @@ $clima_user_active = in_array($active_menu, [
           <?php if (can('dashboard.ver')): ?>
           <li class="nav-item">
             <a href="<?php echo ASSET_BASE; ?>public/dashboard.php" class="nav-link <?php echo is_active('dashboard', $active_menu); ?>">
-              <i class="icon-home4"></i><span>Dashboard</span>
+              <i class="icon-home4"></i><span>Inicio</span>
             </a>
           </li>
           <?php endif; ?>
@@ -123,7 +132,7 @@ $clima_user_active = in_array($active_menu, [
               <li class="nav-item">
                 <a href="<?php echo ASSET_BASE; ?>public/clima.php"
                   class="nav-link <?php echo is_active('clima', $active_menu); ?>">
-                  <i class="icon-pencil7"></i> Responder Cuestionario
+                  <i class="icon-pencil7"></i> Responder Encuesta
                 </a>
               </li>
               <li class="nav-item">
@@ -168,7 +177,7 @@ $clima_user_active = in_array($active_menu, [
           <?php endif; ?>
 
           <?php if (can('plantilla.ver') || can('plantilla.admin')): ?>
-          <li class="nav-item">
+          <li class="nav-item <?php echo is_active('plantilla', $active_menu); ?>">
             <a href="<?php echo ASSET_BASE; ?>public/plantilla.php" class="nav-link <?php echo is_active('plantilla', $active_menu); ?>">
               <i class="icon-table2"></i><span>Plantilla Autorizada</span>
             </a>
@@ -191,7 +200,14 @@ $clima_user_active = in_array($active_menu, [
                 </a>
               </li>
 
-              <li class="nav-item">
+              <li class="nav-item <?php echo is_active('admin_accesos', $active_menu); ?>">
+                <a href="<?php echo ASSET_BASE; ?>public/admin_accesos.php"
+                  class="nav-link <?php echo is_active('admin_accesos', $active_menu); ?>">
+                  Historial de Accesos
+                </a>
+              </li>
+
+              <li class="nav-item <?php echo is_active('import_nomina', $active_menu); ?>">
                 <a href="<?php echo ASSET_BASE; ?>public/importar_nomina.php"
                   class="nav-link <?php echo is_active('import_nomina', $active_menu); ?>">
                   Importar nómina
@@ -203,7 +219,7 @@ $clima_user_active = in_array($active_menu, [
               <li class="nav-item">
                 <a href="<?php echo ASSET_BASE; ?>public/admin_org_unidades.php"
                   class="nav-link <?php echo is_active('admin_org_unidades', $active_menu); ?>">
-                  Áras
+                  Áreas
                 </a>
               </li>
 
@@ -243,7 +259,7 @@ $clima_user_active = in_array($active_menu, [
               <li class="nav-item">
                 <a href="<?php echo ASSET_BASE; ?>public/admin_documentos.php"
                   class="nav-link <?php echo is_active('admin_documentos', $active_menu); ?>">
-                  <i class="icon-book mr-2"></i>Documentos y Manuales
+                  Documentos y Manuales
                 </a>
               </li>
               <?php endif; ?>
@@ -251,8 +267,8 @@ $clima_user_active = in_array($active_menu, [
               <?php if (can('organizacion.admin') || can('clima.admin')): ?>
               <li class="nav-item">
                 <a href="<?php echo ASSET_BASE; ?>public/clima_admin.php"
-                  class="nav-link <?php echo is_active('clima_admin', $active_menu); ?>">
-                 Clima Laboral
+                  class="nav-link<?php echo (is_active('clima_admin', $active_menu) || is_active('clima_captura', $active_menu) || is_active('clima_captura_respuestas', $active_menu) || is_active('clima_periodos', $active_menu) || is_active('clima_generar_elegibles', $active_menu) || is_active('clima_participacion', $active_menu) || is_active('clima_dimensiones', $active_menu) || is_active('clima_resultados', $active_menu) || is_active('clima_planes', $active_menu)) ? ' active' : ''; ?>">
+                  Clima Laboral
                 </a>
               </li>
               <?php endif; ?>

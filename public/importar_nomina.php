@@ -11,10 +11,12 @@ require_perm('nomina.importar');
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
+$active_menu = 'import_nomina';
 $page_title = 'Importar nómina | SGRH';
 include __DIR__ . '/../includes/layout/head.php';
 include __DIR__ . '/../includes/layout/navbar.php';
 include __DIR__ . '/../includes/layout/sidebar.php';
+include __DIR__ . '/../includes/layout/content_open.php';
 
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
@@ -24,17 +26,15 @@ if ($warnings !== null) {
 }
 ?>
 
-<div class="page-content">
-  <div class="content-wrapper">
-    <div class="content">
-      <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="card-title mb-0">Importar layout de nómina</h5>
-          <a href="importar_nomina_historial.php" class="btn btn-info btn-sm">
-            <i class="icon-list"></i> Ver Historial
-          </a>
-        </div>
-        <div class="card-body">
+<div class="page-header page-header-light">
+  <div class="page-header-content">
+    <div class="page-title">
+      <h4>Importar layout de nómina</h4>
+    </div>
+  </div>
+</div>
+
+<div class="content">
 
           <?php if (!empty($_GET['ok']) && $warnings): ?>
             <div class="alert alert-success">
@@ -101,10 +101,65 @@ if ($warnings !== null) {
             <button class="btn btn-primary">Procesar</button>
           </form>
 
+          <div class="alert alert-secondary mt-3" style="white-space: pre-line;">
+            <strong>Guía rápida del layout Excel (.xlsx)</strong>
+            
+            - Hoja: "Reporte" (o la primera si no existe). Fila 1 son encabezados; datos desde fila 2.
+            - Formatos: fechas en YYYY-MM-DD o fecha Excel; montos con o sin $/coma; RFC se normaliza a 10 caracteres (RFC base).
+
+            Campos (A→AJ) con mapeo y notas
+            A Empresa → empleados.empresa_id (obligatorio; nombre exacto en catálogo)
+            B Número empleado → empleados.no_emp (obligatorio, identificador único por empresa)
+            C Apellido paterno → empleados.apellido_paterno
+            D Apellido materno → empleados.apellido_materno
+            E Nombre(s) → empleados.nombre
+            F RFC empleado → empleados.rfc_base (toma solo los primeros 10 caracteres)
+            G CURP → empleados.curp
+            H Estatus → empleados.es_activo (ACTIVO/SI/1=1, INACTIVO/NO/0=0)
+            I Fecha ingreso → empleados.fecha_ingreso (dd/mm/yyyy o serial Excel)
+            J Fecha baja → empleados.fecha_baja
+            K Tipo empleado ID → empleados.tipo_empleado_id
+            L Tipo empleado nombre → empleados.tipo_empleado_nombre
+            M Departamento ID/clave → empleados.adscripcion_id (busca en org_adscripciones.clave)
+            N Departamento nombre → empleados.departamento_nombre
+            O Puesto código (old) → empleados.puesto_nomina_id (fallback; no principal)
+            P Nombre del puesto → empleados.puesto_id (lookup principal en org_puestos.nombre)
+            Q Centro trabajo ID → empleados.centro_trabajo_id
+            R Centro trabajo nombre → empleados.centro_trabajo_nombre
+            T Nombre del jefe → empleados.jefe_no_emp (busca por nombre completo en empleados/usuarios)
+            U Salario mensual → empleados.salario_mensual (limpia $ y comas)
+            V Salario diario → empleados.salario_diario (limpia $ y comas)
+            W Correo → empleados_demograficos.correo
+            X Teléfono → empleados_demograficos.telefono
+            Y Período / Tipo nómina → empleados_demograficos.tipo_nomina
+            Z Número de afiliación IMSS → empleados_demograficos.nss
+            AA Calle domicilio → empleados_demograficos.domicilio_calle
+            AB Municipio domicilio → empleados_demograficos.domicilio_municipio
+            AC Colonia domicilio → empleados_demograficos.domicilio_colonia
+            AD C.P. domicilio → empleados_demograficos.domicilio_cp
+            AE Estado domicilio → empleados_demograficos.domicilio_estado
+            AF Número exterior domicilio → empleados_demograficos.domicilio_num_ext
+            AG CLABE → empleados_demograficos.clabe
+            AH Crédito Infonavit → empleados_demograficos.tiene_credito_infonavit (SI/NO/1/0)
+            AI Unidad médica familiar → empleados_demograficos.unidad_medica_familiar
+            AJ Banco → empleados_demograficos.banco_id (mapea por nombre en cat_bancos)
+
+            Recomendado mínimo: Empresa, No. Empleado, Nombre, RFC, Estatus, Fecha ingreso, Puesto nombre, Departamento (M/N) si usas organización.
+            Advertencias: puestos/adscripciones/jefes no encontrados se listan tras la importación para que los crees y reimportes si aplica.
+          </div>
+
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<?php include __DIR__ . '/../includes/layout/scripts.php'; ?>
+<style>
+/* Asegurar que esta pantalla permita scroll completo */
+body, html, .content-wrapper { overflow: auto !important; height: auto; }
+</style>
+
+<?php 
+include __DIR__ . '/../includes/layout/content_close.php';
+include __DIR__ . '/../includes/layout/scripts.php'; 
+?>

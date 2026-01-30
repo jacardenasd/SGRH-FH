@@ -1,0 +1,55 @@
+:root {
+  --brand-primary: #596782;
+  --brand-primary-dark: #45506a;
+  --brand-primary-rgb: 89, 103, 130;
+  --brand-contrast: #ffffff;
+}
+/* intentionally left empty after removing custom brand overrides */
+}
+
+.sidebar.sidebar-dark {
+  background: linear-gradient(180deg, var(--brand-primary), var(--brand-primary-dark));
+}
+
+.sidebar-dark .nav-sidebar .nav-link:not(.disabled):hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-dark .nav-sidebar .nav-item > .nav-link.active,
+.sidebar-dark .nav-sidebar .nav-item-open > .nav-link:not(.disabled),
+.sidebar-dark .nav-sidebar > .nav-item-expanded:not(.nav-item-open) > .nav-link {
+  background-color: rgba(0, 0, 0, 0.12);
+  border-left: 3px solid rgba(255, 255, 255, 0.6);
+  color: var(--brand-contrast);
+}
+
+.sidebar-dark .nav-sidebar > .nav-item-submenu > .nav-group-sub {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-dark .nav-group-sub .nav-link.active {
+  color: var(--brand-contrast);
+}
+
+.sidebar-dark .btn-sidebar-expand {
+  background-color: transparent;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--brand-contrast);
+}
+
+.sidebar-dark .btn-sidebar-expand:hover,
+.sidebar-dark .btn-sidebar-expand:focus {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-dark .btn-sidebar-expand:not([disabled]):not(.disabled):active {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.form-control:focus,
+.custom-select:focus,
+.select2-container--default .select2-selection--single:focus,
+.select2-container--default .select2-selection--multiple:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 0.2rem rgba(var(--brand-primary-rgb), 0.2);
+}

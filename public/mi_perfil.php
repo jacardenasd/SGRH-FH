@@ -3,6 +3,7 @@
 
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/guard.php';
+require_once __DIR__ . '/../includes/csrf.php';
 
 require_login();
 require_password_change_redirect();
@@ -62,12 +63,13 @@ $stmt = $pdo->prepare("
     SELECT
         u.usuario_id, u.no_emp, u.rfc_base, u.estatus,
         u.debe_cambiar_pass, u.pass_cambiada,
+        u.nombre AS nombre, 
+        u.apellido_paterno AS apellido_paterno, 
+        u.apellido_materno AS apellido_materno,
         ue.empresa_id, ue.es_admin, ue.estatus AS ue_estatus,
         ue.empleado_id,
-        e.nombre, e.apellido_paterno, e.apellido_materno,
         e.es_activo, e.estatus AS estatus_empleado,
-        e.foto_path,
-        ed.correo, ed.telefono
+        e.foto_path
     FROM usuarios u
     JOIN usuario_empresas ue
       ON ue.usuario_id = u.usuario_id
@@ -75,8 +77,6 @@ $stmt = $pdo->prepare("
      AND ue.estatus = 1
     LEFT JOIN empleados e
       ON e.empleado_id = ue.empleado_id
-    LEFT JOIN empleados_demograficos ed
-      ON ed.empleado_id = ue.empleado_id
     WHERE u.usuario_id = :usuario_id
     LIMIT 1
 ");
@@ -90,6 +90,23 @@ if (!$row) {
     die('No tienes acceso activo a la empresa seleccionada. Reingresa o selecciona empresa nuevamente.');
 }
 
+// DEBUG: Verificar datos de nombre
+// error_log("DEBUG mi_perfil - nombre: " . var_export($row['nombre'], true));
+// error_log("DEBUG mi_perfil - apellido_paterno: " . var_export($row['apellido_paterno'], true));
+// error_log("DEBUG mi_perfil - apellido_materno: " . var_export($row['apellido_materno'], true));
+
+// Asegurar que los campos existen incluso si son NULL
+$row['nombre'] = isset($row['nombre']) ? $row['nombre'] : '';
+$row['apellido_paterno'] = isset($row['apellido_paterno']) ? $row['apellido_paterno'] : '';
+$row['apellido_materno'] = isset($row['apellido_materno']) ? $row['apellido_materno'] : '';
+$row['no_emp'] = isset($row['no_emp']) ? $row['no_emp'] : '';
+$row['rfc_base'] = isset($row['rfc_base']) ? $row['rfc_base'] : '';
+$row['estatus'] = isset($row['estatus']) ? $row['estatus'] : '';
+$row['empleado_id'] = isset($row['empleado_id']) ? $row['empleado_id'] : '';
+$row['estatus_empleado'] = isset($row['estatus_empleado']) ? $row['estatus_empleado'] : '';
+$row['correo'] = isset($row['correo']) ? $row['correo'] : '';
+$row['telefono'] = isset($row['telefono']) ? $row['telefono'] : '';
+
 // Determinar si se puede editar (requiere empleado_id vinculado)
 $puede_editar = (!empty($row['empleado_id']) && (int)$row['empleado_id'] > 0);
 
@@ -97,13 +114,33 @@ $puede_editar = (!empty($row['empleado_id']) && (int)$row['empleado_id'] > 0);
 $demograficos = null;
 if ($puede_editar) {
     $stmt = $pdo->prepare("
-        SELECT sexo, fecha_nacimiento, escolaridad, estado_civil, num_hijos
-        FROM empleados_demograficos
-        WHERE empleado_id = :empleado_id
+        SELECT 
+            ed.escolaridad, ed.estado_civil, ed.num_hijos,
+            e.curp
+        FROM empleados_demograficos ed
+        LEFT JOIN empleados e ON e.empleado_id = ed.empleado_id
+        WHERE ed.empleado_id = :empleado_id
         LIMIT 1
     ");
     $stmt->execute([':empleado_id' => (int)$row['empleado_id']]);
     $demograficos = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Extraer datos del CURP en PHP
+    if ($demograficos && !empty($demograficos['curp'])) {
+        $curp = $demograficos['curp'];
+        // Sexo: posición 10 (H=Hombre, M=Mujer)
+        $demograficos['sexo'] = (strlen($curp) >= 11) ? strtoupper(substr($curp, 10, 1)) : null;
+        // Fecha nacimiento: posiciones 4-9 (YYMMDD)
+        if (strlen($curp) >= 10) {
+            $yy = substr($curp, 4, 2);
+            $mm = substr($curp, 6, 2);
+            $dd = substr($curp, 8, 2);
+            $year = ((int)$yy >= 0 && (int)$yy <= 30) ? '20' . $yy : '19' . $yy;
+            $demograficos['fecha_nacimiento'] = $year . '-' . $mm . '-' . $dd;
+        } else {
+            $demograficos['fecha_nacimiento'] = null;
+        }
+    }
 }
 
 // Detectar si viene del redirect de guard.php
@@ -112,20 +149,29 @@ $requiere_demograficos = isset($_GET['completar_demograficos']) && (int)$_GET['c
 $mensaje = '';
 $errores = [];
 
+// Inicializar variables con valores de $row (para GET)
+$nombre           = isset($row['nombre']) ? $row['nombre'] : '';
+$apellido_paterno = isset($row['apellido_paterno']) ? $row['apellido_paterno'] : '';
+$apellido_materno = isset($row['apellido_materno']) ? $row['apellido_materno'] : '';
+$correo           = '';  // Correo no viene de BD en esta consulta
+$telefono         = '';  // Teléfono no viene de BD en esta consulta
+
 // Procesar POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    csrf_validate();
 
     // Bloquear edición si no hay empleado vinculado
     if (!$puede_editar) {
         $errores[] = 'Tu usuario no está vinculado a un empleado para esta empresa. Contacta al administrador.';
     } else {
 
-        // Campos de empleado
-        $nombre           = isset($_POST['nombre']) ? trim((string)$_POST['nombre']) : '';
-        $apellido_paterno = isset($_POST['apellido_paterno']) ? trim((string)$_POST['apellido_paterno']) : '';
-        $apellido_materno = isset($_POST['apellido_materno']) ? trim((string)$_POST['apellido_materno']) : '';
-        $correo           = isset($_POST['correo']) ? trim((string)$_POST['correo']) : '';
-        $telefono         = isset($_POST['telefono']) ? trim((string)$_POST['telefono']) : '';
+        // Campos de empleado (actualizar con valores de POST)
+        $nombre           = isset($_POST['nombre']) ? trim((string)$_POST['nombre']) : $nombre;
+        $apellido_paterno = isset($_POST['apellido_paterno']) ? trim((string)$_POST['apellido_paterno']) : $apellido_paterno;
+        $apellido_materno = isset($_POST['apellido_materno']) ? trim((string)$_POST['apellido_materno']) : $apellido_materno;
+        $correo           = isset($_POST['correo']) ? trim((string)$_POST['correo']) : $correo;
+        $telefono         = isset($_POST['telefono']) ? trim((string)$_POST['telefono']) : $telefono;
 
         if ($nombre === '') {
             $errores[] = 'El nombre es obligatorio.';
@@ -137,23 +183,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Validación lógica de correo por empresa (no hay UNIQUE en BD)
-        if ($correo !== '') {
-            $stmt = $pdo->prepare("
-                SELECT COUNT(*)
-                FROM empleados
-                WHERE empresa_id = :empresa_id
-                  AND correo = :correo
-                  AND empleado_id <> :empleado_id
-            ");
-            $stmt->execute([
-                ':empresa_id' => $empresa_id,
-                ':correo' => $correo,
-                ':empleado_id' => (int)$row['empleado_id']
-            ]);
-            if ((int)$stmt->fetchColumn() > 0) {
-                $errores[] = 'El correo ya está en uso por otro empleado en esta empresa.';
-            }
-        }
+        // El correo está en la tabla usuarios a través de usuario_empresas
+        // Esta validación se omite ya que el correo se maneja a nivel de usuarios
 
         // =========================
         // CARGA DE FOTO (storage)
@@ -248,61 +279,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Guardar si no hay errores
         if (count($errores) === 0) {
 
-            // 1) Actualizar EMPLEADO (maestro RH)
+            // 1) Actualizar USUARIOS (nombre y apellidos)
             $stmt = $pdo->prepare("
-                UPDATE empleados
+                UPDATE usuarios
                 SET
                     nombre = :nombre,
                     apellido_paterno = :ap_paterno,
                     apellido_materno = :ap_materno
-                WHERE empleado_id = :empleado_id
-                  AND empresa_id = :empresa_id
+                WHERE usuario_id = :usuario_id
                 LIMIT 1
             ");
-            $ok_emp = $stmt->execute([
+            $ok_usr = $stmt->execute([
                 ':nombre' => $nombre,
                 ':ap_paterno' => ($apellido_paterno === '' ? null : $apellido_paterno),
                 ':ap_materno' => ($apellido_materno === '' ? null : $apellido_materno),
-                ':empleado_id' => (int)$row['empleado_id'],
-                ':empresa_id' => $empresa_id
+                ':usuario_id' => $usuario_id
             ]);
 
-            if (!$ok_emp) {
-                $errores[] = 'No se pudo actualizar la información del empleado.';
+            if (!$ok_usr) {
+                $errores[] = 'No se pudo actualizar la información del usuario.';
             }
 
-            // 1.5) GUARDAR DATOS DEMOGRÁFICOS
+            // 1.5) GUARDAR DATOS DEMOGRÁFICOS (solo campos que aún existen)
             if (count($errores) === 0) {
-                $sexo            = isset($_POST['sexo']) ? trim((string)$_POST['sexo']) : '';
-                $fecha_nac       = isset($_POST['fecha_nacimiento']) ? trim((string)$_POST['fecha_nacimiento']) : '';
+                // sexo y fecha_nacimiento ya NO se guardan, se calculan del CURP
                 $escolaridad     = isset($_POST['escolaridad']) ? trim((string)$_POST['escolaridad']) : '';
                 $estado_civil    = isset($_POST['estado_civil']) ? trim((string)$_POST['estado_civil']) : '';
                 $num_hijos_raw   = isset($_POST['num_hijos']) ? trim((string)$_POST['num_hijos']) : '';
                 $num_hijos       = ($num_hijos_raw === '') ? 0 : (int)$num_hijos_raw;
 
-                // Validar campos requeridos demográficos
-                if ($sexo === '' || $fecha_nac === '' || $escolaridad === '' || $estado_civil === '') {
-                    $errores[] = 'Los datos demográficos son obligatorios (sexo, fecha de nacimiento, escolaridad, estado civil).';
-                }
-
-                // Validar sexo enum
-                if ($sexo !== '' && !in_array($sexo, ['M', 'F', 'X'])) {
-                    $errores[] = 'El sexo debe ser M, F o X.';
-                }
-
-                // Validar fecha de nacimiento
-                if ($fecha_nac !== '') {
-                    $fecha_valida = DateTime::createFromFormat('Y-m-d', $fecha_nac);
-                    if (!$fecha_valida || $fecha_valida->format('Y-m-d') !== $fecha_nac) {
-                        $errores[] = 'La fecha de nacimiento no es válida.';
-                    } else {
-                        // Verificar edad razonable (entre 18 y 100 años)
-                        $hoy = new DateTime();
-                        $edad = $hoy->diff($fecha_valida)->y;
-                        if ($edad < 18 || $edad > 100) {
-                            $errores[] = 'La fecha de nacimiento debe corresponder a una edad entre 18 y 100 años.';
-                        }
-                    }
+                // Validar campos requeridos demográficos (sin sexo y fecha_nacimiento)
+                if ($escolaridad === '' || $estado_civil === '') {
+                    $errores[] = 'Los datos demográficos son obligatorios (escolaridad, estado civil).';
                 }
 
                 if (count($errores) === 0) {
@@ -314,40 +322,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $existe = (int)$stmt->fetchColumn() > 0;
 
                     if ($existe) {
-                        // UPDATE
+                        // UPDATE (solo campos que aún existen)
                         $stmt = $pdo->prepare("
                             UPDATE empleados_demograficos
                             SET
-                                sexo = :sexo,
-                                fecha_nacimiento = :fecha_nac,
                                 escolaridad = :escolaridad,
                                 estado_civil = :estado_civil,
                                 num_hijos = :num_hijos,
-                                correo = :correo,
-                                telefono = :telefono,
                                 updated_at = NOW()
                             WHERE empleado_id = :empleado_id
                             LIMIT 1
                         ");
                     } else {
-                        // INSERT
+                        // INSERT (solo campos que aún existen)
                         $stmt = $pdo->prepare("
                             INSERT INTO empleados_demograficos
-                            (empleado_id, sexo, fecha_nacimiento, escolaridad, estado_civil, num_hijos, correo, telefono, created_at, updated_at)
+                            (empleado_id, escolaridad, estado_civil, num_hijos, created_at, updated_at)
                             VALUES
-                            (:empleado_id, :sexo, :fecha_nac, :escolaridad, :estado_civil, :num_hijos, :correo, :telefono, NOW(), NOW())
+                            (:empleado_id, :escolaridad, :estado_civil, :num_hijos, NOW(), NOW())
                         ");
                     }
 
                     $ok_demo = $stmt->execute([
                         ':empleado_id' => (int)$row['empleado_id'],
-                        ':sexo' => $sexo,
-                        ':fecha_nac' => ($fecha_nac === '' ? null : $fecha_nac),
                         ':escolaridad' => $escolaridad,
                         ':estado_civil' => $estado_civil,
-                        ':num_hijos' => $num_hijos,
-                        ':correo' => ($correo === '' ? null : $correo),
-                        ':telefono' => ($telefono === '' ? null : $telefono)
+                        ':num_hijos' => $num_hijos
                     ]);
 
                     if (!$ok_demo) {
@@ -405,12 +405,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 SELECT
                     u.usuario_id, u.no_emp, u.rfc_base, u.estatus,
                     u.debe_cambiar_pass, u.pass_cambiada,
+                    u.nombre AS nombre, 
+                    u.apellido_paterno AS apellido_paterno, 
+                    u.apellido_materno AS apellido_materno,
                     ue.empresa_id, ue.es_admin, ue.estatus AS ue_estatus,
                     ue.empleado_id,
-                    e.nombre, e.apellido_paterno, e.apellido_materno,
                     e.es_activo, e.estatus AS estatus_empleado,
-                    e.foto_path,
-                    ed.correo, ed.telefono
+                    e.foto_path
                 FROM usuarios u
                 JOIN usuario_empresas ue
                   ON ue.usuario_id = u.usuario_id
@@ -418,8 +419,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  AND ue.estatus = 1
                 LEFT JOIN empleados e
                   ON e.empleado_id = ue.empleado_id
-                LEFT JOIN empleados_demograficos ed
-                  ON ed.empleado_id = ue.empleado_id
                 WHERE u.usuario_id = :usuario_id
                 LIMIT 1
             ");
@@ -428,18 +427,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':empresa_id' => $empresa_id
             ]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Asegurar que los campos existen incluso si son NULL
+            $row['nombre'] = isset($row['nombre']) ? $row['nombre'] : '';
+            $row['apellido_paterno'] = isset($row['apellido_paterno']) ? $row['apellido_paterno'] : '';
+            $row['apellido_materno'] = isset($row['apellido_materno']) ? $row['apellido_materno'] : '';
+            $row['no_emp'] = isset($row['no_emp']) ? $row['no_emp'] : '';
+            $row['rfc_base'] = isset($row['rfc_base']) ? $row['rfc_base'] : '';
+            $row['estatus'] = isset($row['estatus']) ? $row['estatus'] : '';
+            $row['empleado_id'] = isset($row['empleado_id']) ? $row['empleado_id'] : '';
+            $row['estatus_empleado'] = isset($row['estatus_empleado']) ? $row['estatus_empleado'] : '';
+            $row['correo'] = isset($row['correo']) ? $row['correo'] : '';
+            $row['telefono'] = isset($row['telefono']) ? $row['telefono'] : '';
+            
             $puede_editar = (!empty($row['empleado_id']) && (int)$row['empleado_id'] > 0);
 
             // Recargar datos demográficos
             if ($puede_editar) {
                 $stmt = $pdo->prepare("
-                    SELECT sexo, fecha_nacimiento, escolaridad, estado_civil, num_hijos
-                    FROM empleados_demograficos
-                    WHERE empleado_id = :empleado_id
+                    SELECT 
+                        ed.escolaridad, ed.estado_civil, ed.num_hijos,
+                        e.curp
+                    FROM empleados_demograficos ed
+                    LEFT JOIN empleados e ON e.empleado_id = ed.empleado_id
+                    WHERE ed.empleado_id = :empleado_id
                     LIMIT 1
                 ");
                 $stmt->execute([':empleado_id' => (int)$row['empleado_id']]);
                 $demograficos = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                // Extraer datos del CURP en PHP
+                if ($demograficos && !empty($demograficos['curp'])) {
+                    $curp = $demograficos['curp'];
+                    $demograficos['sexo'] = (strlen($curp) >= 11) ? strtoupper(substr($curp, 10, 1)) : null;
+                    if (strlen($curp) >= 10) {
+                        $yy = substr($curp, 4, 2);
+                        $mm = substr($curp, 6, 2);
+                        $dd = substr($curp, 8, 2);
+                        $year = ((int)$yy >= 0 && (int)$yy <= 30) ? '20' . $yy : '19' . $yy;
+                        $demograficos['fecha_nacimiento'] = $year . '-' . $mm . '-' . $dd;
+                    } else {
+                        $demograficos['fecha_nacimiento'] = null;
+                    }
+                }
             }
         } else {
             $mensaje = alert_html('danger', '<strong>Revisa lo siguiente:</strong><br>' . implode('<br>', $errores));
@@ -519,7 +549,7 @@ include __DIR__ . '/../includes/layout/content_open.php';
                         <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center"
                              style="width:120px;height:120px;">
                             <span style="font-size:36px;">
-                                <?php echo strtoupper(substr((string)$row['nombre'], 0, 1)); ?>
+                                <?php echo strtoupper(substr((string)$nombre, 0, 1)); ?>
                             </span>
                         </div>
                     <?php endif; ?>
@@ -542,6 +572,7 @@ include __DIR__ . '/../includes/layout/content_open.php';
             </div>
 
             <form method="post" action="mi_perfil.php" enctype="multipart/form-data">
+                <?php csrf_input(); ?>
 
                 <h6 class="font-weight-semibold">Datos del empleado (empresa activa)</h6>
 
@@ -550,7 +581,7 @@ include __DIR__ . '/../includes/layout/content_open.php';
                         <div class="form-group">
                             <label>Nombre *</label>
                             <input type="text" name="nombre" class="form-control" required
-                                   value="<?php echo h($row['nombre']); ?>"
+                                   value="<?php echo h($nombre); ?>"
                                    <?php echo $puede_editar ? '' : 'disabled'; ?>>
                         </div>
                     </div>
@@ -559,7 +590,7 @@ include __DIR__ . '/../includes/layout/content_open.php';
                         <div class="form-group">
                             <label>Apellido paterno</label>
                             <input type="text" name="apellido_paterno" class="form-control"
-                                   value="<?php echo h($row['apellido_paterno']); ?>"
+                                   value="<?php echo h($apellido_paterno); ?>"
                                    <?php echo $puede_editar ? '' : 'disabled'; ?>>
                         </div>
                     </div>
@@ -568,7 +599,7 @@ include __DIR__ . '/../includes/layout/content_open.php';
                         <div class="form-group">
                             <label>Apellido materno</label>
                             <input type="text" name="apellido_materno" class="form-control"
-                                   value="<?php echo h($row['apellido_materno']); ?>"
+                                   value="<?php echo h($apellido_materno); ?>"
                                    <?php echo $puede_editar ? '' : 'disabled'; ?>>
                         </div>
                     </div>
@@ -580,16 +611,15 @@ include __DIR__ . '/../includes/layout/content_open.php';
                         <div class="form-group">
                             <label>Correo</label>
                             <input type="email" name="correo" class="form-control"
-                                   value="<?php echo h($row['correo']); ?>"
+                                   value="<?php echo h($correo); ?>"
                                    <?php echo $puede_editar ? '' : 'disabled'; ?>>
                         </div>
                     </div>
-
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Teléfono</label>
                             <input type="text" name="telefono" class="form-control"
-                                   value="<?php echo h($row['telefono']); ?>"
+                                   value="<?php echo h($telefono); ?>"
                                    <?php echo $puede_editar ? '' : 'disabled'; ?>>
                         </div>
                     </div>
@@ -603,7 +633,7 @@ include __DIR__ . '/../includes/layout/content_open.php';
                             <input type="file" name="foto" class="form-control"
                                    accept="image/jpeg,image/png"
                                    <?php echo $puede_editar ? '' : 'disabled'; ?>>
-                            <small class="form-text text-muted">JPG o PNG. Máx. 2 MB. Se guarda en <code>storage/</code>.</small>
+                            <small class="form-text text-muted">JPG o PNG. Máx. 2 MB.</small>
                         </div>
                     </div>
                 </div>
@@ -620,8 +650,8 @@ include __DIR__ . '/../includes/layout/content_open.php';
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>Sexo *</label>
-                            <select name="sexo" class="form-control" required <?php echo $puede_editar ? '' : 'disabled'; ?>>
+                            <label>Sexo (Derivado del CURP)</label>
+                            <select name="sexo" class="form-control" disabled>
                                 <option value="">-- Selecciona --</option>
                                 <option value="M" <?php echo ($demograficos && $demograficos['sexo'] === 'M') ? 'selected' : ''; ?>>Masculino</option>
                                 <option value="F" <?php echo ($demograficos && $demograficos['sexo'] === 'F') ? 'selected' : ''; ?>>Femenino</option>
@@ -632,10 +662,9 @@ include __DIR__ . '/../includes/layout/content_open.php';
 
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>Fecha de nacimiento *</label>
-                            <input type="date" name="fecha_nacimiento" class="form-control" required
-                                   value="<?php echo $demograficos ? h($demograficos['fecha_nacimiento']) : ''; ?>"
-                                   <?php echo $puede_editar ? '' : 'disabled'; ?>>
+                            <label>Fecha de nacimiento (Derivado del CURP)</label>
+                            <input type="date" name="fecha_nacimiento" class="form-control" disabled
+                                   value="<?php echo $demograficos ? h($demograficos['fecha_nacimiento']) : ''; ?>">
                         </div>
                     </div>
 

@@ -1,10 +1,12 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/csrf.php';
 
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  csrf_validate();
     $rfc  = $_POST['rfc'] ?? '';
     $pass = $_POST['password'] ?? '';
 
@@ -33,15 +35,28 @@ $page_title = 'Login | SGRH';
 include __DIR__ . '/../includes/layout/head.php';
 ?>
 
+<style>
+  .login-bg {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.65), rgba(15, 118, 110, 0.65)),
+                url('<?php echo ASSET_BASE; ?>global_assets/images/backgrounds/user_bg1.png') center center / cover no-repeat;
+    min-height: 100vh;
+  }
+  .login-card {
+    box-shadow: 0 12px 45px rgba(0, 0, 0, 0.25);
+    border: 0;
+  }
+</style>
+
 <div class="page-content">
   <div class="content-wrapper">
-    <div class="content d-flex justify-content-center align-items-center">
+    <div class="content d-flex justify-content-center align-items-center login-bg">
 
       <form class="login-form" method="post" autocomplete="off">
-        <div class="card mb-0">
+        <?php csrf_input(); ?>
+        <div class="card mb-0 login-card">
           <div class="card-body">
             <div class="text-center mb-3">
-              <i class="icon-reading icon-2x text-secondary border-secondary border-3 rounded-pill p-3 mb-3 mt-1"></i>
+              <img src="<?php echo ASSET_BASE; ?>global_assets/images/logos/FH_dark.png" alt="Logo FH" class="mb-3 mt-1" style="max-height: 96px;">
               <h5 class="mb-0">Acceso al sistema</h5>
               <span class="d-block text-muted">RFC (sin homoclave) + contraseña</span>
             </div>

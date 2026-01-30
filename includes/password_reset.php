@@ -129,3 +129,31 @@ function pr_update_password($usuario_id, $new_password) {
 
     return [true, 'OK'];
 }
+
+/**
+ * Restablece la contraseña al No. de empleado y obliga cambio en siguiente login.
+ */
+function pr_reset_to_no_emp($usuario_id, $no_emp) {
+    global $pdo;
+
+    $no_emp = trim((string)$no_emp);
+    if ($no_emp === '') {
+        return [false, 'El usuario no tiene No. de empleado'];
+    }
+
+    $hash = password_hash($no_emp, PASSWORD_DEFAULT);
+
+    $stmt = $pdo->prepare("
+        UPDATE usuarios
+        SET password_hash = :h,
+            debe_cambiar_pass = 1,
+            pass_cambiada = 0,
+            updated_at = NOW()
+        WHERE usuario_id = :uid
+        LIMIT 1
+    ");
+    $stmt->execute([':h' => $hash, ':uid' => (int)$usuario_id]);
+
+    return [true, 'OK'];
+}
+?>

@@ -284,11 +284,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               $flash = 'Datos incompletos para agregar excepción.';
               $flash_type = 'danger';
             } else {
-              $stE = $pdo->prepare("SELECT empleado_id, unidad_id, nombre, apellido_paterno, apellido_materno FROM empleados WHERE empresa_id=? AND no_emp=? LIMIT 1");
-              $stE->execute([$empresa_id, $no_emp]);
+              $stE = $pdo->prepare("SELECT empleado_id, unidad_id FROM empleados WHERE empresa_id=? AND tipo_empleado_id = 1 LIMIT 1");
+              $stE->execute([$empresa_id]);
               $emp = $stE->fetch(PDO::FETCH_ASSOC);
               if (!$emp) {
-                $flash = 'Empleado no encontrado por No. empleado.';
+                $flash = 'No hay empleados activos.';
                 $flash_type = 'danger';
               } else {
                 $empleado_id = (int)$emp['empleado_id'];
@@ -387,17 +387,19 @@ if ($periodo && $empresa_id > 0) {
     $sql_lista = "
         SELECT
           ce.empleado_id,
-          CONCAT(e.nombre, ' ', e.apellido_paterno, ' ', COALESCE(e.apellido_materno, '')) AS nombre_completo,
           e.no_emp,
+          CONCAT(us.nombre, ' ', us.apellido_paterno, ' ', COALESCE(us.apellido_materno, '')) AS nombre_completo,
           u.nombre AS unidad_nombre,
           e.fecha_ingreso,
           ce.elegible,
           ce.motivo_no_elegible
         FROM clima_elegibles ce
         LEFT JOIN empleados e ON e.empleado_id = ce.empleado_id
+        LEFT JOIN usuario_empresas ue ON ue.empleado_id = e.empleado_id AND ue.empresa_id = e.empresa_id
+        LEFT JOIN usuarios us ON us.usuario_id = ue.usuario_id
         LEFT JOIN org_unidades u ON u.unidad_id = ce.unidad_id
         WHERE ce.periodo_id=? AND ce.empresa_id=?
-        ORDER BY u.nombre ASC, e.nombre ASC
+        ORDER BY u.nombre ASC, us.nombre ASC
     ";
     $lst = $pdo->prepare($sql_lista);
     $lst->execute([$periodo_id, $empresa_id]);
@@ -406,11 +408,13 @@ if ($periodo && $empresa_id > 0) {
     // Excepciones actuales
     $excepciones = [];
     if (table_exists($pdo, 'clima_excepciones')) {
-      $sx = $pdo->prepare("SELECT ex.empleado_id, ex.unidad_id_override, e.no_emp,
-                     CONCAT(e.nombre,' ',e.apellido_paterno,' ',COALESCE(e.apellido_materno,'')) AS nombre,
+      $sx = $pdo->prepare("SELECT ex.empleado_id, ex.unidad_id_override,
+                     CONCAT(us.nombre,' ',us.apellido_paterno,' ',COALESCE(us.apellido_materno,'')) AS nombre,
                      u.nombre AS unidad_nombre
                   FROM clima_excepciones ex
                   LEFT JOIN empleados e ON e.empleado_id = ex.empleado_id
+                  LEFT JOIN usuario_empresas ue ON ue.empleado_id = e.empleado_id AND ue.empresa_id = e.empresa_id
+                  LEFT JOIN usuarios us ON us.usuario_id = ue.usuario_id
                   LEFT JOIN org_unidades u ON u.unidad_id = COALESCE(ex.unidad_id_override, e.unidad_id)
                   WHERE ex.periodo_id = ? AND ex.empresa_id = ?");
       $sx->execute([$periodo_id, $empresa_id]);
@@ -430,7 +434,7 @@ if ($periodo && $empresa_id > 0) {
 
 // Layout UI
 $page_title  = 'Clima Laboral - Universo Elegible';
-$active_menu = 'clima_elegibles';
+$active_menu = 'clima_generar_elegibles';
 
 $extra_css = [
   'global_assets/css/icons/icomoon/styles.min.css',

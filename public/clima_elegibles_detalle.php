@@ -58,9 +58,6 @@ if (!$unidad) {
 $sql = "
     SELECT
         e.empleado_id,
-        emp.no_emp,
-        emp.rfc_base,
-        CONCAT_WS(' ', emp.nombre, emp.apellido_paterno, emp.apellido_materno) AS nombre_completo,
         e.elegible,
         CASE WHEN r.empleado_id IS NOT NULL THEN 'Respondió' ELSE 'Pendiente' END AS estado_respuesta,
         MAX(r.fecha_respuesta) AS fecha_respuesta,
@@ -74,8 +71,8 @@ $sql = "
       AND e.empresa_id = ?
       AND e.unidad_id = ?
       AND e.elegible = 1
-    GROUP BY e.empleado_id, emp.no_emp, emp.rfc_base, emp.nombre, emp.apellido_paterno, emp.apellido_materno, r.empleado_id
-    ORDER BY emp.no_emp ASC
+    GROUP BY e.empleado_id, r.empleado_id
+    ORDER BY e.empleado_id ASC
 ";
 
 $stmt = $pdo->prepare($sql);
@@ -206,9 +203,9 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
       <tbody>
         <?php foreach ($elegibles as $e): ?>
           <tr class="<?php echo ($e['estado_respuesta'] === 'Respondió') ? '' : 'table-warning'; ?>">
-            <td><?php echo h($e['no_emp']); ?></td>
-            <td><?php echo h($e['rfc_base']); ?></td>
-            <td><?php echo h($e['nombre_completo']); ?></td>
+            <td><?php echo h($e['empleado_id']); ?></td>
+            <td></td>
+            <td></td>
             <td>
               <?php if ($e['estado_respuesta'] === 'Respondió'): ?>
                 <span class="badge badge-success">

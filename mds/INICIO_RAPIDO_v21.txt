@@ -1,0 +1,78 @@
+# ⚡ Inicio Rápido - v2.1 (2 minutos)
+
+**¿Qué es esto?** Las encuestas en papel ahora son más compactas y confidenciales.
+
+---
+
+## 🎯 3 Cambios Principales
+
+### 1️⃣ Encuesta más pequeña
+- **Antes**: 14 páginas
+- **Ahora**: 2 páginas A4
+- **Beneficio**: Menos papel, fácil de distribuir
+
+### 2️⃣ Datos demográficos
+- **Nuevo**: Campos Empresa, Unidad, Departamento
+- **Beneficio**: Análisis por área sin identificar personas
+
+### 3️⃣ Captura anónima
+- **Nuevo**: Opción 🔒 Anónima en captura
+- **Beneficio**: 100% confidencialidad si se necesita
+
+---
+
+## 📋 Próximos Pasos (Elige uno)
+
+### Solo quiero probar (2 min)
+```
+1. Abre: http://localhost/sgrh/public/clima_encuesta_impresion.php
+2. Haz clic: "🖨️ Imprimir encuesta"
+3. Verifica: 2 páginas en preview
+```
+
+### Quiero saber todo (15 min)
+```
+1. Lee: CLIMA_v21_README.md (5 min)
+2. Lee: GUIA_IMPRESION_RAPIDA.md (5 min)
+3. Lee: GUIA_CAPTURA_ANONIMA.md (5 min)
+```
+
+### Soy desarrollador (30 min)
+```
+1. Lee: CHANGELOG_MEJORAS_PAPEL.md (15 min)
+2. Lee: CAMBIOS_ARCHIVOS_v21.md (10 min)
+3. Revisa código (5 min)
+```
+
+---
+
+## 🔗 Enlaces
+
+**Sistema**:
+- Imprimir: `/public/clima_encuesta_impresion.php`
+- Capturar: `/public/clima_captura_respuestas.php`
+
+**Documentación**:
+- Resumen: `CLIMA_v21_README.md` ← EMPIEZA AQUÍ
+- Índice: `TABLA_CONTENIDOS_v21.md`
+
+---
+
+## ❓ Preguntas Rápidas
+
+**¿Cómo imprimo?**  
+Accede a `/public/clima_encuesta_impresion.php` y haz clic en "🖨️ Imprimir"
+
+**¿Cómo capturo?**  
+Accede a `/public/clima_captura_respuestas.php` y elige Tipo: 👤 o 🔒
+
+**¿Qué cambió en el código?**  
+Lee `CHANGELOG_MEJORAS_PAPEL.md`
+
+---
+
+**Versión**: 2.1  
+**Fecha**: 21 de enero de 2026  
+**Tiempo**: ⚡ 2 minutos
+
+👉 Siguiente: Abre `CLIMA_v21_README.md`

@@ -58,7 +58,18 @@ if ($nuevo_ingreso_id > 0) {
     $st = $pdo->prepare($sql);
     $st->execute([':nid' => $nuevo_ingreso_id, ':emp' => $empresa_id]);
 } else {
-    $sql = "SELECT * FROM empleados_demograficos WHERE empleado_id = :eid";
+    // Consultar desde empleados + empleados_demograficos
+    $sql = "SELECT 
+                e.*,
+                ed.*,
+                e.curp,
+                e.salario_diario as sueldo_diario,
+                e.salario_mensual as sueldo_mensual,
+                e.fecha_ingreso as fecha_alta,
+                e.puesto_nombre as puesto
+            FROM empleados e
+            LEFT JOIN empleados_demograficos ed ON ed.empleado_id = e.empleado_id
+            WHERE e.empleado_id = :eid";
     $st = $pdo->prepare($sql);
     $st->execute([':eid' => $empleado_id]);
 }
@@ -68,6 +79,33 @@ $emp = $st->fetch(PDO::FETCH_ASSOC);
 if (!$emp) {
     echo json_encode(['ok' => false, 'error' => 'Empleado no encontrado']);
     exit;
+}
+
+// Extraer datos del CURP en PHP
+if (!empty($emp['curp'])) {
+    $curp = $emp['curp'];
+    // Sexo: posición 10 (H=Hombre, M=Mujer)
+    $emp['sexo'] = (strlen($curp) >= 11) ? strtoupper(substr($curp, 10, 1)) : null;
+    
+    // Fecha nacimiento: posiciones 4-9 (YYMMDD)
+    if (strlen($curp) >= 10) {
+        $yy = substr($curp, 4, 2);
+        $mm = substr($curp, 6, 2);
+        $dd = substr($curp, 8, 2);
+        $year = ((int)$yy >= 0 && (int)$yy <= 30) ? '20' . $yy : '19' . $yy;
+        $emp['fecha_nacimiento'] = $year . '-' . $mm . '-' . $dd;
+    }
+    
+    // Nacionalidad: posición 16 (H=mexicano, E=extranjero)
+    if (strlen($curp) >= 17) {
+        $nac_char = strtoupper(substr($curp, 16, 1));
+        $emp['nacionalidad'] = ($nac_char === 'H') ? 'Mexicana' : 'Extranjera';
+    }
+    
+    // Lugar de nacimiento: posiciones 11-12 (código de estado)
+    if (strlen($curp) >= 13) {
+        $emp['lugar_nacimiento'] = substr($curp, 11, 2);
+    }
 }
 
 // Validar datos completos

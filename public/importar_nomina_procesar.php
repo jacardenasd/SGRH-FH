@@ -201,6 +201,15 @@ try {
 
     $usuarioSesionId = isset($_SESSION['usuario_id']) ? (int)$_SESSION['usuario_id'] : null;
 
+    // Verificar que el usuario existe antes de insertar
+    if ($usuarioSesionId !== null) {
+        $stmtCheckUser = $pdo->prepare("SELECT usuario_id FROM usuarios WHERE usuario_id = ? LIMIT 1");
+        $stmtCheckUser->execute([$usuarioSesionId]);
+        if (!$stmtCheckUser->fetch()) {
+            $usuarioSesionId = null; // Usuario no existe, usar NULL
+        }
+    }
+
     // Cabecera importación
     $stmt = $pdo->prepare("
         INSERT INTO nomina_importaciones (empresa_id, usuario_id, archivo_nombre, status, mensaje)
@@ -260,9 +269,6 @@ try {
         'no_emp' => ':no_emp',
         'rfc_base' => ':rfc_base',
         'curp' => ':curp',
-        'nombre' => ':nombre',
-        'apellido_paterno' => ':ap',
-        'apellido_materno' => ':am',
         'es_activo' => ':es_activo',
         'correo' => ':correo',
         'telefono' => ':telefono',
@@ -289,6 +295,7 @@ try {
 
         'salario_diario' => ':sd',
         'salario_mensual' => ':sm',
+        'sueldo_integrado' => ':si',
 
         'empresa_nombre' => ':empresa_nombre',
         'estatus' => ':estatus',
@@ -324,6 +331,7 @@ try {
         'nombres' => ':nombre',
         'apellido_paterno' => ':ap',
         'apellido_materno' => ':am',
+        'correo' => ':correo',
         'estatus' => ':estatus',
         'empleado_id' => ':empleado_id',
         'password_hash' => ':pass_hash',
@@ -402,6 +410,13 @@ try {
         $salario_diario_raw = $sheet->getCell("V{$r}")->getValue();
         $salario_mensual = parse_money_2($salario_mensual_raw);
         $salario_diario = parse_money_2($salario_diario_raw);
+        
+        // Calcular sueldo integrado (salario_diario * 1.0452 aproximadamente)
+        // Este factor incluye aguinaldo (15 días), vacaciones y prima vacacional
+        $sueldo_integrado = null;
+        if ($salario_diario !== null && $salario_diario > 0) {
+            $sueldo_integrado = round($salario_diario * 1.0452, 2);
+        }
 
         // Columnas opcionales: Correo (W) y Teléfono (X)
         $correo_excel = '';
@@ -623,12 +638,13 @@ try {
                 // Limpiar y normalizar el nombre del jefe
                 $jefe_nom_limpio = strtoupper(trim($jefe_nom));
                 
-                // Intentar búsqueda exacta primero
+                // Intentar búsqueda exacta primero en tabla usuarios
                 $stmtJefe = $pdo->prepare("
-                    SELECT no_emp 
-                    FROM empleados 
-                    WHERE empresa_id = ?
-                    AND UPPER(CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno, ''))) = ?
+                    SELECT u.no_emp 
+                    FROM usuarios u
+                    INNER JOIN usuario_empresas ue ON ue.usuario_id = u.usuario_id
+                    WHERE ue.empresa_id = ?
+                    AND UPPER(CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', COALESCE(u.apellido_materno, ''))) = ?
                     LIMIT 1
                 ");
                 $stmtJefe->execute([$empresa_id, $jefe_nom_limpio]);
@@ -637,10 +653,11 @@ try {
                 // Si no encuentra, intentar con LIKE
                 if (!$rowJefe) {
                     $stmtJefe = $pdo->prepare("
-                        SELECT no_emp 
-                        FROM empleados 
-                        WHERE empresa_id = ?
-                        AND UPPER(CONCAT(nombre, ' ', apellido_paterno, ' ', COALESCE(apellido_materno, ''))) LIKE ?
+                        SELECT u.no_emp 
+                        FROM usuarios u
+                        INNER JOIN usuario_empresas ue ON ue.usuario_id = u.usuario_id
+                        WHERE ue.empresa_id = ?
+                        AND UPPER(CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', COALESCE(u.apellido_materno, ''))) LIKE ?
                         LIMIT 1
                     ");
                     $stmtJefe->execute([$empresa_id, '%' . $jefe_nom_limpio . '%']);
@@ -669,9 +686,6 @@ try {
                 case ':no_emp': $empParams[':no_emp'] = $no_emp; break;
                 case ':rfc_base': $empParams[':rfc_base'] = $rfc; break;
                 case ':curp': $empParams[':curp'] = ($curp !== '' ? $curp : null); break;
-                case ':nombre': $empParams[':nombre'] = ($nombre !== '' ? $nombre : null); break;
-                case ':ap': $empParams[':ap'] = ($ap !== '' ? $ap : null); break;
-                case ':am': $empParams[':am'] = ($am !== '' ? $am : null); break;
                 case ':es_activo': $empParams[':es_activo'] = $es_activo; break;
                 case ':correo': $empParams[':correo'] = ($correo_excel !== '' ? $correo_excel : null); break;
                 case ':telefono': $empParams[':telefono'] = ($telefono_excel !== '' ? $telefono_excel : null); break;
@@ -697,6 +711,7 @@ try {
                 case ':jefe_nom': $empParams[':jefe_nom'] = ($jefe_nom !== '' ? $jefe_nom : null); break;
                 case ':sd': $empParams[':sd'] = $salario_diario; break;
                 case ':sm': $empParams[':sm'] = $salario_mensual; break;
+                case ':si': $empParams[':si'] = $sueldo_integrado; break;
                 // empleados.estatus es ENUM ('activo','baja','suspendido')
                 case ':empresa_nombre': $empParams[':empresa_nombre'] = ($empresaNombre !== '' ? $empresaNombre : null); break;
                 case ':estatus': $empParams[':estatus'] = 'activo'; break;
@@ -728,6 +743,7 @@ try {
                 case ':nombre': $usrParams[':nombre'] = ($nombre !== '' ? $nombre : null); break;
                 case ':ap': $usrParams[':ap'] = ($ap !== '' ? $ap : null); break;
                 case ':am': $usrParams[':am'] = ($am !== '' ? $am : null); break;
+                case ':correo': $usrParams[':correo'] = ($correo_excel !== '' ? $correo_excel : null); break;
                 // usuarios.estatus es ENUM ('activo','inactivo','baja')
                 case ':estatus': $usrParams[':estatus'] = 'activo'; break;
                 case ':empleado_id': $usrParams[':empleado_id'] = $empleado_id; break;
@@ -786,10 +802,9 @@ try {
                     }
                 }
 
-                // Mapa de datos demograficos a insertar
+                // Mapa de datos demograficos a insertar (sin correo, va en usuarios)
                 $demogData = [
                     'empleado_id' => $empleado_id,
-                    'correo' => ($correo_excel !== '' ? $correo_excel : null),
                     'telefono' => ($telefono_excel !== '' ? $telefono_excel : null),
                     'tipo_nomina' => ($tipo_nomina_excel !== '' ? $tipo_nomina_excel : null),
                     'nss' => ($nss_excel !== '' ? $nss_excel : null),

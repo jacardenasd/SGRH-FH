@@ -139,6 +139,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // =======================
 // CARGAR DATOS
 // =======================
+// Obtener nombre de la empresa
+$empresa_nombre = '';
+$stmt_emp = $pdo->prepare("SELECT nombre FROM empresas WHERE empresa_id=? LIMIT 1");
+$stmt_emp->execute([$empresa_id]);
+$row_emp = $stmt_emp->fetch(PDO::FETCH_ASSOC);
+if ($row_emp) {
+    $empresa_nombre = $row_emp['nombre'];
+}
+
 // Dimensiones
 $dimensiones = $pdo->query("SELECT * FROM clima_dimensiones WHERE activo=1 ORDER BY orden")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -198,8 +207,11 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
 <div class="page-header page-header-light">
   <div class="page-header-content header-elements-md-inline">
-    <div class="page-title d-flex">
+    <div class="page-title d-flex flex-column">
       <h4><i class="icon-file-text2 mr-2"></i> <span class="font-weight-semibold">Clima Laboral</span> - Planes de Acción</h4>
+      <?php if ($empresa_nombre): ?>
+      <span class="text-muted font-size-sm"><i class="icon-office mr-1"></i><?php echo h($empresa_nombre); ?></span>
+      <?php endif; ?>
     </div>
     <div class="header-elements d-none d-md-flex">
       <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalPlan" onclick="abrirPlanNuevo()">
@@ -220,13 +232,13 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
   <!-- Selector de periodo -->
   <div class="card">
-    <div class="card-header">
-      <h5 class="card-title">Filtrar por periodo</h5>
+    <div class="card-header bg-light">
+      <h5 class="card-title mb-0"><i class="icon-calendar mr-2"></i>Seleccionar Periodo para Gestionar Planes</h5>
     </div>
     <div class="card-body">
       <form method="get" class="form-inline">
-        <label class="mr-2">Periodo:</label>
-        <select name="periodo_id" class="form-control mr-2" onchange="this.form.submit()">
+        <label class="mr-2 font-weight-semibold">Periodo:</label>
+        <select name="periodo_id" class="form-control mr-2" onchange="this.form.submit()" style="min-width: 250px;">
           <?php foreach ($periodos as $p): ?>
           <option value="<?php echo (int)$p['periodo_id']; ?>" <?php echo ((int)$p['periodo_id'] === $periodo_id) ? 'selected' : ''; ?>>
             <?php echo h($p['anio']); ?> (<?php echo h($p['estatus']); ?>)
@@ -234,10 +246,24 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
           <?php endforeach; ?>
         </select>
       </form>
+      <small class="text-muted d-block mt-2">
+        <i class="icon-info22 mr-1"></i>Los planes de acción se crean y gestionan por periodo. Selecciona el periodo para ver y administrar sus planes.
+      </small>
     </div>
   </div>
 
   <?php if ($periodo): ?>
+
+  <!-- Info del periodo -->
+  <div class="alert alert-info border-left-3 border-left-info">
+    <div class="d-flex align-items-center">
+      <i class="icon-info22 icon-2x mr-3"></i>
+      <div>
+        <h6 class="font-weight-semibold mb-1">Gestionando planes del periodo: <?php echo h($periodo['anio']); ?></h6>
+        <p class="mb-0 text-muted">Los planes mostrados corresponden a todas las Direcciones de <strong><?php echo h($empresa_nombre); ?></strong> para este periodo.</p>
+      </div>
+    </div>
+  </div>
 
   <!-- Estadísticas -->
   <div class="row">
@@ -277,8 +303,16 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
   <!-- Listado de planes -->
   <div class="card">
-    <div class="card-header">
-      <h5 class="card-title">Planes de acción registrados</h5>
+    <div class="card-header bg-white">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">
+          <i class="icon-list mr-2"></i>Planes de Acción por Dirección
+        </h5>
+        <span class="badge badge-pill badge-info"><?php echo count($planes); ?> planes registrados</span>
+      </div>
+      <small class="text-muted d-block mt-2">
+        <i class="icon-info22 mr-1"></i>Visualización de planes de todas las Direcciones de la empresa para el periodo seleccionado.
+      </small>
     </div>
     <div class="table-responsive">
       <table class="table" id="tablePlanes">

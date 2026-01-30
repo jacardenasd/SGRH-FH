@@ -188,7 +188,7 @@ include __DIR__ . '/../includes/layout/content_open.php';
                   <p class="text-muted mb-0 small"><?php echo htmlspecialchars($doc['descripcion']); ?></p>
                   <?php endif; ?>
                 </div>
-                <a href="<?php echo ASSET_BASE; ?>storage/<?php echo htmlspecialchars($doc['archivo_path']); ?>" class="btn btn-sm btn-primary" download target="_blank">
+                <a href="<?php echo ASSET_BASE; ?>public/descargar_documento.php?id=<?php echo $doc['documento_id']; ?>" class="btn btn-sm btn-primary" download>
                   <i class="icon-download mr-1"></i> Descargar
                 </a>
               </div>

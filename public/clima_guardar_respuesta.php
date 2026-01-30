@@ -30,7 +30,7 @@ if (isset($_POST['valor'])) { $valor = (int)$_POST['valor']; }
 
 if ($empresa_id <= 0 || $usuario_id <= 0) out(false, array('error' => 'Sesión inválida.'));
 if ($reactivo_id <= 0) out(false, array('error' => 'Reactivo inválido.'));
-if ($valor < 1 || $valor > 5) out(false, array('error' => 'Valor fuera de rango (1-5).'));
+if ($valor < 1 || $valor > 3) out(false, array('error' => 'Valor fuera de rango (1-3).'));
 
 // Resolver empleado_id
 $empleado_id = 0;

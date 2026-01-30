@@ -164,11 +164,9 @@ if ($total_reactivos > 0) $porcentaje = round(($total_contestados / $total_react
 
 // Likert
 $likert = array(
-  1 => 'Totalmente en desacuerdo',
-  2 => 'En desacuerdo',
-  3 => 'Neutral',
-  4 => 'De acuerdo',
-  5 => 'Totalmente de acuerdo'
+  1 => 'Totalmente De acuerdo',
+  2 => 'Parcialmente De acuerdo',
+  3 => 'En Desacuerdo'
 );
 
 // =====================================================
@@ -217,7 +215,7 @@ if (!$abiertas_disponibles) {
 }
 
 // Layout (Limitless)
-$active_menu = 'clima_contestar';
+$active_menu = 'clima';
 
 require_once __DIR__ . '/../includes/layout/head.php';
 require_once __DIR__ . '/../includes/layout/navbar.php';
@@ -257,11 +255,23 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
   <?php else: ?>
 
     <?php if ($ya_finalizo): ?>
-      <div class="alert alert-success">
-        Esta encuesta ya fue finalizada. Ya no es posible modificar respuestas.
-        <?php if ($finalizado_at): ?>
-          <div class="text-muted" style="font-size:12px;">Finalizada: <?php echo h($finalizado_at); ?></div>
-        <?php endif; ?>
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <div class="media">
+            <div class="mr-3">
+              <i class="icon-checkmark-circle2 icon-3x"></i>
+            </div>
+            <div class="media-body">
+              <h5 class="font-weight-semibold mb-1">Encuesta completada</h5>
+              <p class="mb-0">Esta encuesta ya fue finalizada. A continuación puedes ver tus respuestas.</p>
+              <?php if ($finalizado_at): ?>
+                <div class="mt-2" style="font-size:13px; opacity: 0.9;">
+                  <i class="icon-calendar mr-1"></i> Finalizada: <?php echo h($finalizado_at); ?>
+                </div>
+              <?php endif; ?>
+            </div>
+          </div>
+        </div>
       </div>
     <?php endif; ?>
 
@@ -272,6 +282,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
       </div>
     <?php endif; ?>
 
+    <?php if (!$ya_finalizo): ?>
     <div class="card">
       <div class="card-header header-elements-inline">
         <h6 class="card-title">Instrucciones</h6>
@@ -296,23 +307,18 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
         <div class="d-flex align-items-center justify-content-between" style="margin-top:16px;">
           <div>
-            <?php if ($ya_finalizo): ?>
-              <span class="badge badge-success">Encuesta finalizada</span>
-            <?php else: ?>
-              <span class="text-muted">Cuando termines, da clic en <strong>Finalizar encuesta</strong>.</span>
-            <?php endif; ?>
+            <span class="text-muted">Cuando termines, da clic en <strong>Finalizar encuesta</strong>.</span>
           </div>
           <div>
-            <?php if (!$ya_finalizo): ?>
-              <button type="button" class="btn btn-primary" id="btnFinalizar">
-                <i class="icon-checkmark3 mr-2"></i> Finalizar encuesta
-              </button>
-            <?php endif; ?>
+            <button type="button" class="btn btn-primary" id="btnFinalizar">
+              <i class="icon-checkmark3 mr-2"></i> Finalizar encuesta
+            </button>
           </div>
         </div>
 
       </div>
     </div>
+    <?php endif; ?>
 
     <?php if ($total_reactivos > 0): ?>
       <?php foreach ($dimensiones as $d): ?>
@@ -333,41 +339,76 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                 $sel = 0;
                 if (isset($resp_map[$rid])) $sel = (int)$resp_map[$rid];
               ?>
-              <div class="mb-3 p-3 border rounded">
+              <div class="mb-3 p-3 border rounded <?php echo $ya_finalizo ? 'bg-light' : ''; ?>">
                 <div class="mb-3">
                   <strong><?php echo (int)$rx['orden']; ?>.</strong> <?php echo h($rx['texto']); ?>
                 </div>
+                
+                <?php if ($ya_finalizo): ?>
+                  <!-- Vista de solo lectura cuando está finalizada -->
+                  <?php
+                    $emojis = array(1 => '😊', 2 => '😐', 3 => '😞');
+                    $labels = array(
+                      1 => 'Totalmente De acuerdo',
+                      2 => 'Parcialmente De acuerdo',
+                      3 => 'En Desacuerdo'
+                    );
+                    $colors = array(1 => '#4CAF50', 2 => '#FFC107', 3 => '#F44336');
+                    
+                    if ($sel > 0 && isset($emojis[$sel])) {
+                      $emoji = $emojis[$sel];
+                      $label_text = $labels[$sel];
+                      $color = $colors[$sel];
+                  ?>
+                  <div style="display: flex; align-items: center; padding: 15px; background-color: <?php echo $color; ?>20; border-left: 4px solid <?php echo $color; ?>; border-radius: 4px;">
+                    <div style="font-size: 40px; margin-right: 15px;"><?php echo $emoji; ?></div>
+                    <div>
+                      <div style="font-size: 16px; font-weight: 600; color: <?php echo $color; ?>;">
+                        <?php echo h($label_text); ?>
+                      </div>
+                      <div style="font-size: 12px; color: #666; margin-top: 3px;">
+                        Tu respuesta
+                      </div>
+                    </div>
+                  </div>
+                  <?php } else { ?>
+                  <div class="alert alert-warning mb-0">
+                    <i class="icon-warning mr-2"></i> Sin respuesta registrada
+                  </div>
+                  <?php } ?>
+                <?php else: ?>
+                  <!-- Vista editable cuando NO está finalizada -->
+                  <div style="display: flex; justify-content: space-around; gap: 10px; margin: 15px 0;">
+                    <?php foreach ($likert as $k => $label): ?>
+                      <?php 
+                        $checked = ($sel === (int)$k) ? 'checked' : '';
+                        $emojis = array(1 => '😊', 2 => '😐', 3 => '😞');
+                        $colors = array(1 => '#4CAF50', 2 => '#FFC107', 3 => '#F44336');
+                        $emoji = isset($emojis[$k]) ? $emojis[$k] : '';
+                        $bgColor = isset($colors[$k]) ? $colors[$k] : '#ddd';
+                      ?>
+                      <label style="cursor: pointer; text-align: center; flex: 1;">
+                        <input type="radio"
+                               name="r_<?php echo $rid; ?>"
+                               value="<?php echo (int)$k; ?>"
+                               <?php echo $checked; ?>
+                               class="radLikert"
+                               data-reactivo="<?php echo $rid; ?>"
+                               style="display: none;">
+                        <div style="font-size: 50px; padding: 15px; border-radius: 8px; border: 2px solid #ddd; background-color: transparent; transition: all 0.3s; cursor: pointer;"
+                             class="emoji-option"
+                             data-value="<?php echo (int)$k; ?>"
+                             data-reactivo="<?php echo $rid; ?>"
+                             data-color="<?php echo $bgColor; ?>">
+                          <?php echo $emoji; ?>
+                        </div>
+                        <div style="font-size: 11px; margin-top: 5px; color: #666;"><?php echo h(str_replace(array('😊 ', '😐 ', '😞 '), '', $label)); ?></div>
+                      </label>
+                    <?php endforeach; ?>
+                  </div>
 
-                <div class="table-responsive">
-                  <table class="table table-bordered table-sm mb-2">
-                    <thead class="bg-light">
-                      <tr>
-                        <?php foreach ($likert as $k => $label): ?>
-                          <th class="text-center" style="width: 20%;"><?php echo h($label); ?></th>
-                        <?php endforeach; ?>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <?php foreach ($likert as $k => $label): ?>
-                          <?php $checked = ($sel === (int)$k) ? 'checked' : ''; ?>
-                          <td class="text-center">
-                            <label class="mb-0">
-                              <input type="radio"
-                                     name="r_<?php echo $rid; ?>"
-                                     value="<?php echo (int)$k; ?>"
-                                     <?php echo $checked; ?>
-                                     class="radLikert"
-                                     data-reactivo="<?php echo $rid; ?>">
-                            </label>
-                          </td>
-                        <?php endforeach; ?>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div class="text-muted" style="font-size: 12px;" id="st_<?php echo $rid; ?>"></div>
+                  <div style="font-size: 13px; font-weight: 500; min-height: 20px; margin-top: 8px;" id="st_<?php echo $rid; ?>"></div>
+                <?php endif; ?>
               </div>
             <?php endforeach; ?>
           </div>
@@ -383,11 +424,13 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
         <h6 class="card-title">Preguntas abiertas</h6>
       </div>
       <div class="card-body">
+        <?php if (!$ya_finalizo): ?>
         <p class="text-muted mb-3">
           Tus comentarios nos ayudan a definir planes de acción por Dirección. Evita incluir datos personales o nombres.
         </p>
+        <?php endif; ?>
 
-        <?php if (!$abiertas_disponibles): ?>
+        <?php if (!$abiertas_disponibles && !$ya_finalizo): ?>
           <div class="alert alert-warning">
             Aún no está habilitada la captura de preguntas abiertas en base de datos.
             Ejecuta el script <code>clima_preguntas_abiertas.sql</code> para crear tablas y catálogo.
@@ -403,23 +446,40 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
             $val = '';
             if ($pid > 0 && isset($abiertas_map[$pid])) $val = (string)$abiertas_map[$pid];
           ?>
-          <div class="form-group" style="margin-bottom:14px;">
-            <label>
+          <div class="form-group <?php echo $ya_finalizo ? 'mb-4' : 'mb-3'; ?>" style="margin-bottom:14px;">
+            <label class="font-weight-semibold">
               <?php echo h($orden); ?>) <?php echo h($txt); ?>
-              <?php if ($ob === 1): ?><span class="text-danger">*</span><?php endif; ?>
+              <?php if ($ob === 1 && !$ya_finalizo): ?><span class="text-danger">*</span><?php endif; ?>
             </label>
-            <textarea class="form-control txtAbierta" rows="3"
-                      data-pregunta="<?php echo $pid; ?>"
-                      <?php if ($ob === 1): ?>data-obligatorio="1"<?php endif; ?>
-                      <?php if (!$abiertas_disponibles): ?>disabled<?php endif; ?>
-                      placeholder="Escribe tu respuesta..."><?php echo h($val); ?></textarea>
-            <div class="status-save text-muted" id="sta_<?php echo $pid; ?>"></div>
+            
+            <?php if ($ya_finalizo): ?>
+              <!-- Vista de solo lectura -->
+              <?php if (!empty($val)): ?>
+                <div class="p-3 border rounded bg-light" style="white-space: pre-wrap;">
+                  <?php echo h($val); ?>
+                </div>
+              <?php else: ?>
+                <div class="alert alert-warning mb-0">
+                  <i class="icon-warning mr-2"></i> Sin respuesta registrada
+                </div>
+              <?php endif; ?>
+            <?php else: ?>
+              <!-- Vista editable -->
+              <textarea class="form-control txtAbierta" rows="3"
+                        data-pregunta="<?php echo $pid; ?>"
+                        <?php if ($ob === 1): ?>data-obligatorio="1"<?php endif; ?>
+                        <?php if (!$abiertas_disponibles): ?>disabled<?php endif; ?>
+                        placeholder="Escribe tu respuesta..."><?php echo h($val); ?></textarea>
+              <div class="status-save text-muted" id="sta_<?php echo $pid; ?>"></div>
+            <?php endif; ?>
           </div>
         <?php endforeach; ?>
 
+        <?php if (!$ya_finalizo): ?>
         <div class="text-muted" style="font-size:12px;">
           <span class="text-danger">*</span> Pregunta obligatoria.
         </div>
+        <?php endif; ?>
       </div>
     </div>
 
@@ -447,16 +507,19 @@ $(function() {
 
   function setStatus(id, text, isError){
     var el = $('#st_' + id);
-    el.removeClass('text-danger').removeClass('text-success')
-      .addClass(isError ? 'text-danger' : 'text-success');
-    el.text(text);
+    if (isError) {
+      el.html('<div style="background-color: #f8d7da; color: #721c24; padding: 10px 12px; border-radius: 4px; border-left: 4px solid #dc3545; font-weight: bold; margin-top: 8px;">⚠️ ' + text + '</div>');
+    } else {
+      el.html('<span style="color: #28a745; font-weight: bold;">✓ ' + text + '</span>');
+    }
   }
 
   function setStatusAbierta(preguntaId, text, isError){
     var el = $('#sta_' + preguntaId);
     el.removeClass('text-danger').removeClass('text-success')
       .addClass(isError ? 'text-danger' : 'text-success');
-    el.text(text);
+    var emoji = isError ? '❌ ' : '✓ ';
+    el.text(emoji + text);
   }
 
   function setAvance(avance, contestadas){
@@ -476,7 +539,71 @@ $(function() {
     return;
   }
 
-  // Guardar Likert
+  // Manejador para emojis clicables
+  $(document).on('click', '.emoji-option', function(){
+    var valor = $(this).data('value');
+    var reactivoId = $(this).data('reactivo');
+    var color = $(this).data('color');
+    
+    // Marcar el radio button
+    $('input[name="r_' + reactivoId + '"][value="' + valor + '"]').prop('checked', true);
+    
+    // Restaurar todos los emojis de este reactivo a estado normal
+    $('[data-reactivo="' + reactivoId + '"].emoji-option').css({
+      'border-width': '2px',
+      'border-color': '#ddd',
+      'background-color': 'transparent',
+      'box-shadow': 'none',
+      'transform': 'scale(1)'
+    });
+    
+    // Aplicar estilos solo al emoji seleccionado
+    $(this).css({
+      'border-width': '3px',
+      'border-color': color,
+      'background-color': color + '40',
+      'box-shadow': '0 0 8px ' + color + '60',
+      'transform': 'scale(1.08)'
+    });
+    
+    // Guardar la respuesta
+    setStatus(reactivoId, 'Guardando...', false);
+    $.ajax({
+      url: 'clima_guardar_respuesta.php',
+      method: 'POST',
+      dataType: 'json',
+      data: { reactivo_id: reactivoId, valor: valor }
+    }).done(function(resp){
+      if (resp && resp.ok) {
+        setStatus(reactivoId, 'Guardado', false);
+        if (resp.avance !== undefined) {
+          var av = parseFloat(resp.avance);
+          if (isNaN(av)) av = 0;
+          setAvance(av, resp.contestadas);
+        }
+      } else {
+        setStatus(reactivoId, (resp && resp.error) ? resp.error : 'Error al guardar', true);
+      }
+    }).fail(function(){
+      setStatus(reactivoId, 'Error de comunicación al guardar', true);
+    });
+  });
+
+  // Marcar emojis ya seleccionados al cargar la página
+  $('input[class="radLikert"]:checked').each(function(){
+    var valor = $(this).val();
+    var reactivoId = $(this).data('reactivo');
+    var $emojiDiv = $('[data-reactivo="' + reactivoId + '"][data-value="' + valor + '"]');
+    var color = $emojiDiv.data('color');
+    $emojiDiv.css({
+      'border-width': '3px',
+      'border-color': color,
+      'background-color': color + '40',
+      'box-shadow': '0 0 8px ' + color + '60'
+    });
+  });
+
+  // Guardar Likert (antiguo manejador, mantenerlo para compatibilidad)
   $(document).on('change', '.radLikert', function(){
     var reactivoId = $(this).data('reactivo');
     var valor = $(this).val();
@@ -541,11 +668,16 @@ $(function() {
   // Función para mostrar alerta en HTML
   function showAlertBox(message, type) {
     type = type || 'danger'; // 'danger', 'success', 'warning', 'info'
+    var emoji = '';
+    if (type === 'danger') emoji = '❌ ';
+    else if (type === 'success') emoji = '✅ ';
+    else if (type === 'warning') emoji = '⚠️ ';
+    else if (type === 'info') emoji = 'ℹ️ ';
     
     var alertHtml = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
                     '<button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">' +
                     '<span aria-hidden="true">&times;</span></button>' +
-                    message +
+                    emoji + message +
                     '</div>';
     
     // Insertar alerta al inicio del contenido
@@ -562,6 +694,31 @@ $(function() {
   // Finalizar
   $('#btnFinalizar, #btnFinalizarFinal').on('click', function(){
     var $btn = $(this);
+    
+    // Validar que todas las preguntas estén contestadas
+    var preguntas_sin_respuesta = [];
+    var total_preguntas = 0;
+    
+    // Recorrer todos los inputs radio de Likert
+    $('input[name^="r_"]').each(function(){
+      var reactivoId = $(this).data('reactivo');
+      var valor = $('input[name="r_' + reactivoId + '"]:checked').val();
+      
+      if (!valor) {
+        if (preguntas_sin_respuesta.indexOf(reactivoId) === -1) {
+          preguntas_sin_respuesta.push(reactivoId);
+          // Mostrar error en la pregunta
+          setStatus(reactivoId, 'Esta pregunta es obligatoria', true);
+        }
+      }
+      total_preguntas++;
+    });
+    
+    if (preguntas_sin_respuesta.length > 0) {
+      showAlertBox('Hay ' + preguntas_sin_respuesta.length + ' pregunta(s) sin responder. Completa todas antes de finalizar.', 'danger');
+      return;
+    }
+    
     $btn.prop('disabled', true);
 
     $.ajax({

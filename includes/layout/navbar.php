@@ -3,7 +3,11 @@ $nombre_usuario = isset($_SESSION['nombre_usuario']) && $_SESSION['nombre_usuari
 
 $empresa_alias  = isset($_SESSION['empresa_alias']) ? $_SESSION['empresa_alias'] : '';
 $empresa_nombre_sess = isset($_SESSION['empresa_nombre']) ? $_SESSION['empresa_nombre'] : 'Sin empresa';
-$empresa_nombre = $empresa_alias ? $empresa_alias : $empresa_nombre_sess;
+
+// Omitir "SA de CV" y variantes similares
+$empresa_nombre = trim(preg_replace('/\b(s\.?a\.?\s+de\s+c\.?v\.?|s\.?a\.?|sociedad\s+anónima)\b/i', '', $empresa_nombre_sess));
+$empresa_nombre = trim(preg_replace('/\.+\s*$/', '', $empresa_nombre));
+$empresa_nombre = $empresa_nombre ?: $empresa_nombre_sess;
 
 // Logo dinámico por empresa
 // Busca coincidencias con archivos en global_assets/images/logos

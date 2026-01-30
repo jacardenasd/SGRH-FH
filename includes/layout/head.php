@@ -10,6 +10,10 @@ if (!isset($extra_css)) { $extra_css = []; }
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title><?php echo htmlspecialchars($page_title); ?></title>
 
+	<!-- Favicon -->
+	<link rel="icon" type="image/x-icon" href="<?php echo ASSET_BASE; ?>favicon.ico">
+	<!-- /Favicon -->
+
 	<!-- Global stylesheets -->
 	<link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
 	<link href="<?php echo ASSET_BASE; ?>global_assets/css/icons/icomoon/styles.min.css" rel="stylesheet" type="text/css">

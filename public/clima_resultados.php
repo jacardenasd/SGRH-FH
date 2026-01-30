@@ -89,12 +89,12 @@ if ($periodo) {
     $stmt_g = $pdo->prepare($sql_global);
     $stmt_g->execute([$periodo_id, $empresa_id]);
     $row_g = $stmt_g->fetch(PDO::FETCH_ASSOC);
-    $prom_1_5 = $row_g ? (float)$row_g['promedio_global'] : 0.0;
-    // Convertir escala 1-5 a 0-100: ((valor - 1) / 4) * 100
-    $prom_0_100 = $prom_1_5 > 0 ? (($prom_1_5 - 1) / 4) * 100 : 0.0;
+    $prom_1_3 = $row_g ? (float)$row_g['promedio_global'] : 0.0;
+    // Convertir escala 1-3 a 0-100: ((3 - valor) / 2) * 100
+    $prom_0_100 = $prom_1_3 > 0 ? ((3 - $prom_1_3) / 2) * 100 : 0.0;
     $resumen_global = array(
         'promedio_global' => round($prom_0_100, 2),
-        'promedio_1_5' => round($prom_1_5, 2)
+        'promedio_1_3' => round($prom_1_3, 2)
     );
 
     // Resultados por Dirección (solo publicadas)
@@ -144,24 +144,24 @@ if ($periodo) {
             $stmt_d = $pdo->prepare($sql_dim);
             $stmt_d->execute([$periodo_id, $empresa_id, $uid, $did]);
             $row_d = $stmt_d->fetch(PDO::FETCH_ASSOC);
-            $prom_dim_1_5 = $row_d ? (float)$row_d['promedio'] : 0.0;
-            $prom_dim_0_100 = $prom_dim_1_5 > 0 ? (($prom_dim_1_5 - 1) / 4) * 100 : 0.0;
+            $prom_dim_1_3 = $row_d ? (float)$row_d['promedio'] : 0.0;
+            $prom_dim_0_100 = $prom_dim_1_3 > 0 ? ((3 - $prom_dim_1_3) / 2) * 100 : 0.0;
 
             $promedios_dim[] = array(
                 'dimension_id' => $did,
                 'dimension_nombre' => $dim['nombre'],
                 'promedio' => round($prom_dim_0_100, 2),
-                'promedio_1_5' => round($prom_dim_1_5, 2)
+                'promedio_1_3' => round($prom_dim_1_3, 2)
             );
         }
 
         // Convertir promedio unidad a escala 0-100
-        $prom_u_1_5 = (float)$unidad['promedio_unidad'];
-        $prom_u_0_100 = $prom_u_1_5 > 0 ? (($prom_u_1_5 - 1) / 4) * 100 : 0.0;
+        $prom_u_1_3 = (float)$unidad['promedio_unidad'];
+        $prom_u_0_100 = $prom_u_1_3 > 0 ? ((3 - $prom_u_1_3) / 2) * 100 : 0.0;
 
         $ranking_unidades[$idx]['dimensiones'] = $promedios_dim;
         $ranking_unidades[$idx]['promedio_unidad'] = round($prom_u_0_100, 2);
-        $ranking_unidades[$idx]['promedio_unidad_1_5'] = round($prom_u_1_5, 2);
+        $ranking_unidades[$idx]['promedio_unidad_1_3'] = round($prom_u_1_3, 2);
     }
 
     // ===========================
@@ -173,12 +173,17 @@ if ($periodo) {
     // Por Sexo
     $sql_sexo = "
         SELECT 
-            COALESCE(ed.sexo, 'No especificado') as categoria,
+            COALESCE(
+                CASE 
+                    WHEN LENGTH(e.curp) >= 11 THEN UPPER(SUBSTRING(e.curp, 11, 1))
+                    ELSE 'No especificado'
+                END, 
+                'No especificado'
+            ) as categoria,
             AVG(cr.valor) AS promedio
         FROM clima_respuestas cr
         INNER JOIN clima_elegibles ce ON ce.periodo_id = cr.periodo_id AND ce.empleado_id = cr.empleado_id
         INNER JOIN empleados e ON e.empleado_id = ce.empleado_id
-        LEFT JOIN empleados_demograficos ed ON ed.empleado_id = e.empleado_id
         WHERE cr.periodo_id = ?
           AND ce.empresa_id = ?
           AND ce.elegible = 1
@@ -190,8 +195,8 @@ if ($periodo) {
     $rows_sexo = $stmt_sexo->fetchAll(PDO::FETCH_ASSOC);
     $demograficos['sexo'] = array();
     foreach ($rows_sexo as $row) {
-        $prom_1_5 = (float)$row['promedio'];
-        $prom_0_100 = $prom_1_5 > 0 ? (($prom_1_5 - 1) / 4) * 100 : 0.0;
+        $prom_1_3 = (float)$row['promedio'];
+        $prom_0_100 = $prom_1_3 > 0 ? ((3 - $prom_1_3) / 2) * 100 : 0.0;
         $sexo_label = $row['categoria'];
         if ($sexo_label === 'M') $sexo_label = 'Masculino';
         elseif ($sexo_label === 'F') $sexo_label = 'Femenino';
@@ -201,22 +206,80 @@ if ($periodo) {
         );
     }
 
-    // Por Rango de Edad
+    // Por Rango de Edad (extraído del CURP)
     $sql_edad = "
         SELECT 
             CASE 
-                WHEN TIMESTAMPDIFF(YEAR, ed.fecha_nacimiento, CURDATE()) < 25 THEN '< 25 años'
-                WHEN TIMESTAMPDIFF(YEAR, ed.fecha_nacimiento, CURDATE()) BETWEEN 25 AND 34 THEN '25-34 años'
-                WHEN TIMESTAMPDIFF(YEAR, ed.fecha_nacimiento, CURDATE()) BETWEEN 35 AND 44 THEN '35-44 años'
-                WHEN TIMESTAMPDIFF(YEAR, ed.fecha_nacimiento, CURDATE()) BETWEEN 45 AND 54 THEN '45-54 años'
-                WHEN TIMESTAMPDIFF(YEAR, ed.fecha_nacimiento, CURDATE()) >= 55 THEN '55+ años'
+                WHEN LENGTH(e.curp) >= 10 THEN
+                    CASE 
+                        WHEN TIMESTAMPDIFF(YEAR, 
+                            STR_TO_DATE(
+                                CONCAT(
+                                    IF(CAST(SUBSTRING(e.curp, 5, 2) AS UNSIGNED) <= 30, '20', '19'),
+                                    SUBSTRING(e.curp, 5, 2), '-',
+                                    SUBSTRING(e.curp, 7, 2), '-',
+                                    SUBSTRING(e.curp, 9, 2)
+                                ), 
+                                '%Y-%m-%d'
+                            ), 
+                            CURDATE()
+                        ) < 25 THEN '< 25 años'
+                        WHEN TIMESTAMPDIFF(YEAR, 
+                            STR_TO_DATE(
+                                CONCAT(
+                                    IF(CAST(SUBSTRING(e.curp, 5, 2) AS UNSIGNED) <= 30, '20', '19'),
+                                    SUBSTRING(e.curp, 5, 2), '-',
+                                    SUBSTRING(e.curp, 7, 2), '-',
+                                    SUBSTRING(e.curp, 9, 2)
+                                ), 
+                                '%Y-%m-%d'
+                            ), 
+                            CURDATE()
+                        ) BETWEEN 25 AND 34 THEN '25-34 años'
+                        WHEN TIMESTAMPDIFF(YEAR, 
+                            STR_TO_DATE(
+                                CONCAT(
+                                    IF(CAST(SUBSTRING(e.curp, 5, 2) AS UNSIGNED) <= 30, '20', '19'),
+                                    SUBSTRING(e.curp, 5, 2), '-',
+                                    SUBSTRING(e.curp, 7, 2), '-',
+                                    SUBSTRING(e.curp, 9, 2)
+                                ), 
+                                '%Y-%m-%d'
+                            ), 
+                            CURDATE()
+                        ) BETWEEN 35 AND 44 THEN '35-44 años'
+                        WHEN TIMESTAMPDIFF(YEAR, 
+                            STR_TO_DATE(
+                                CONCAT(
+                                    IF(CAST(SUBSTRING(e.curp, 5, 2) AS UNSIGNED) <= 30, '20', '19'),
+                                    SUBSTRING(e.curp, 5, 2), '-',
+                                    SUBSTRING(e.curp, 7, 2), '-',
+                                    SUBSTRING(e.curp, 9, 2)
+                                ), 
+                                '%Y-%m-%d'
+                            ), 
+                            CURDATE()
+                        ) BETWEEN 45 AND 54 THEN '45-54 años'
+                        WHEN TIMESTAMPDIFF(YEAR, 
+                            STR_TO_DATE(
+                                CONCAT(
+                                    IF(CAST(SUBSTRING(e.curp, 5, 2) AS UNSIGNED) <= 30, '20', '19'),
+                                    SUBSTRING(e.curp, 5, 2), '-',
+                                    SUBSTRING(e.curp, 7, 2), '-',
+                                    SUBSTRING(e.curp, 9, 2)
+                                ), 
+                                '%Y-%m-%d'
+                            ), 
+                            CURDATE()
+                        ) >= 55 THEN '55+ años'
+                        ELSE 'No especificado'
+                    END
                 ELSE 'No especificado'
             END as categoria,
             AVG(cr.valor) AS promedio
         FROM clima_respuestas cr
         INNER JOIN clima_elegibles ce ON ce.periodo_id = cr.periodo_id AND ce.empleado_id = cr.empleado_id
         INNER JOIN empleados e ON e.empleado_id = ce.empleado_id
-        LEFT JOIN empleados_demograficos ed ON ed.empleado_id = e.empleado_id
         WHERE cr.periodo_id = ?
           AND ce.empresa_id = ?
           AND ce.elegible = 1
@@ -229,8 +292,8 @@ if ($periodo) {
     $rows_edad = $stmt_edad->fetchAll(PDO::FETCH_ASSOC);
     $demograficos['edad'] = array();
     foreach ($rows_edad as $row) {
-        $prom_1_5 = (float)$row['promedio'];
-        $prom_0_100 = $prom_1_5 > 0 ? (($prom_1_5 - 1) / 4) * 100 : 0.0;
+        $prom_1_3 = (float)$row['promedio'];
+        $prom_0_100 = $prom_1_3 > 0 ? ((3 - $prom_1_3) / 2) * 100 : 0.0;
         $demograficos['edad'][] = array(
             'categoria' => $row['categoria'],
             'promedio' => round($prom_0_100, 2)
@@ -265,8 +328,8 @@ if ($periodo) {
     $rows_antiguedad = $stmt_antiguedad->fetchAll(PDO::FETCH_ASSOC);
     $demograficos['antiguedad'] = array();
     foreach ($rows_antiguedad as $row) {
-        $prom_1_5 = (float)$row['promedio'];
-        $prom_0_100 = $prom_1_5 > 0 ? (($prom_1_5 - 1) / 4) * 100 : 0.0;
+        $prom_1_3 = (float)$row['promedio'];
+        $prom_0_100 = $prom_1_3 > 0 ? ((3 - $prom_1_3) / 2) * 100 : 0.0;
         $demograficos['antiguedad'][] = array(
             'categoria' => $row['categoria'],
             'promedio' => round($prom_0_100, 2)
@@ -589,8 +652,8 @@ foreach ($dimensiones as $dim) {
     $stmt_dg = $pdo->prepare($sql_dim_global);
     $stmt_dg->execute([$periodo_id, $empresa_id, $did]);
     $row_dg = $stmt_dg->fetch(PDO::FETCH_ASSOC);
-    $prom_1_5 = $row_dg ? (float)$row_dg['promedio'] : 0.0;
-    $prom_0_100 = $prom_1_5 > 0 ? (($prom_1_5 - 1) / 4) * 100 : 0.0;
+    $prom_1_3 = $row_dg ? (float)$row_dg['promedio'] : 0.0;
+    $prom_0_100 = $prom_1_3 > 0 ? ((3 - $prom_1_3) / 2) * 100 : 0.0;
     $promedios_dim_global[] = array(
         'nombre' => $dim['nombre'],
         'promedio' => round($prom_0_100, 2)

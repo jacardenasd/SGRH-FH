@@ -113,9 +113,21 @@ $page_title = 'Seleccionar empresa | SGRH';
 include __DIR__ . '/../includes/layout/head.php';
 ?>
 
+<style>
+  .login-bg {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.65), rgba(15, 118, 110, 0.65)),
+                url('<?php echo ASSET_BASE; ?>global_assets/images/backgrounds/user_bg1.png') center center / cover no-repeat;
+    min-height: 100vh;
+  }
+  .login-card {
+    box-shadow: 0 12px 45px rgba(0, 0, 0, 0.25);
+    border: 0;
+  }
+</style>
+
 <div class="page-content">
   <div class="content-wrapper">
-    <div class="content d-flex justify-content-center align-items-center">
+    <div class="content d-flex justify-content-center align-items-center login-bg">
 
       <form class="login-form" method="post">
         <div class="card mb-0">

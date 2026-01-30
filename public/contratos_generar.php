@@ -45,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
                              WHERE c.empresa_id = :e
                              AND c.estatus NOT IN ('borrador')
                              AND c.empleado_id IN (
-                                 SELECT empleado_id FROM empleados_demograficos 
-                                 WHERE rfc = (SELECT rfc FROM empleados_nuevo_ingreso WHERE nuevo_ingreso_id = :nid)
+                                 SELECT e.empleado_id FROM empleados e
+                                 WHERE e.rfc = (SELECT rfc FROM empleados_nuevo_ingreso WHERE nuevo_ingreso_id = :nid)
                              )";
             $stCheckDocs = $pdo->prepare($sqlCheckDocs);
             $stCheckDocs->execute(array(':nid' => $nuevo_ingreso_id, ':e' => $empresa_id));
@@ -135,8 +135,8 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                                     WHERE c.empresa_id = :e
                                     AND c.estatus NOT IN ('borrador')
                                     AND c.empleado_id IN (
-                                        SELECT empleado_id FROM empleados_demograficos 
-                                        WHERE rfc = :rfc
+                                        SELECT e.empleado_id FROM empleados e
+                                        WHERE e.rfc = :rfc
                                     )";
               $stCheckContratos = $pdo->prepare($sqlCheckContratos);
               $stCheckContratos->execute(array(':e' => $empresa_id, ':rfc' => $emp['rfc']));
@@ -221,6 +221,17 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 <script>
 $(function() {
   $('.datatable-basic').DataTable({
+    language: {
+      search: 'Buscar:',
+      lengthMenu: 'Mostrar _MENU_ registros',
+      info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+      zeroRecords: 'No se encontraron registros',
+      emptyTable: 'No hay datos disponibles',
+      paginate: {
+        previous: 'Anterior',
+        next: 'Siguiente'
+      }
+    },
     columnDefs: [{
       orderable: false,
       targets: [5]

@@ -10,6 +10,38 @@ function normaliza_rfc_base($rfc_raw) {
 }
 
 /**
+ * Registrar intento de acceso al sistema
+ */
+function registrar_acceso($usuario_id, $rfc_intento, $exitoso, $mensaje = null, $empresa_id = null) {
+    global $pdo;
+    
+    $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+    $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? substr($_SERVER['HTTP_USER_AGENT'], 0, 255) : null;
+    
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO usuarios_accesos 
+            (usuario_id, rfc_intento, exitoso, ip_address, user_agent, empresa_id, mensaje)
+            VALUES 
+            (:usuario_id, :rfc_intento, :exitoso, :ip, :user_agent, :empresa_id, :mensaje)
+        ");
+        
+        $stmt->execute([
+            ':usuario_id' => $usuario_id,
+            ':rfc_intento' => $rfc_intento,
+            ':exitoso' => $exitoso ? 1 : 0,
+            ':ip' => $ip,
+            ':user_agent' => $user_agent,
+            ':empresa_id' => $empresa_id,
+            ':mensaje' => $mensaje
+        ]);
+    } catch (Exception $e) {
+        // Registrar error pero no interrumpir el flujo de login
+        error_log("Error al registrar acceso: " . $e->getMessage());
+    }
+}
+
+/**
  * Login con RFC + password.
  * Nota: el password inicial puede ser NoEmp, pero ya NO se pide NoEmp en login.
  *
@@ -22,6 +54,8 @@ function login_intento($rfc_raw, $password) {
     $password = (string)$password;
 
     if (strlen($rfc_base) !== 10 || $password === '') {
+        // Registrar intento fallido
+        registrar_acceso(null, $rfc_base, false, 'RFC o contraseña inválidos');
         return [false, 'RFC o contraseña inválidos.'];
     }
 
@@ -37,6 +71,8 @@ function login_intento($rfc_raw, $password) {
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (!$rows) {
+        // Registrar intento fallido - usuario no encontrado
+        registrar_acceso(null, $rfc_base, false, 'Credenciales incorrectas');
         return [false, 'Credenciales incorrectas.'];
     }
 
@@ -46,6 +82,7 @@ function login_intento($rfc_raw, $password) {
         if (!empty($u['password_hash']) && password_verify($password, $u['password_hash'])) {
             if ($u_match !== null) {
                 // Caso extremo: dos usuarios con mismo RFC base y misma contraseña
+                registrar_acceso(null, $rfc_base, false, 'Conflicto de autenticación');
                 return [false, 'No fue posible autenticar. Contacta a RH.'];
             }
             $u_match = $u;
@@ -53,6 +90,10 @@ function login_intento($rfc_raw, $password) {
     }
 
     if (!$u_match) {
+        // Registrar intento fallido - contraseña incorrecta
+        // Intentamos obtener el usuario_id del primer registro para registrar el intento
+        $usuario_id_intento = isset($rows[0]['usuario_id']) ? (int)$rows[0]['usuario_id'] : null;
+        registrar_acceso($usuario_id_intento, $rfc_base, false, 'Contraseña incorrecta');
         return [false, 'Credenciales incorrectas.'];
     }
 
@@ -84,6 +125,9 @@ function login_intento($rfc_raw, $password) {
 
     $_SESSION['empresas'] = $empresas;
 
+    // Determinar empresa_id para el registro
+    $empresa_id_acceso = null;
+    
     // Si tiene 1 empresa, setearla
     if (count($empresas) === 1) {
         $_SESSION['empresa_id'] = (int)$empresas[0]['empresa_id'];
@@ -91,6 +135,8 @@ function login_intento($rfc_raw, $password) {
         $_SESSION['empresa_alias'] = $empresas[0]['alias'];
         $_SESSION['es_admin_empresa'] = (int)$empresas[0]['es_admin'];
         $_SESSION['empleado_id'] = $empresas[0]['empleado_id'] ? (int)$empresas[0]['empleado_id'] : null;
+        
+        $empresa_id_acceso = (int)$empresas[0]['empresa_id'];
 
         // Cargar permisos
         cargar_permisos_sesion((int)$u_match['usuario_id']);
@@ -101,6 +147,15 @@ function login_intento($rfc_raw, $password) {
         // Aún no hay empresa seleccionada
         $_SESSION['permisos'] = [];
     }
+
+    // Registrar acceso exitoso
+    registrar_acceso(
+        (int)$u_match['usuario_id'], 
+        $rfc_base, 
+        true, 
+        'Acceso exitoso',
+        $empresa_id_acceso
+    );
 
     return [true, 'OK'];
 }

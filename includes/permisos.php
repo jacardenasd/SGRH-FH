@@ -15,6 +15,12 @@ function cargar_permisos_sesion($usuario_id) {
         return;
     }
 
+    // Si no hay empresa seleccionada, dejar permisos vacíos
+    if (empty($_SESSION['empresa_id'])) {
+        $_SESSION['permisos'] = [];
+        return;
+    }
+
     $sql = "
         SELECT p.clave
         FROM usuario_roles ur
