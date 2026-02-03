@@ -30,6 +30,10 @@ if ($warnings !== null) {
   <div class="page-header-content">
     <div class="page-title">
       <h4>Importar layout de nómina</h4>
+      <p class="text-muted mb-0">
+        <a href="importar_nomina_historial.php" class="text-muted"><i class="icon-history"></i> Ver historial</a> | 
+        <a href="importar_nomina_revertir.php" class="text-muted"><i class="icon-undo2"></i> Revertir última importación</a>
+      </p>
     </div>
   </div>
 </div>

@@ -97,6 +97,8 @@ if ($import_id_sel > 0) {
                           <span class="badge badge-success">Procesado</span>
                         <?php elseif ($imp['status'] === 'cargado'): ?>
                           <span class="badge badge-warning">Cargado</span>
+                        <?php elseif ($imp['status'] === 'revertido'): ?>
+                          <span class="badge badge-info">Revertido</span>
                         <?php else: ?>
                           <span class="badge badge-danger"><?php echo htmlspecialchars($imp['status']); ?></span>
                         <?php endif; ?>
@@ -107,6 +109,14 @@ if ($import_id_sel > 0) {
                            class="btn btn-sm btn-info" title="Ver detalle">
                           <i class="icon-eye"></i>
                         </a>
+                        <?php if ($imp['status'] === 'procesado'): ?>
+                          <a href="importar_nomina_revertir.php?revert_id=<?php echo (int)$imp['import_id']; ?>" 
+                             class="btn btn-sm btn-warning" title="Revertir esta importación">
+                            <i class="icon-undo2"></i>
+                          </a>
+                        <?php elseif ($imp['status'] === 'revertido'): ?>
+                          <span class="badge badge-warning">Revertido</span>
+                        <?php endif; ?>
                       </td>
                     </tr>
                   <?php endforeach; ?>
