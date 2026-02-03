@@ -80,9 +80,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_reversion']
                 $payload = json_decode($reg['payload_json'], true);
                 
                 if ($accion === 'insert') {
-                    // Si se insertó, eliminamos el registro
-                    $stmt = $pdo->prepare("DELETE FROM empleados WHERE no_emp = ? AND empresa_id = ?");
+                    // Si se insertó, eliminamos el registro y sus datos relacionados
+                    // Primero obtenemos el empleado_id para limpiar tablas relacionadas
+                    $stmt = $pdo->prepare("
+                        SELECT empleado_id FROM empleados 
+                        WHERE no_emp = ? AND empresa_id = ?
+                    ");
                     $stmt->execute([$no_emp, $ultima_importacion['empresa_id']]);
+                    $emp = $stmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if ($emp) {
+                        $empleado_id = (int)$emp['empleado_id'];
+                        
+                        // Eliminar datos relacionados en empleados_demograficos
+                        $stmt = $pdo->prepare("DELETE FROM empleados_demograficos WHERE empleado_id = ?");
+                        $stmt->execute([$empleado_id]);
+                        
+                        // Eliminar cualquier registro de usuarios asociado si existe
+                        $stmt = $pdo->prepare("DELETE FROM usuarios WHERE empleado_id = ?");
+                        $stmt->execute([$empleado_id]);
+                        
+                        // Finalmente eliminar el empleado
+                        $stmt = $pdo->prepare("DELETE FROM empleados WHERE empleado_id = ?");
+                        $stmt->execute([$empleado_id]);
+                    } else {
+                        // Si no existe el empleado, intenta eliminar de todas formas
+                        $stmt = $pdo->prepare("DELETE FROM empleados WHERE no_emp = ? AND empresa_id = ?");
+                        $stmt->execute([$no_emp, $ultima_importacion['empresa_id']]);
+                    }
+                    
                     $contadores['eliminados']++;
                     
                     $detalles_reversion[] = [
