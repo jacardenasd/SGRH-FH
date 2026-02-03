@@ -30,10 +30,6 @@ if ($warnings !== null) {
   <div class="page-header-content">
     <div class="page-title">
       <h4>Importar layout de nómina</h4>
-      <p class="text-muted mb-0">
-        <a href="importar_nomina_historial.php" class="text-muted"><i class="icon-history"></i> Ver historial</a> | 
-        <a href="importar_nomina_revertir.php" class="text-muted"><i class="icon-undo2"></i> Revertir última importación</a>
-      </p>
     </div>
   </div>
 </div>
@@ -102,7 +98,19 @@ if ($warnings !== null) {
               <label>Archivo Excel (layout nómina)</label>
               <input type="file" name="archivo" class="form-control" accept=".xlsx" required>
             </div>
-            <button class="btn btn-primary">Procesar</button>
+            <div class="d-flex justify-content-between align-items-center">
+              <button class="btn btn-primary">
+                <i class="icon-upload"></i> Procesar
+              </button>
+              <div class="btn-group">
+                <a href="importar_nomina_historial.php" class="btn btn-info btn-sm">
+                  <i class="icon-history"></i> Ver historial
+                </a>
+                <a href="importar_nomina_revertir.php" class="btn btn-warning btn-sm">
+                  <i class="icon-undo2"></i> Revertir última importación
+                </a>
+              </div>
+            </div>
           </form>
 
           <div class="alert alert-secondary mt-3" style="white-space: pre-line;">
