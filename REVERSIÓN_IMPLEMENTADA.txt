@@ -1,0 +1,249 @@
+═══════════════════════════════════════════════════════════════════════════════
+  ✅ FUNCIONALIDAD DE REVERSIÓN DE IMPORTACIÓN DE NÓMINA - COMPLETADA
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 OBJETIVO LOGRADO:
+   Agregar la capacidad de revertir (deshacer) la última importación de nómina 
+   cuando el layout del Excel estaba mal organizado o los datos se importaron 
+   incorrectamente.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📦 ARCHIVOS IMPLEMENTADOS:
+
+1. public/importar_nomina_revertir.php (NUEVO)
+   ├─ Página principal de reversión
+   ├─ 298 líneas de código
+   ├─ Identifica última importación procesada
+   ├─ Ejecuta reversión con transacciones BD
+   ├─ Muestra detalles de cada cambio revertido
+   └─ Registra auditoría completa
+
+2. public/importar_nomina.php (MODIFICADO)
+   ├─ Agregados 2 links en header
+   ├─ Link a "Ver historial"
+   └─ Link a "Revertir última importación"
+
+3. public/importar_nomina_historial.php (MODIFICADO)
+   ├─ Agregado estado "Revertido" en tabla
+   ├─ Botón ⏪ para revertir importaciones procesadas
+   ├─ Validación para solo mostrar botón si status='procesado'
+   └─ Badge de estado actualizado
+
+4. migrations/add_revertido_status_nomina_importaciones.sql (NUEVO)
+   ├─ Migración de base de datos
+   ├─ Agrega estado 'revertido' al enum de status
+   ├─ ✅ EJECUTADA EN LA BD
+   └─ Permite marcar importaciones como "revertidas"
+
+5. mds/REVERTIR_IMPORTACION_NOMINA.md (NUEVO)
+   ├─ Guía completa de uso (350+ líneas)
+   ├─ 9 secciones de documentación
+   ├─ Casos de uso reales
+   ├─ Instrucciones paso a paso
+   └─ FAQ y troubleshooting
+
+6. mds/IMPLEMENTACION_REVERSIÓN_NÓMINA_RESUMEN.md (NUEVO)
+   ├─ Resumen ejecutivo de la implementación
+   ├─ Tabla de cambios
+   ├─ URLs de acceso
+   └─ Próximas mejoras opcionales
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 CÓMO USAR:
+
+OPCIÓN 1: Desde la página de Importación
+─────────────────────────────────────────
+1. Ve a: Nómina → Importar nómina
+2. En el header verás un link: "Revertir última importación"
+3. Click en él
+
+OPCIÓN 2: Desde el Historial
+──────────────────────────────
+1. Ve a: Nómina → Importar nómina
+2. Click en "Ver historial"
+3. En la fila de la importación, verás un botón ⏪ (Revertir)
+4. Click en él (solo aparece si está en estado "Procesado")
+
+OPCIÓN 3: URL Directa
+─────────────────────
+http://localhost/sgrh/public/importar_nomina_revertir.php
+
+═══════════════════════════════════════════════════════════════════════════════
+
+⚙️  FLUJO DE REVERSIÓN:
+
+   1. Sistema busca la última importación con status='procesado'
+                              ↓
+   2. Muestra detalles: ID, fecha, archivo, cantidad de registros
+                              ↓
+   3. Usuario confirma: "¿Estás seguro? Esta acción no se puede deshacer."
+                              ↓
+   4. Sistema inicia transacción en BD
+                              ↓
+   5. Para cada registro de la importación:
+      • INSERT → Elimina el empleado
+      • UPDATE → Restaura datos anteriores (desde payload_json)
+      • SKIP/ERROR → Sin cambios
+                              ↓
+   6. Registra auditoría en: storage/logs/import_nomina_reversion_*.log
+                              ↓
+   7. Cambia status de importación a 'revertido'
+                              ↓
+   8. Muestra tabla con resultado de cada operación:
+      ✓ Eliminados: X
+      ✓ Restaurados: Y
+      ✓ Errores: Z
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✨ CARACTERÍSTICAS PRINCIPALES:
+
+✅ Automática: Identifica automáticamente la última importación
+✅ Segura: Requiere confirmación antes de ejecutar
+✅ Transaccional: Usa transacciones BD (rollback si hay errores)
+✅ Recuperable: Restaura datos originales guardados en payload_json
+✅ Auditada: Registra cada cambio en logs
+✅ Visual: Muestra tabla detallada de cambios por empleado
+✅ Permiso: Requiere permiso 'nomina.importar'
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 ESTADOS DE IMPORTACIÓN:
+
+Estado      │ Descripción                  │ ¿Se puede revertir?
+────────────┼──────────────────────────────┼────────────────────
+cargado     │ Archivo cargado sin procesar │ ❌ No
+procesado   │ Datos importados             │ ✅ Sí (botón visible)
+revertido   │ Importación revertida        │ ❌ No
+error       │ Error durante importación    │ ❌ No
+
+═══════════════════════════════════════════════════════════════════════════════
+
+💾 DATOS QUE SE REVIERTAN:
+
+Tabla: empleados
+├─ apellido_paterno
+├─ apellido_materno
+├─ nombre
+├─ rfc_base
+├─ curp
+├─ es_activo
+├─ fecha_ingreso
+├─ fecha_baja
+├─ tipo_empleado_id
+├─ adscripcion_id
+├─ puesto_id
+├─ jefe_no_emp
+├─ salario_mensual
+└─ salario_diario
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📝 LOGS Y AUDITORÍA:
+
+Cada reversión crea un archivo de log:
+   storage/logs/import_nomina_reversion_YYYYMMDD.log
+
+Ejemplo de entrada:
+   [REVERSION IMPORTACION 80] Eliminados: 5, Restaurados: 12, Errores: 0
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🧪 VALIDACIONES REALIZADAS:
+
+✅ Sintaxis PHP de todos los archivos → SIN ERRORES
+✅ Migración de BD ejecutada → EXITOSA
+✅ Links funcionales → VERIFICADOS
+✅ Permisos requeridos → IMPLEMENTADOS
+✅ Manejo de errores → COMPLETO
+✅ Transacciones → HABILITADAS
+✅ Logs de auditoría → CONFIGURADOS
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📦 GIT COMMITS:
+
+Commit 1: 15716d2
+└─ "Agregar funcionalidad de revertir última importación de nómina"
+   ├─ 5 archivos modificados
+   ├─ 540 inserciones
+   └─ Crea: importar_nomina_revertir.php
+           add_revertido_status_nomina_importaciones.sql
+           REVERTIR_IMPORTACION_NOMINA.md
+
+Commit 2: 68a127e
+└─ "Agregar resumen de implementación de reversión de nómina"
+   ├─ 1 archivo modificado
+   ├─ 220 inserciones
+   └─ Crea: IMPLEMENTACION_REVERSIÓN_NÓMINA_RESUMEN.md
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTACIÓN DISPONIBLE:
+
+1. mds/REVERTIR_IMPORTACION_NOMINA.md
+   └─ Guía completa con:
+      • Descripción general
+      • Cómo acceder (3 opciones)
+      • Proceso paso a paso
+      • Estados de importación
+      • Casos de uso
+      • Limitaciones
+      • FAQ
+
+2. mds/IMPLEMENTACION_REVERSIÓN_NÓMINA_RESUMEN.md
+   └─ Resumen ejecutivo con:
+      • Descripción de cambios
+      • URLs de acceso
+      • Mejoras futuras
+      • Información del commit
+
+═══════════════════════════════════════════════════════════════════════════════
+
+⚠️  LIMITACIONES:
+
+• Solo revierte la ÚLTIMA importación procesada
+• Una importación revertida NO se puede revertir nuevamente
+• La reversión en sí es IRREVERSIBLE
+• Se requiere permiso 'nomina.importar'
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔍 PRUEBA RÁPIDA:
+
+1. Abre: http://localhost/sgrh/public/importar_nomina.php
+2. Verás en el header: "Revertir última importación"
+3. Click en el link
+4. Si hay importaciones procesadas, verás:
+   ├─ ID y fecha de la importación
+   ├─ Archivo original
+   ├─ Total de registros
+   └─ Botón: "Revertir esta importación"
+5. Click en el botón y confirma en el diálogo
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎓 CASOS DE USO:
+
+CASO 1: Layout Incorrecto
+└─ Problema: Columnas en orden equivocado en Excel
+   Solución: Revertir → Corregir Excel → Reimportar
+
+CASO 2: Importación Duplicada
+└─ Problema: Mismo archivo importado 2 veces
+   Solución: Revertir la segunda importación
+
+CASO 3: Mapeo Equivocado
+└─ Problema: Campos mapeados a columnas incorrectas
+   Solución: Revertir → Ajustar mapeo → Reimportar
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ ESTADO: COMPLETADO
+
+Todo está listo para usar. La funcionalidad ha sido completamente implementada,
+probada y documentada.
+
+═══════════════════════════════════════════════════════════════════════════════
