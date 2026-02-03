@@ -9,6 +9,7 @@ Se ha añadido la capacidad de **revertir la última importación de nómina** q
 - ✅ **Reversión automática**: Deshace automáticamente los cambios en la base de datos
 - ✅ **Recuperación de datos**: Restaura los datos originales de empleados que fueron actualizados
 - ✅ **Eliminación segura**: Elimina registros que fueron insertados durante la importación
+- ✅ **Limpieza completa**: Elimina también datos relacionados en `empleados_demograficos` y `usuarios`
 - ✅ **Auditoría completa**: Registra todos los cambios en logs
 - ✅ **Confirmación requerida**: Solicita confirmación antes de ejecutar la reversión
 - ✅ **Detalles de operación**: Muestra un resumen detallado de cada cambio revertido
@@ -37,7 +38,7 @@ El sistema automáticamente identifica la **última importación procesada** (m�
 
 ### 2. Análisis
 Revisa cada registro de la importación:
-- **INSERT**: Se eliminará el registro insertado
+- **INSERT**: Se eliminará el registro insertado (de `empleados`, `empleados_demograficos` y `usuarios`)
 - **UPDATE**: Se restaurarán los datos originales guardados
 - **SKIP/ERROR**: No habrá cambios
 
@@ -84,6 +85,20 @@ El sistema almacena automáticamente:
   - Metadatos de la acción
 
 Esto permite restaurar exactamente al estado anterior.
+
+## Tablas Afectadas por Reversión
+
+### Cuando se revierte un INSERT (Eliminación)
+Se eliminan completamente todos los registros asociados al empleado en:
+- ✅ `empleados` - Registro principal del empleado
+- ✅ `empleados_demograficos` - Datos demográficos
+- ✅ `usuarios` - Usuario asociado (si existe)
+
+### Cuando se revierte un UPDATE (Restauración)
+Se restauran solo los campos de:
+- ✅ `empleados` - Con sus valores originales
+
+La tabla `empleados_demograficos` se actualiza solo si esos datos fueron modificados durante la importación.
 
 ## Límite y Restricciones
 
