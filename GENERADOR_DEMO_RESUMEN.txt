@@ -1,0 +1,267 @@
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║   🎯 GENERADOR DE DATOS DEMO - CLIMA LABORAL                 ║
+║   Suite Completa de Herramientas                              ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+────────────────────────────────────────────────────────────────
+
+📦 ARCHIVOS CREADOS (6 nuevos)
+
+  1. GENERAR_DEMO_CLIMA_README.md ⭐ LEER PRIMERO
+     └─ Guía completa paso a paso
+     └─ 4 métodos diferentes de uso
+     └─ Solución de problemas
+     └─ Ubicación: /sgrh/
+
+  2. generar_demo_clima.sql
+     └─ Script SQL puro para MySQL
+     └─ 200+ empleados elegibles
+     └─ 7,200+ respuestas realistas
+     └─ Ubicación: /sgrh/
+
+  3. clima_generar_demo.php ⭐ MÁS FÁCIL
+     └─ Interfaz web amigable
+     └─ Botones visuales
+     └─ Detección de errores
+     └─ Ubicación: /sgrh/public/
+     └─ URL: http://localhost/sgrh/public/clima_generar_demo.php
+
+  4. ejecutar_demo_clima.bat
+     └─ Script Windows batch
+     └─ Doble-click para ejecutar
+     └─ Ubicación: /sgrh/
+
+  5. ejecutar_demo_clima.ps1
+     └─ Script PowerShell moderno
+     └─ Salida coloreada
+     └─ Parámetros avanzados
+     └─ Ubicación: /sgrh/
+
+  6. GENERAR_DEMO_CLIMA.md
+     └─ Documentación técnica detallada
+     └─ Personalización avanzada
+     └─ Verificación SQL
+     └─ Ubicación: /sgrh/mds/
+
+  7. EJEMPLOS_CONSULTAS_CLIMA.sql
+     └─ 40+ consultas SQL ejemplo
+     └─ Análisis de datos
+     └─ Reportes ejecutivos
+     └─ Ubicación: /sgrh/
+
+  8. INDICE_GENERADOR_DEMO.md
+     └─ Índice de toda la documentación
+     └─ Navegación entre archivos
+     └─ Checklist de uso
+     └─ Ubicación: /sgrh/
+
+────────────────────────────────────────────────────────────────
+
+🚀 INICIO RÁPIDO (3 PASOS)
+
+  1️⃣  ABRIR EN NAVEGADOR
+     http://localhost/sgrh/public/clima_generar_demo.php
+
+  2️⃣  HACER CLIC EN
+     ✨ "Generar Demo"
+
+  3️⃣  VER RESULTADOS EN
+     http://localhost/sgrh/public/clima_resultados_mi_unidad.php
+
+✅ ¡LISTO! Los gráficos mostrarán datos de clima laboral.
+
+────────────────────────────────────────────────────────────────
+
+📊 DATOS GENERADOS
+
+  Empleados elegibles:    ~150-200
+  Reactivos por empleado: 48
+  Total respuestas:       ~7,200-9,600
+  Distribución:           20% - 50% - 30%
+  Escala conversión:      1-3 → 0-100%
+  Resultado esperado:     50-60% (realista)
+
+────────────────────────────────────────────────────────────────
+
+🎯 ELEGIR MÉTODO DE USO
+
+  ┌─ Para principiantes ────────────────────┐
+  │ → Usar clima_generar_demo.php           │
+  │   (Interfaz web, más fácil)             │
+  └─────────────────────────────────────────┘
+
+  ┌─ Para usuarios avanzados ──────────────┐
+  │ → Usar generar_demo_clima.sql           │
+  │   (Script SQL directo, más control)     │
+  └─────────────────────────────────────────┘
+
+  ┌─ Para Windows ──────────────────────────┐
+  │ → Usar ejecutar_demo_clima.bat          │
+  │   (Doble-click, sin terminal)           │
+  └─────────────────────────────────────────┘
+
+  ┌─ Para automatización ──────────────────┐
+  │ → Usar ejecutar_demo_clima.ps1          │
+  │   (PowerShell, parámetros)              │
+  └─────────────────────────────────────────┘
+
+────────────────────────────────────────────────────────────────
+
+✅ CHECKLIST PREVIO
+
+  Antes de generar, asegúrate de:
+
+  □ Estoy logueado en SGRH
+  □ He seleccionado una empresa
+  □ Existen reactivos en clima_dimensiones.php
+  □ Existe un período activo en clima_periodos.php
+
+────────────────────────────────────────────────────────────────
+
+📈 ESTRUCTURA DE DATOS
+
+  Las 4 Superdimensiones (12 dimensiones totales):
+
+  1. Relación con el Jefe Inmediato (2 dim)
+     • Liderazgo inmediato
+     • Reconocimiento
+
+  2. Relación con los Compañeros (3 dim)
+     • Colaboración
+     • Comunicación
+     • Equidad
+
+  3. Relación con la Empresa (4 dim)
+     • Propósito
+     • Estructura
+     • Recursos
+     • Bienestar
+
+  4. Relación con el Trabajo (3 dim)
+     • Claridad de rol
+     • Desarrollo
+     • Procesos
+
+────────────────────────────────────────────────────────────────
+
+🎨 ESCALA DE COLORES EN GRÁFICAS
+
+  Rango       Color           Significado
+  ─────────────────────────────────────────
+  0-29%       🔴 Rojo         Crítico
+  30-49%      🟠 Naranja      Alerta
+  50-69%      🟢 Verde        Regular ← Esperado con datos demo
+  70-100%     🔵 Azul         Bueno
+
+────────────────────────────────────────────────────────────────
+
+🔧 PERSONALIZACIÓN
+
+  Cambiar cantidad de empleados:
+  └─ En generar_demo_clima.sql, línea 62: LIMIT 200
+
+  Cambiar distribución de respuestas:
+  └─ En generar_demo_clima.sql, líneas 80-87: CASE WHEN...
+
+  Usar período diferente:
+  └─ Parámetro URL: ?periodo_id=2
+
+────────────────────────────────────────────────────────────────
+
+🆘 SOLUCIONAR PROBLEMAS
+
+  ❌ No veo gráficas
+     → Limpiar datos + Generar demo nuevamente
+
+  ❌ Error: "No hay reactivos"
+     → Configurar en /public/clima_dimensiones.php
+
+  ❌ Error: "No hay empresa"
+     → Seleccionar empresa en menú principal
+
+  ❌ Los valores muestran 0%
+     → Tenías datos con escala antigua, limpia primero
+
+  ❌ No puedo conectar a MySQL
+     → Verificar credenciales en ejecutar_demo_clima.bat o .ps1
+
+────────────────────────────────────────────────────────────────
+
+📞 SOPORTE
+
+  Si tienes problemas:
+
+  1. Abre: GENERAR_DEMO_CLIMA_README.md
+  2. Busca tu error en "Solucionar Problemas"
+  3. Intenta alternativa: Usa clima_generar_demo.php (web)
+  4. Verifica requisitos: Reactivos y período existen
+  5. Revisa: error.log del servidor
+
+────────────────────────────────────────────────────────────────
+
+📚 DOCUMENTACIÓN
+
+  Archivo                          Propósito
+  ─────────────────────────────────────────────────────────
+  GENERAR_DEMO_CLIMA_README.md     ⭐ Comienza aquí
+  GENERAR_DEMO_CLIMA.md            Documentación técnica
+  EJEMPLOS_CONSULTAS_CLIMA.sql     Análisis de datos
+  INDICE_GENERADOR_DEMO.md         Índice completo
+
+────────────────────────────────────────────────────────────────
+
+🎓 PRÓXIMOS PASOS
+
+  Después de generar datos:
+
+  1. Visita: /sgrh/public/clima_resultados_mi_unidad.php
+     → Verifica que aparecen gráficas
+
+  2. Crea planes de acción:
+     → /sgrh/public/clima_planes.php
+
+  3. Analiza participación:
+     → /sgrh/public/clima_participacion.php
+
+  4. Genera reportes:
+     → Usa EJEMPLOS_CONSULTAS_CLIMA.sql
+
+────────────────────────────────────────────────────────────────
+
+✨ CARACTERÍSTICAS DEL GENERADOR
+
+  ✅ 200+ empleados elegibles automáticamente
+  ✅ 48 reactivos por empleado (completo)
+  ✅ Distribución realista (20-50-30)
+  ✅ Conversión automática a porcentaje (0-100%)
+  ✅ Publicación automática de resultados
+  ✅ Sin afectar estructura de BD
+  ✅ Rápido (5-30 segundos)
+  ✅ 4 formas diferentes de usar
+  ✅ Detección de errores
+  ✅ Fácil de personalizar
+
+────────────────────────────────────────────────────────────────
+
+🎉 ¡TODO LISTO!
+
+  ✅ Suite de generación creada
+  ✅ Documentación completa
+  ✅ 6 formas diferentes de usar
+  ✅ Ejemplos y guías incluidas
+  ✅ Listo para usar
+
+  Siguiente: Abre http://localhost/sgrh/public/clima_generar_demo.php
+
+────────────────────────────────────────────────────────────────
+
+Versión: 2.0
+Fecha: Febrero 2026
+Sistema: SGRH v2.0+
+Módulo: Clima Laboral
+
+╔════════════════════════════════════════════════════════════════╗
+║  Para más información, lee: GENERAR_DEMO_CLIMA_README.md      ║
+╚════════════════════════════════════════════════════════════════╝

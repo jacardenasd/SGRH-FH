@@ -47,7 +47,44 @@ if (!$mi_empleado || !$mi_empleado['unidad_id']) {
     $mi_empleado = null;
 }
 
-$mi_unidad_id = $mi_empleado ? (int)$mi_empleado['unidad_id'] : 0;
+$mi_unidad_id_default = $mi_empleado ? (int)$mi_empleado['unidad_id'] : 0;
+
+// Obtener todas las unidades accesibles por el usuario
+// Si es admin, puede ver todas las unidades con resultados publicados
+if (can('organizacion.admin') || can('clima.admin')) {
+    $stmt_unidades = $pdo->prepare("
+        SELECT DISTINCT u.unidad_id, u.nombre as unidad_nombre
+        FROM org_unidades u
+        INNER JOIN clima_publicacion cp ON cp.unidad_id = u.unidad_id AND cp.empresa_id = ?
+        WHERE cp.habilitado = 1
+        ORDER BY u.nombre
+    ");
+    $stmt_unidades->execute([$empresa_id]);
+} else {
+    $stmt_unidades = $pdo->prepare("
+        SELECT DISTINCT e.unidad_id, u.nombre as unidad_nombre
+        FROM usuario_empresas ue
+        INNER JOIN empleados e ON e.empleado_id = ue.empleado_id
+        INNER JOIN org_unidades u ON u.unidad_id = e.unidad_id
+        WHERE ue.usuario_id = ? AND ue.empresa_id = ? AND ue.estatus = 1
+        ORDER BY u.nombre
+    ");
+    $stmt_unidades->execute([$usuario_id, $empresa_id]);
+}
+$unidades_disponibles = $stmt_unidades->fetchAll(PDO::FETCH_ASSOC);
+
+// Filtro de unidad (tomar del GET o usar la unidad por defecto)
+$unidad_id_filtro = isset($_GET['unidad_id']) ? (int)$_GET['unidad_id'] : $mi_unidad_id_default;
+$mi_unidad_id = $unidad_id_filtro;
+
+// Obtener nombre de la unidad seleccionada
+$unidad_seleccionada_nombre = '';
+foreach ($unidades_disponibles as $u) {
+    if ($u['unidad_id'] == $mi_unidad_id) {
+        $unidad_seleccionada_nombre = $u['unidad_nombre'];
+        break;
+    }
+}
 
 // =======================
 // SELECCIÓN DE PERIODO
@@ -177,7 +214,7 @@ if ($periodo) {
     
     if ($row_e && (int)$row_e['total_respondieron'] > 0) {
         $prom_1_3 = (float)$row_e['promedio_empresa'];
-        $prom_0_100 = $prom_1_3 > 0 ? min(100, max(0, (($prom_1_3 - 1) / 2) * 100)) : 0.0;
+        $prom_0_100 = $prom_1_3 > 0 ? min(100, max(0, (125 - $prom_1_3 * 25))) : 0.0;
         
         $resultados_empresa = array(
             'total_respondieron' => (int)$row_e['total_respondieron'],
@@ -202,7 +239,7 @@ if ($periodo) {
             $stmt_d_e->execute([$periodo_id, $empresa_id, $did]);
             $row_d_e = $stmt_d_e->fetch(PDO::FETCH_ASSOC);
             $prom_dim_1_3 = $row_d_e ? (float)$row_d_e['promedio'] : 0.0;
-            $prom_dim_0_100 = $prom_dim_1_3 > 0 ? min(100, max(0, (($prom_dim_1_3 - 1) / 2) * 100)) : 0.0;
+            $prom_dim_0_100 = $prom_dim_1_3 > 0 ? min(100, max(0, (125 - $prom_dim_1_3 * 25))) : 0.0;
 
             $promedios_dimensiones_empresa[] = array(
                 'dimension_id' => $did,
@@ -227,7 +264,7 @@ if ($periodo) {
             $stmt_sd_e->execute([$periodo_id, $empresa_id, $superdim]);
             $row_sd_e = $stmt_sd_e->fetch(PDO::FETCH_ASSOC);
             $prom_sd_1_3 = $row_sd_e ? (float)$row_sd_e['promedio'] : 0.0;
-            $prom_sd_0_100 = $prom_sd_1_3 > 0 ? min(100, max(0, (($prom_sd_1_3 - 1) / 2) * 100)) : 0.0;
+            $prom_sd_0_100 = $prom_sd_1_3 > 0 ? min(100, max(0, (125 - $prom_sd_1_3 * 25))) : 0.0;
 
             $promedios_superdimensiones_empresa[] = array(
                 'superdimension' => $superdim,
@@ -257,7 +294,7 @@ if ($periodo) {
         
         if ($row_u && (int)$row_u['total_respondieron'] > 0) {
             $prom_1_3 = (float)$row_u['promedio_unidad'];
-            $prom_0_100 = $prom_1_3 > 0 ? min(100, max(0, (($prom_1_3 - 1) / 2) * 100)) : 0.0;
+            $prom_0_100 = $prom_1_3 > 0 ? min(100, max(0, (125 - $prom_1_3 * 25))) : 0.0;
             
             $resultados_unidad = array(
                 'total_respondieron' => (int)$row_u['total_respondieron'],
@@ -283,7 +320,7 @@ if ($periodo) {
                 $stmt_d_u->execute([$periodo_id, $empresa_id, $mi_unidad_id, $did]);
                 $row_d_u = $stmt_d_u->fetch(PDO::FETCH_ASSOC);
                 $prom_dim_1_3 = $row_d_u ? (float)$row_d_u['promedio'] : 0.0;
-                $prom_dim_0_100 = $prom_dim_1_3 > 0 ? min(100, max(0, (($prom_dim_1_3 - 1) / 2) * 100)) : 0.0;
+                $prom_dim_0_100 = $prom_dim_1_3 > 0 ? min(100, max(0, (125 - $prom_dim_1_3 * 25))) : 0.0;
 
                 $promedios_dimensiones_unidad[] = array(
                     'dimension_id' => $did,
@@ -309,7 +346,7 @@ if ($periodo) {
                 $stmt_sd_u->execute([$periodo_id, $empresa_id, $mi_unidad_id, $superdim]);
                 $row_sd_u = $stmt_sd_u->fetch(PDO::FETCH_ASSOC);
                 $prom_sd_1_3 = $row_sd_u ? (float)$row_sd_u['promedio'] : 0.0;
-                $prom_sd_0_100 = $prom_sd_1_3 > 0 ? min(100, max(0, (($prom_sd_1_3 - 1) / 2) * 100)) : 0.0;
+                $prom_sd_0_100 = $prom_sd_1_3 > 0 ? min(100, max(0, (125 - $prom_sd_1_3 * 25))) : 0.0;
 
                 $promedios_superdimensiones_unidad[] = array(
                     'superdimension' => $superdim,
@@ -359,14 +396,14 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
   <?php if ($mi_empleado): ?>
 
-  <!-- Info de mi unidad -->
+  <!-- Info de unidad seleccionada -->
   <div class="card bg-light">
     <div class="card-body">
       <div class="d-flex align-items-center">
         <i class="icon-office icon-2x text-primary mr-3"></i>
         <div>
-          <h5 class="mb-0"><?php echo h($mi_empleado['unidad_nombre']); ?></h5>
-          <span class="text-muted">Mi Dirección</span>
+          <h5 class="mb-0"><?php echo h($unidad_seleccionada_nombre); ?></h5>
+          <span class="text-muted">Unidad/Dirección</span>
         </div>
       </div>
     </div>
@@ -387,38 +424,47 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
         <h6 class="font-weight-semibold mb-2">Interpretación de Resultados</h6>
         <p class="mb-2">
-          <strong style="color: #29B6F6;">✓ Resultado Sobresaliente (≥ 85%):</strong> 
-          Se presenta cuando la línea actual sobrepasa el ideal. El clima percibido es óptimo y estos resultados se consideran 
-          <strong>fortalezas del clima del área.</strong>
+          <strong style="color: #29B6F6;">✓ Resultado Sobresaliente (≥ 80%):</strong> 
+          El clima percibido es óptimo y estos resultados se consideran fortalezas del área.
         </p>
         <p class="mb-2">
-          <strong style="color: #66BB6A;">✓ Resultado Satisfactorio (75-84%):</strong> 
-          Se identifica cuando la línea actual está por debajo de 85 y por arriba de 75 puntos. Si la brecha tiende a disminuir, 
-          el clima percibido es <strong>positivo</strong>. De lo contrario, genera evidencia de pérdida de motivación y exige 
-          <strong>mayor atención.</strong>
+          <strong style="color: #66BB6A;">✓ Resultado Satisfactorio (60-79%):</strong> 
+          El clima percibido es positivo, pero aún hay oportunidades de mejora que requieren seguimiento.
         </p>
         <p class="mb-0">
-          <strong style="color: #EF5350;">⚠ Resultado Deficiente (< 65%):</strong> 
-          Se presenta cuando la línea actual cae por debajo de 65 puntos, indicando una <strong>pérdida de potencial y rendimiento.</strong> 
-          El clima percibido es <strong>negativo</strong> y <strong>requiere atención inmediata.</strong>
+          <strong style="color: #EF5350;">⚠ Resultado Deficiente (< 60%):</strong> 
+          El clima percibido es negativo, con pérdida de potencial y rendimiento, y requiere atención inmediata.
         </p>
       </div>
     </div>
   </div>
 
   <?php if (!empty($periodos)): ?>
-  <!-- Selector de periodo -->
+  <!-- Selector de periodo y unidad -->
   <div class="card mb-3">
     <div class="card-body">
       <form method="get" class="form-inline">
-        <label class="mr-2 font-weight-semibold">Seleccionar período:</label>
-        <select name="periodo_id" class="form-control" style="width: 150px;" onchange="this.form.submit()">
+        <label class="mr-2 font-weight-semibold">Período:</label>
+        <select name="periodo_id" class="form-control mr-3" style="width: 150px;" onchange="this.form.submit()">
           <?php foreach ($periodos as $p): ?>
           <option value="<?php echo (int)$p['periodo_id']; ?>" <?php echo ((int)$p['periodo_id'] === $periodo_id) ? 'selected' : ''; ?>>
             <?php echo h($p['anio']); ?>
           </option>
           <?php endforeach; ?>
         </select>
+        
+        <?php if (count($unidades_disponibles) > 1): ?>
+        <label class="mr-2 font-weight-semibold ml-3">Unidad:</label>
+        <select name="unidad_id" class="form-control" style="width: 300px;" onchange="this.form.submit()">
+          <?php foreach ($unidades_disponibles as $u): ?>
+            <option value="<?php echo h($u['unidad_id']); ?>" <?php echo ($u['unidad_id'] == $mi_unidad_id) ? 'selected' : ''; ?>>
+              <?php echo h($u['unidad_nombre']); ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+        <?php else: ?>
+          <input type="hidden" name="unidad_id" value="<?php echo h($mi_unidad_id); ?>">
+        <?php endif; ?>
       </form>
     </div>
   </div>

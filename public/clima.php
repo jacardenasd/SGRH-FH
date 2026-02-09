@@ -59,23 +59,19 @@ if ($empresa_id > 0 && $usuario_id > 0 && $periodo_activo) {
       $soy_elegible = true;
       $periodo_contestar = $periodo_activo;
 
-      // Verificar si ya finalizó la encuesta (no solo si tiene respuestas)
-      $stmt_resp = $pdo->prepare("SELECT completado FROM clima_envios WHERE periodo_id=? AND empleado_id=? LIMIT 1");
+      // Verificar si ya finalizó la encuesta y cómo fue capturada
+      $stmt_resp = $pdo->prepare("SELECT completado, ip, user_agent FROM clima_envios WHERE periodo_id=? AND empleado_id=? LIMIT 1");
       $stmt_resp->execute([(int)$periodo_activo['periodo_id'], $empleado_id]);
       $row_envio = $stmt_resp->fetch(PDO::FETCH_ASSOC);
       $ya_respondio = ($row_envio && (int)$row_envio['completado'] === 1);
 
-      // Verificar si tiene respuestas capturadas manualmente en clima_respuestas
-      // Considerar "capturado" solo si están todas las respuestas de la escala
-      $stmt_total_rx = $pdo->prepare("SELECT COUNT(*) FROM clima_reactivos WHERE activo = 1");
-      $stmt_total_rx->execute();
-      $total_rx = (int)$stmt_total_rx->fetchColumn();
-
-      $stmt_manual = $pdo->prepare("SELECT COUNT(DISTINCT reactivo_id) FROM clima_respuestas WHERE periodo_id=? AND empleado_id=?");
-      $stmt_manual->execute([(int)$periodo_activo['periodo_id'], $empleado_id]);
-      $manual_contestados = (int)$stmt_manual->fetchColumn();
-
-      $capturado_manual = ($total_rx > 0 && $manual_contestados >= $total_rx);
+      // Determinar si fue captura manual
+      // Si completó pero NO tiene IP ni user_agent, significa que fue captura manual por RH
+      if ($ya_respondio && $row_envio) {
+        $capturado_manual = (empty($row_envio['ip']) && empty($row_envio['user_agent']));
+      } else {
+        $capturado_manual = false;
+      }
     }
   }
 }

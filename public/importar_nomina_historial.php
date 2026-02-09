@@ -9,6 +9,7 @@ require_demograficos_redirect();
 require_empresa();
 require_perm('nomina.importar');
 
+$active_menu = 'import_nomina';
 $page_title = 'Historial de Importaciones | SGRH';
 include __DIR__ . '/../includes/layout/head.php';
 include __DIR__ . '/../includes/layout/navbar.php';

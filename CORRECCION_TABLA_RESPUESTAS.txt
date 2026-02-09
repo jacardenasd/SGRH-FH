@@ -1,0 +1,123 @@
+✅ CORRECCIÓN FINAL - Estructura de Tabla clima_respuestas
+
+================================================================================
+PROBLEMA IDENTIFICADO
+================================================================================
+
+Error: Unknown column 'empresa_id' in 'field list'
+
+CAUSA:
+La tabla clima_respuestas NO tiene las columnas: empresa_id, unidad_id
+Solo tiene: respuesta_id, periodo_id, empleado_id, reactivo_id, valor, fecha_respuesta
+
+================================================================================
+ESTRUCTURA REAL DE TABLA
+================================================================================
+
+✅ clima_respuestas
+├─ respuesta_id (AUTO_INCREMENT, PK)
+├─ periodo_id ✅
+├─ empleado_id ✅
+├─ reactivo_id ✅
+├─ valor ✅
+└─ fecha_respuesta (DEFAULT CURRENT_TIMESTAMP)
+
+⚠️ NO tiene: empresa_id, unidad_id, ip, user_agent
+
+================================================================================
+CAMBIOS REALIZADOS
+================================================================================
+
+ARCHIVO: generar_demo_clima.sql
+─────────────────────────────────
+❌ INSERT INTO clima_respuestas (periodo_id, empresa_id, unidad_id, ...)
+✅ INSERT INTO clima_respuestas (periodo_id, empleado_id, reactivo_id, valor, fecha_respuesta)
+
+ARCHIVO: clima_generar_demo.php
+───────────────────────────────
+❌ INSERT (periodo_id, empresa_id, unidad_id, empleado_id, reactivo_id, valor, fecha_respuesta)
+✅ INSERT (periodo_id, empleado_id, reactivo_id, valor)
+
+❌ DELETE FROM clima_respuestas WHERE periodo_id = ? AND empresa_id = ?
+✅ DELETE FROM clima_respuestas WHERE periodo_id = ?
+
+❌ SELECT FROM clima_respuestas ... WHERE periodo_id = ? AND empresa_id = ?
+✅ SELECT FROM clima_respuestas ... JOIN clima_elegibles (para obtener empresa/unidad)
+
+================================================================================
+FLUJO CORRECTO AHORA
+================================================================================
+
+1. Insertar en clima_elegibles
+   └─ Tiene: periodo_id, empresa_id, unidad_id, empleado_id, elegible
+
+2. Insertar en clima_respuestas
+   └─ Tiene: periodo_id, empleado_id, reactivo_id, valor
+   └─ Se obtiene empresa_id, unidad_id desde clima_elegibles mediante JOIN
+
+3. Registrar en clima_envios
+   └─ Se hace JOIN entre clima_respuestas y clima_elegibles
+   └─ Se obtienen los datos: periodo_id, empresa_id, unidad_id, empleado_id
+
+================================================================================
+TABLAS Y RELACIONES CORRECTAS
+================================================================================
+
+clima_elegibles
+  └─ periodo_id, empresa_id, unidad_id, empleado_id, elegible ✅
+
+        ↓ JOIN ON (periodo_id, empleado_id)
+
+clima_respuestas
+  └─ periodo_id, empleado_id, reactivo_id, valor ✅
+
+        ↓ JOIN para obtener empresa_id, unidad_id
+
+clima_envios
+  └─ periodo_id, empresa_id, unidad_id, empleado_id, completado ✅
+
+clima_publicacion
+  └─ periodo_id, empresa_id, unidad_id, publicado ✅
+
+================================================================================
+PRUEBA NUEVAMENTE
+================================================================================
+
+1. Abre: http://localhost/sgrh/public/clima_generar_demo.php
+
+2. Haz clic en "✨ Generar Demo"
+
+3. Debería mostrar:
+   ✅ Elegibles generados: XX
+   ✅ Total respuestas: XXXX
+   ✅ Envios completados: XX
+   ✅ Resultados publicados: XX
+
+4. Sin errores SQL esta vez
+
+================================================================================
+VERIFICAR EN BD
+================================================================================
+
+-- Ver respuestas insertadas
+SELECT COUNT(*) FROM clima_respuestas WHERE periodo_id = 1;
+
+-- Ver estructura de clima_respuestas
+DESC clima_respuestas;
+
+-- Ver un registro
+SELECT * FROM clima_respuestas LIMIT 1;
+
+================================================================================
+ESTADO
+================================================================================
+
+✅ Todos los scripts corregidos
+✅ Estructuras de tablas verificadas
+✅ Relaciones ajustadas correctamente
+✅ Listo para ejecutar
+
+================================================================================
+Fecha: Febrero 3, 2026
+Sistema: SGRH v2.0+
+Módulo: Clima Laboral

@@ -59,11 +59,18 @@ $sql = "
     SELECT
         e.empleado_id,
         e.elegible,
+        us.nombre,
+        us.apellido_paterno,
+        us.apellido_materno,
+        us.rfc_base,
+        us.no_emp,
         CASE WHEN r.empleado_id IS NOT NULL THEN 'Respondió' ELSE 'Pendiente' END AS estado_respuesta,
         MAX(r.fecha_respuesta) AS fecha_respuesta,
         COUNT(DISTINCT r.reactivo_id) AS total_respuestas
     FROM clima_elegibles e
     INNER JOIN empleados emp ON emp.empleado_id = e.empleado_id
+    INNER JOIN usuario_empresas ue ON ue.empleado_id = emp.empleado_id AND ue.empresa_id = emp.empresa_id
+    INNER JOIN usuarios us ON us.usuario_id = ue.usuario_id
     LEFT JOIN clima_respuestas r 
         ON r.periodo_id = e.periodo_id 
        AND r.empleado_id = e.empleado_id
@@ -71,7 +78,7 @@ $sql = "
       AND e.empresa_id = ?
       AND e.unidad_id = ?
       AND e.elegible = 1
-    GROUP BY e.empleado_id, r.empleado_id
+    GROUP BY e.empleado_id, us.nombre, us.apellido_paterno, us.apellido_materno, us.rfc_base, us.no_emp, r.empleado_id
     ORDER BY e.empleado_id ASC
 ";
 
@@ -203,9 +210,18 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
       <tbody>
         <?php foreach ($elegibles as $e): ?>
           <tr class="<?php echo ($e['estado_respuesta'] === 'Respondió') ? '' : 'table-warning'; ?>">
-            <td><?php echo h($e['empleado_id']); ?></td>
-            <td></td>
-            <td></td>
+            <td><?php echo h($e['no_emp'] ?? $e['empleado_id']); ?></td>
+            <td><?php echo h($e['rfc_base'] ?? ''); ?></td>
+            <td>
+              <?php 
+              $nombre_completo = trim(
+                ($e['nombre'] ?? '') . ' ' . 
+                ($e['apellido_paterno'] ?? '') . ' ' . 
+                ($e['apellido_materno'] ?? '')
+              );
+              echo h($nombre_completo ?: 'Sin nombre');
+              ?>
+            </td>
             <td>
               <?php if ($e['estado_respuesta'] === 'Respondió'): ?>
                 <span class="badge badge-success">

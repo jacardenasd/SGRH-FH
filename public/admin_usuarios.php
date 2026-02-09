@@ -246,6 +246,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 bitacora('admin_usuarios', 'update_alcance', ['usuario_id' => $usuario_id_post, 'unidades' => $unidades_sel, 'adscripciones' => $adscripciones_sel]);
                 $flash = 'Alcance organizacional actualizado correctamente.';
+            } elseif ($action === 'update_empresas') {
+                $empresas_sel = isset($_POST['empresas']) && is_array($_POST['empresas']) ? array_map('intval', $_POST['empresas']) : [];
+                $admin_empresas = isset($_POST['admin_empresas']) && is_array($_POST['admin_empresas']) ? $_POST['admin_empresas'] : [];
+
+                // Limpiar empresas actuales del usuario
+                $del = $pdo->prepare("DELETE FROM usuario_empresas WHERE usuario_id = :uid");
+                $del->execute([':uid' => $usuario_id_post]);
+
+                // Insertar empresas seleccionadas
+                if (!empty($empresas_sel)) {
+                    $ins = $pdo->prepare("INSERT INTO usuario_empresas (usuario_id, empresa_id, empleado_id, es_admin, estatus) VALUES (:uid, :eid, :empleado_id, :es_admin, 1)");
+                    foreach ($empresas_sel as $eid) {
+                        $eid = (int)$eid;
+                        $es_admin = isset($admin_empresas[$eid]) ? 1 : 0;
+                        
+                        // Intentar resolver empleado_id por usuario + empresa
+                        $stmtU = $pdo->prepare("SELECT no_emp, rfc_base FROM usuarios WHERE usuario_id = :uid LIMIT 1");
+                        $stmtU->execute([':uid' => $usuario_id_post]);
+                        $u = $stmtU->fetch(PDO::FETCH_ASSOC);
+                        
+                        $empleado_id = null;
+                        if ($u) {
+                            $stmtE = $pdo->prepare("SELECT empleado_id FROM empleados WHERE empresa_id = :eid AND no_emp = :no_emp AND rfc_base = :rfc_base LIMIT 1");
+                            $stmtE->execute([
+                                ':eid' => $eid,
+                                ':no_emp' => $u['no_emp'],
+                                ':rfc_base' => $u['rfc_base'],
+                            ]);
+                            $e = $stmtE->fetch(PDO::FETCH_ASSOC);
+                            if ($e) {
+                                $empleado_id = (int)$e['empleado_id'];
+                            }
+                        }
+                        
+                        $ins->execute([
+                            ':uid' => $usuario_id_post,
+                            ':eid' => $eid,
+                            ':empleado_id' => $empleado_id,
+                            ':es_admin' => $es_admin
+                        ]);
+                    }
+                }
+
+                // Cargar permisos si el usuario tiene empresas asignadas
+                $stmtCheck = $pdo->prepare("SELECT empresa_id FROM usuario_empresas WHERE usuario_id = :uid LIMIT 1");
+                $stmtCheck->execute([':uid' => $usuario_id_post]);
+                if ($stmtCheck->fetch()) {
+                    // Si tiene al menos una empresa, cargar permisos generales (global_usuario)
+                    cargar_permisos_sesion($usuario_id_post);
+                }
+
+                bitacora('admin_usuarios', 'update_empresas', ['usuario_id' => $usuario_id_post, 'empresas' => $empresas_sel]);
+                $flash = 'Empresas asignadas correctamente.';
             } else {
                 $flash = 'Acción no reconocida.';
                 $flash_type = 'warning';
@@ -288,6 +341,10 @@ $adscripciones_stmt = $pdo->prepare("SELECT a.adscripcion_id, a.nombre, a.unidad
                                       ORDER BY u.nombre, a.nombre");
 $adscripciones_stmt->execute([':empresa_id' => $empresa_id]);
 $adscripciones_lista = $adscripciones_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Obtener todas las empresas del sistema
+$empresas_stmt = $pdo->query("SELECT empresa_id, nombre, alias FROM empresas WHERE estatus = 1 ORDER BY nombre");
+$empresas_todas = $empresas_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Users list
 $where = [];
@@ -542,6 +599,14 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                                       <i class="icon-tree7"></i> Alcance
                                     </button>
 
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm mr-1 btn-empresas"
+                                            data-user-id="<?php echo (int)$u['usuario_id']; ?>"
+                                            data-user-name="<?php echo h($nombre); ?>"
+                                            title="Asignar empresas">
+                                      <i class="icon-building"></i> Empresas
+                                    </button>
+
                                     <form method="post" action="" class="mr-1">
                                         <input type="hidden" name="csrf_token" value="<?php echo h($csrf_token); ?>">
                                         <input type="hidden" name="action" value="toggle_status">
@@ -670,6 +735,57 @@ require_once __DIR__ . '/../includes/layout/content_close.php';
     </div>
 </div>
 
+<!-- Modal: Asignar empresas -->
+<div id="modal_empresas" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display:none;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" action="">
+                <input type="hidden" name="csrf_token" value="<?php echo h($csrf_token); ?>">
+                <input type="hidden" name="action" value="update_empresas">
+                <input type="hidden" name="usuario_id" id="empresas_usuario_id" value="">
+
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title"><i class="icon-building mr-2"></i>Asignar Empresas a <span id="empresas_usuario_nombre" class="font-weight-semibold"></span></h5>
+                    <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="icon-info22 mr-2"></i>
+                        Selecciona las empresas a las que este usuario tendrá acceso. Marca "Admin" si será administrador de esa empresa.
+                    </div>
+
+                    <div id="empresas_list_container">
+                        <?php foreach ($empresas_todas as $emp): ?>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="checkbox" class="form-check-input chk-empresa" name="empresas[]" value="<?php echo (int)$emp['empresa_id']; ?>">
+                                        <?php echo h($emp['alias'] ?: $emp['nombre']); ?>
+                                    </label>
+                                </div>
+                                <div class="ml-3 mt-2">
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input chk-admin-empresa" name="admin_empresas[<?php echo (int)$emp['empresa_id']; ?>]" value="1">
+                                            <strong>Admin de esta empresa</strong>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar empresas</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Modal: Confirmar reseteo de contraseña -->
 <div id="modal_reset_pass" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display:none;">
     <div class="modal-dialog modal-dialog-centered">
@@ -722,7 +838,7 @@ require_once __DIR__ . '/../includes/layout/content_close.php';
         }
 
         // Asegurar que los modales arranquen ocultos
-        $('#modal_roles, #modal_alcance, #modal_reset_pass').modal({ show: false });
+        $('#modal_roles, #modal_alcance, #modal_empresas, #modal_reset_pass').modal({ show: false });
 
         // Abrir modal de roles
         $(document).on('click', '.btn-roles', function() {
@@ -774,6 +890,47 @@ require_once __DIR__ . '/../includes/layout/content_close.php';
             });
 
             $('#modal_alcance').modal('show');
+        });
+
+        // Abrir modal de empresas
+        $(document).on('click', '.btn-empresas', function() {
+            var uid = $(this).data('user-id');
+            var uname = $(this).data('user-name');
+
+            $('#empresas_usuario_id').val(uid);
+            $('#empresas_usuario_nombre').text(uname);
+
+            // Resetear todos los checkboxes
+            $('.chk-empresa').prop('checked', false);
+            $('.chk-admin-empresa').prop('checked', false);
+
+            // Cargar empresas asignadas al usuario
+            $.ajax({
+                url: 'ajax_get_usuario_empresas.php',
+                method: 'GET',
+                data: { usuario_id: uid },
+                dataType: 'json',
+                success: function(data) {
+                    if (data.empresas_asignadas && Array.isArray(data.empresas_asignadas)) {
+                        data.empresas_asignadas.forEach(function(emp_id) {
+                            $('.chk-empresa[value="' + emp_id + '"]').prop('checked', true);
+                        });
+                    }
+                    
+                    if (data.admin_empresas && typeof data.admin_empresas === 'object') {
+                        $.each(data.admin_empresas, function(emp_id, is_admin) {
+                            if (is_admin) {
+                                $('input[name="admin_empresas[' + emp_id + ']"]').prop('checked', true);
+                            }
+                        });
+                    }
+                },
+                error: function() {
+                    console.log('Error al cargar empresas del usuario');
+                }
+            });
+
+            $('#modal_empresas').modal('show');
         });
 
         // Abrir modal de confirmación para reseteo de contraseña

@@ -2769,3 +2769,334 @@ Stack trace:
 #0 C:\MAMP\htdocs\sgrh\public\admin_org_plantilla.php(994): PDO->prepare('SELECT empleado...')
 #1 {main}
   thrown in C:\MAMP\htdocs\sgrh\public\admin_org_plantilla.php on line 994
+[03-Feb-2026 14:33:47 America/Mexico_City] PHP Warning:  require_once(C:\MAMP\htdocs\sgrh\public/../includes/functions.php): Failed to open stream: No such file or directory in C:\MAMP\htdocs\sgrh\public\ajax_get_adscripciones.php on line 9
+[03-Feb-2026 14:33:47 America/Mexico_City] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\MAMP\htdocs\sgrh\public/../includes/functions.php' (include_path='.;C:\php\pear') in C:\MAMP\htdocs\sgrh\public\ajax_get_adscripciones.php:9
+Stack trace:
+#0 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\ajax_get_adscripciones.php on line 9
+[03-Feb-2026 16:05:24 America/Mexico_City] PHP Warning:  require_once(C:\MAMP\htdocs\sgrh\public/../includes/functions.php): Failed to open stream: No such file or directory in C:\MAMP\htdocs\sgrh\public\ajax_get_adscripciones.php on line 9
+[03-Feb-2026 16:05:24 America/Mexico_City] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\MAMP\htdocs\sgrh\public/../includes/functions.php' (include_path='.;C:\php\pear') in C:\MAMP\htdocs\sgrh\public\ajax_get_adscripciones.php:9
+Stack trace:
+#0 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\ajax_get_adscripciones.php on line 9
+[03-Feb-2026 18:16:19 America/Mexico_City] PHP Warning:  Undefined array key "no_emp" in C:\MAMP\htdocs\sgrh\public\clima_generar_elegibles.php on line 708
+[03-Feb-2026 18:17:22 America/Mexico_City] GET PARAMS: periodo_id=VACIO, empleado_id=VACIO, tipo_captura=VACIO
+[03-Feb-2026 18:17:22 America/Mexico_City] PARSED: periodo_id=0, empleado_id=0, tipo_captura=identificada
+[03-Feb-2026 18:17:27 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[03-Feb-2026 18:17:27 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[03-Feb-2026 18:17:30 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=identificada
+[03-Feb-2026 18:17:30 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=identificada
+[03-Feb-2026 18:17:33 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=412, tipo_captura=identificada
+[03-Feb-2026 18:17:33 America/Mexico_City] PARSED: periodo_id=3, empleado_id=412, tipo_captura=identificada
+[03-Feb-2026 18:25:16 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:25:27 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:25:32 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:26:12 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:26:15 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:26:17 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:26:47 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:27:14 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:27:15 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:28:02 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:28:03 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:28:04 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:28:35 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:28:36 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:28:37 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:28:43 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:28:49 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:29:45 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:29:47 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:30:08 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:30:32 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:30:50 America/Mexico_City] PHP Warning:  Undefined array key "no_emp" in C:\MAMP\htdocs\sgrh\public\clima_generar_elegibles.php on line 708
+[03-Feb-2026 18:31:05 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:31:10 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:31:44 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:31:51 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:31:52 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:31:55 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:31:57 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:31:59 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:32:08 America/Mexico_City] PHP Warning:  Undefined array key "no_emp" in C:\MAMP\htdocs\sgrh\public\clima_generar_elegibles.php on line 708
+[03-Feb-2026 18:32:12 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:32:14 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:32:21 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:32:57 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:32:59 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:33:48 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:33:49 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:34:43 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:34:44 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:35:25 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:37:07 America/Mexico_City] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\MAMP\htdocs\sgrh\includes\config.php on line 4) in C:\MAMP\htdocs\sgrh\public\clima_generar_demo.php on line 10
+[03-Feb-2026 18:38:06 America/Mexico_City] GET PARAMS: periodo_id=VACIO, empleado_id=VACIO, tipo_captura=VACIO
+[03-Feb-2026 18:38:06 America/Mexico_City] PARSED: periodo_id=0, empleado_id=0, tipo_captura=identificada
+[03-Feb-2026 18:38:08 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[03-Feb-2026 18:38:08 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[03-Feb-2026 18:38:09 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[03-Feb-2026 18:38:09 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[03-Feb-2026 18:38:22 America/Mexico_City] POST COMPLETO: {"action":"guardar_respuestas","periodo_id":"3","es_anonima":"1","unidad_id":"4","empleado_id":"","r_13":"3","r_14":"3","r_15":"3","r_16":"3","r_17":"3","r_18":"3","r_19":"3","r_20":"3","r_25":"1","r_26":"1","r_27":"1","r_28":"1","r_29":"1","r_30":"1","r_31":"1","r_32":"1","r_45":"1","r_46":"1","r_47":"1","r_48":"1","r_1":"1","r_2":"1","r_3":"1","r_4":"1","r_9":"1","r_10":"1","r_11":"1","r_12":"1","r_33":"1","r_34":"1","r_35":"1","r_36":"1","r_41":"1","r_42":"1","r_43":"1","r_44":"1","r_5":"1","r_6":"1","r_7":"1","r_8":"1","r_21":"1","r_22":"1","r_23":"1","r_24":"1","r_37":"1","r_38":"1","r_39":"1","r_40":"1","pa_1":"1","pa_2":"1","pa_5":"1","pa_7":"1"}
+[03-Feb-2026 18:38:22 America/Mexico_City] POST PARSED: periodo_id=3, empleado_id=0, unidad_id=4, es_anonima=SI
+[03-Feb-2026 18:38:22 America/Mexico_City] === DEBUG CLIMA CAPTURA ===
+[03-Feb-2026 18:38:22 America/Mexico_City] Periodo: 3, Empleado: NULL, Unidad: 4
+[03-Feb-2026 18:38:22 America/Mexico_City] Total inserts intentados: 48
+[03-Feb-2026 18:38:22 America/Mexico_City] Primeros 3 inserts: [{"reactivo":13,"valor":3,"result":true,"rowCount":1},{"reactivo":14,"valor":3,"result":true,"rowCount":1},{"reactivo":15,"valor":3,"result":true,"rowCount":1}]
+[03-Feb-2026 18:38:22 America/Mexico_City] En transacción: SI
+[03-Feb-2026 18:38:22 America/Mexico_City] COMMIT ejecutado exitosamente
+[03-Feb-2026 18:38:22 America/Mexico_City] GET PARAMS: periodo_id=VACIO, empleado_id=VACIO, tipo_captura=VACIO
+[03-Feb-2026 18:38:22 America/Mexico_City] PARSED: periodo_id=0, empleado_id=0, tipo_captura=identificada
+[03-Feb-2026 18:39:30 America/Mexico_City] PHP Warning:  Undefined array key "nombre" in C:\MAMP\htdocs\sgrh\public\check_estructura.php on line 41
+[03-Feb-2026 18:43:19 America/Mexico_City] PHP Warning:  Undefined array key "no_emp" in C:\MAMP\htdocs\sgrh\public\clima_generar_elegibles.php on line 708
+[03-Feb-2026 18:54:53 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 18:55:31 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 18:55:47 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 18:57:08 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 18:57:16 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 18:58:05 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 18:59:13 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 18:59:25 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:00:15 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:01:02 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:01:16 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:01:39 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:01:57 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:02:37 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:02:52 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:03:16 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:03:32 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:03:45 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:03:59 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:04:06 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:04:48 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:04:58 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:06:35 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:06:39 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:07:08 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:07:16 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[03-Feb-2026 19:07:31 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'sgrh.cp.habilitado' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php:21
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php(21): PDO->prepare('\r\n    SELECT \r\n...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\get_publicaciones_clima.php on line 21
+[04-Feb-2026 09:22:35 America/Mexico_City] PHP Warning:  require_once(C:\MAMP\htdocs\sgrh\public/../includes/functions.php): Failed to open stream: No such file or directory in C:\MAMP\htdocs\sgrh\public\ajax_get_adscripciones.php on line 9
+[04-Feb-2026 09:22:35 America/Mexico_City] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\MAMP\htdocs\sgrh\public/../includes/functions.php' (include_path='.;C:\php\pear') in C:\MAMP\htdocs\sgrh\public\ajax_get_adscripciones.php:9
+Stack trace:
+#0 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\ajax_get_adscripciones.php on line 9
+[09-Feb-2026 09:20:02 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:20:04 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:20:09 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:23:03 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:23:05 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:23:33 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:23:37 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:23:53 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:24:38 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:24:42 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:24:44 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:24:54 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:43:47 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:43:48 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:44:08 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:44:12 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:44:29 America/Mexico_City] GET PARAMS: periodo_id=VACIO, empleado_id=VACIO, tipo_captura=VACIO
+[09-Feb-2026 09:44:29 America/Mexico_City] PARSED: periodo_id=0, empleado_id=0, tipo_captura=identificada
+[09-Feb-2026 09:44:35 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:48:17 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:48:18 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:233
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(233): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 233
+[09-Feb-2026 09:48:21 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.unidades' doesn't exist in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:236
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(236): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 236
+[09-Feb-2026 09:50:06 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'activo' in 'where clause' in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:236
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(236): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 236
+[09-Feb-2026 09:50:15 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'activo' in 'where clause' in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php:236
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(236): PDO->prepare('\r\n    SELECT un...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 236

@@ -1,0 +1,110 @@
+✅ CORRECCIÓN APLICADA - Error de Columna SQL
+
+================================================================================
+PROBLEMA
+================================================================================
+
+Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'activo' in 'field list'
+
+CAUSA:
+El script de generación usaba el nombre de columna incorrecto 'activo'
+La tabla clima_elegibles real tiene el nombre 'elegible'
+
+================================================================================
+CAMBIOS REALIZADOS
+================================================================================
+
+ARCHIVO 1: generar_demo_clima.sql
+─────────────────────────────────
+❌ Cambio 1: INSERT ... activo → ✅ INSERT ... elegible (línea 3)
+❌ Cambio 2: WHERE ce.activo = 1 → ✅ WHERE ce.elegible = 1 (línea 72)
+❌ Cambio 3: Removido UPDATE clima_elegibles (no existen esos campos)
+❌ Cambio 4: Removido INSERT clima_aplicaciones (tabla no existe para este uso)
+✅ Cambio 5: Agregado INSERT clima_envios (tabla correcta para registrar completados)
+
+ARCHIVO 2: clima_generar_demo.php
+──────────────────────────────────
+❌ Cambio 1: DELETE clima_aplicaciones → ✅ DELETE clima_envios
+❌ Cambio 2: INSERT ... activo → ✅ INSERT ... elegible
+❌ Cambio 3: WHERE ... activo = 1 → ✅ WHERE ... elegible = 1
+✅ Cambio 4: Actualizado INSERT a tabla clima_envios correcta
+
+================================================================================
+TABLAS CORRECTAS USADAS
+================================================================================
+
+✅ clima_elegibles
+   ├─ periodo_id
+   ├─ empleado_id
+   ├─ empresa_id
+   ├─ unidad_id
+   ├─ elegible (1 = elegible, 0 = no elegible)
+   ├─ motivo_no_elegible
+   └─ created_at
+
+✅ clima_respuestas
+   ├─ periodo_id
+   ├─ empresa_id
+   ├─ unidad_id
+   ├─ empleado_id
+   ├─ reactivo_id
+   ├─ valor (1-3)
+   ├─ fecha_respuesta
+   ├─ ip
+   └─ user_agent
+
+✅ clima_envios
+   ├─ periodo_id
+   ├─ empleado_id
+   ├─ empresa_id
+   ├─ unidad_id
+   ├─ completado (1 = completado)
+   ├─ completado_at
+   ├─ ip
+   └─ user_agent
+
+================================================================================
+PRUEBAS A REALIZAR
+================================================================================
+
+1. Abrir en navegador:
+   http://localhost/sgrh/public/clima_generar_demo.php
+
+2. Hacer clic en "🗑️ Limpiar Datos" (si hay datos antiguos)
+
+3. Hacer clic en "✨ Generar Demo"
+   → Debe mostrar: "✅ Datos de demo generados exitosamente"
+
+4. Verificar en:
+   http://localhost/sgrh/public/clima_resultados_mi_unidad.php
+   → Debe mostrar gráficas con datos
+
+================================================================================
+COMANDOS SQL ALTERNATIVOS
+================================================================================
+
+Si prefieres ejecutar directamente desde MySQL:
+
+mysql -u root sgrh < generar_demo_clima.sql
+
+O via MySQL Workbench:
+1. Abrir generar_demo_clima.sql
+2. Ejecutar script
+3. Verificar que no hay errores
+
+================================================================================
+ESTADO
+================================================================================
+
+✅ Scripts corregidos
+✅ Nombres de columnas actualizados
+✅ Tablas correctas identificadas
+✅ Listo para usar
+
+PRÓXIMO PASO:
+Abre http://localhost/sgrh/public/clima_generar_demo.php
+
+================================================================================
+Fecha: Febrero 3, 2026
+Sistema: SGRH v2.0+
+Módulo: Clima Laboral

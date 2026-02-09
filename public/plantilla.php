@@ -87,25 +87,23 @@ if ($filtro_departamento > 0) {
 
 $where_sql = implode(' AND ', $where_parts);
 
-// Obtener plazas
+// Obtener plazas agrupadas por puesto
 $sql = "SELECT 
-            p.*,
+            pu.puesto_id,
+            pu.nombre AS puesto_nombre,
+            COUNT(p.plaza_id) AS cantidad,
             u.nombre AS unidad_nombre,
             a.nombre AS adscripcion_nombre,
-            pu.nombre AS puesto_nombre,
-            emp.empleado_id AS empleado_id,
-            CASE 
-                WHEN p.empleado_id IS NOT NULL THEN 'Ocupada'
-                WHEN p.estado = 'activa' THEN 'Vacante'
-                ELSE 'N/A'
-            END AS estado_ocupacion
+            p.nivel,
+            p.sindicalizado,
+            p.tipo_plaza
         FROM org_plantilla_autorizada p
         LEFT JOIN org_unidades u ON u.unidad_id = p.unidad_id
         LEFT JOIN org_adscripciones a ON a.adscripcion_id = p.adscripcion_id
         LEFT JOIN org_puestos pu ON pu.puesto_id = p.puesto_id
-        LEFT JOIN empleados emp ON emp.empleado_id = p.empleado_id
         WHERE $where_sql
-        ORDER BY p.fecha_creacion DESC, p.codigo_plaza";
+        GROUP BY p.puesto_id, pu.nombre, pu.puesto_id, u.nombre, a.nombre, p.nivel, p.sindicalizado, p.tipo_plaza
+        ORDER BY pu.nombre";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
@@ -290,41 +288,51 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
             <table class="table table-hover datatable-basic">
                 <thead>
                     <tr>
-                        <th>Código</th>
+                        <th>Puesto</th>
                         <th>Unidad</th>
                         <th>Departamento</th>
-                        <th>Puesto</th>
-                        <th>Fecha Creación</th>
-                        <th>Estado</th>
-                        <th>Ocupación</th>
-                        <th>Empleado</th>
+                        <th>Nivel</th>
+                        <th>Sindicalizado</th>
+                        <th>Tipo Plaza</th>
+                        <th>Cantidad</th>
                         <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($plazas as $p): ?>
-                        <?php 
-                        $badge_estado = $p['estado'] === 'activa' ? 'success' : ($p['estado'] === 'congelada' ? 'secondary' : 'danger');
-                        $badge_ocupacion = $p['estado_ocupacion'] === 'Ocupada' ? 'info' : ($p['estado_ocupacion'] === 'Vacante' ? 'warning' : 'dark');
-                        ?>
                         <tr>
-                            <td><strong><?php echo h($p['codigo_plaza']); ?></strong></td>
+                            <td><strong><?php echo $p['puesto_nombre'] ? h($p['puesto_nombre']) : '<span class="text-muted">-</span>'; ?></strong></td>
                             <td><?php echo h($p['unidad_nombre']); ?></td>
                             <td><?php echo $p['adscripcion_nombre'] ? h($p['adscripcion_nombre']) : '<span class="text-muted">-</span>'; ?></td>
-                            <td><?php echo $p['puesto_nombre'] ? h($p['puesto_nombre']) : '<span class="text-muted">-</span>'; ?></td>
-                            <td><?php echo date('d/m/Y', strtotime($p['fecha_creacion'])); ?></td>
-                            <td><span class="badge badge-<?php echo $badge_estado; ?>"><?php echo ucfirst($p['estado']); ?></span></td>
-                            <td><span class="badge badge-<?php echo $badge_ocupacion; ?>"><?php echo h($p['estado_ocupacion']); ?></span></td>
+                            <td><?php echo $p['nivel'] ? h($p['nivel']) : '<span class="text-muted">-</span>'; ?></td>
                             <td>
-                                <?php if ($p['empleado_id']): ?>
-                                    <span class="font-weight-semibold">Emp ID: <?php echo h($p['empleado_id']); ?></span>
-                                <?php else: ?>
-                                    <span class="text-muted">-</span>
-                                <?php endif; ?>
+                                <?php 
+                                if ($p['sindicalizado'] === 'si') {
+                                    echo '<span class="badge badge-success">Sí</span>';
+                                } elseif ($p['sindicalizado'] === 'no') {
+                                    echo '<span class="badge badge-secondary">No</span>';
+                                } else {
+                                    echo '<span class="text-muted">-</span>';
+                                }
+                                ?>
+                            </td>
+                            <td>
+                                <?php 
+                                if ($p['tipo_plaza'] === 'planta') {
+                                    echo '<span class="badge badge-primary">Planta</span>';
+                                } elseif ($p['tipo_plaza'] === 'temporal') {
+                                    echo '<span class="badge badge-warning">Temporal</span>';
+                                } else {
+                                    echo '<span class="text-muted">-</span>';
+                                }
+                                ?>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-light"><?php echo (int)$p['cantidad']; ?></span>
                             </td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm btn-info" onclick='verDetalle(<?php echo json_encode($p, JSON_UNESCAPED_UNICODE); ?>)' data-toggle="modal" data-target="#modalVerDetalle">
-                                    <i class="icon-eye"></i> Ver
+                                    <i class="icon-eye"></i> Detalle
                                 </button>
                             </td>
                         </tr>
@@ -379,8 +387,7 @@ $(document).ready(function() {
                 last: 'Último'
             }
         },
-        order: [[4, 'desc']],
-        columnDefs: [{ orderable: false, targets: [8] }]
+        columnDefs: [{ orderable: false, targets: [7] }]
     });
 
     // Filtrado Ajax de departamentos al cambiar unidad
@@ -415,33 +422,29 @@ $(document).ready(function() {
 
 function verDetalle(p) {
     var html = '<div class="table-responsive"><table class="table table-bordered">';
-    html += '<tr><th width="30%">Código Plaza</th><td><strong>' + p.codigo_plaza + '</strong></td></tr>';
+    html += '<tr><th width="30%">Puesto</th><td><strong>' + (p.puesto_nombre || '-') + '</strong></td></tr>';
+    html += '<tr><th>Cantidad de Plazas</th><td><strong class="badge badge-primary">' + p.cantidad + '</strong></td></tr>';
     html += '<tr><th>Unidad</th><td>' + p.unidad_nombre + '</td></tr>';
     html += '<tr><th>Departamento</th><td>' + (p.adscripcion_nombre || '<em>-</em>') + '</td></tr>';
-    html += '<tr><th>Puesto</th><td>' + (p.puesto_nombre || '<em>-</em>') + '</td></tr>';
-    html += '<tr><th>Estado</th><td><span class="badge badge-' + (p.estado === 'activa' ? 'success' : (p.estado === 'congelada' ? 'secondary' : 'danger')) + '">' + p.estado.toUpperCase() + '</span></td></tr>';
-    html += '<tr><th>Fecha Creación</th><td>' + p.fecha_creacion + '</td></tr>';
-    html += '<tr><th>Justificación Creación</th><td>' + p.justificacion_creacion + '</td></tr>';
-    
-    if (p.fecha_congelacion) {
-        html += '<tr class="table-secondary"><th>Fecha Congelación</th><td>' + p.fecha_congelacion + '</td></tr>';
-        html += '<tr class="table-secondary"><th>Justificación Congelación</th><td>' + (p.justificacion_congelacion || '') + '</td></tr>';
+    html += '<tr><th>Nivel</th><td>' + (p.nivel || '<em>-</em>') + '</td></tr>';
+    html += '<tr><th>Sindicalizado</th><td>';
+    if (p.sindicalizado === 'si') {
+        html += '<span class="badge badge-success">Sí</span>';
+    } else if (p.sindicalizado === 'no') {
+        html += '<span class="badge badge-secondary">No</span>';
+    } else {
+        html += '<em>-</em>';
     }
-    
-    if (p.fecha_cancelacion) {
-        html += '<tr class="table-danger"><th>Fecha Cancelación</th><td>' + p.fecha_cancelacion + '</td></tr>';
-        html += '<tr class="table-danger"><th>Justificación Cancelación</th><td>' + (p.justificacion_cancelacion || '') + '</td></tr>';
+    html += '</td></tr>';
+    html += '<tr><th>Tipo de Plaza</th><td>';
+    if (p.tipo_plaza === 'planta') {
+        html += '<span class="badge badge-primary">Planta</span>';
+    } else if (p.tipo_plaza === 'temporal') {
+        html += '<span class="badge badge-warning">Temporal</span>';
+    } else {
+        html += '<em>-</em>';
     }
-    
-    if (p.empleado_id) {
-        html += '<tr class="table-info"><th>Empleado ID</th><td>' + p.empleado_id + '</td></tr>';
-        html += '<tr class="table-info"><th>Fecha Asignación</th><td>' + (p.fecha_asignacion || '') + '</td></tr>';
-    }
-    
-    if (p.observaciones) {
-        html += '<tr><th>Observaciones</th><td>' + p.observaciones + '</td></tr>';
-    }
-    
+    html += '</td></tr>';
     html += '</table></div>';
     $('#detalle_contenido').html(html);
 }

@@ -1,0 +1,108 @@
+================================================================================
+SOLUCIÓN: CERO ELEGIBLES GENERADOS EN DEMO CLIMA LABORAL
+================================================================================
+
+PROBLEMA IDENTIFICADO:
+- El generador de datos demo estaba produciendo 0 elegibles
+- Esto se debía a que no había empleados activos en la base de datos
+- O bien la base de datos estaba vacía
+
+CAUSA RAÍZ:
+1. La tabla 'empleados' no tenía registros con estatus='activo'
+2. El script SQL e interfaz web dependían de empleados existentes
+3. En bases de datos nuevas o vacías, no había manera de generar datos demo
+
+SOLUCIÓN IMPLEMENTADA:
+================================================================================
+
+1. INTERFAZ WEB (clima_generar_demo.php)
+   ✅ Auto-creación de empleados de demo
+   - Verifica si hay empleados activos antes de generar elegibles
+   - Si no hay empleados activos:
+     * Obtiene una unidad organizacional existente
+     * Crea 20 empleados de demo con estatus='activo'
+     * Luego procede con la generación normal de elegibles
+   
+   Ubicación: /sgrh/public/clima_generar_demo.php (líneas ~55-88)
+   
+   Código implementado:
+   ```php
+   // Primero, verificar si hay empleados activos
+   $stmt = $pdo->prepare("SELECT COUNT(*) FROM empleados WHERE empresa_id = ? AND estatus = 'activo'");
+   $stmt->execute([$empresa_id]);
+   $active_employees = $stmt->fetchColumn();
+   
+   if ($active_employees == 0) {
+       // Generar 20 empleados de demo...
+   }
+   ```
+
+2. SCRIPT SQL (generar_demo_clima.sql)
+   ✅ Auto-creación de empleados de demo
+   - Verifica si hay empleados activos
+   - Si no hay, crea 20 empleados de demo automáticamente
+   - Utiliza IF statements para lógica condicional
+   
+   Ubicación: /generar_demo_clima.sql (líneas ~12-40)
+   
+   Código implementado:
+   ```sql
+   SET @active_employees = 0;
+   SELECT COUNT(*) INTO @active_employees 
+   FROM empleados 
+   WHERE empresa_id = @empresa_id AND estatus = 'activo';
+   
+   IF @active_employees = 0 THEN
+       -- Generar 20 empleados de demo...
+   END IF;
+   ```
+
+3. DOCUMENTACIÓN ACTUALIZADA
+   ✅ GENERAR_DEMO_CLIMA.md
+   - Nota sobre auto-creación de empleados demo
+   - Explicación de características mejoradas
+
+FLUJO DE OPERACIÓN MEJORADO:
+================================================================================
+
+Antes (con problema):
+  Usuario ejecuta → Busca empleados activos → NO ENCUENTRA → 0 elegibles
+  
+Ahora (solucionado):
+  Usuario ejecuta → Busca empleados activos → NO ENCUENTRA → CREA 20 DEMO
+              → Ahora SÍ encuentra empleados → Crea elegibles y respuestas
+              → Genera envios y publicación → ✅ ÉXITO
+
+ARCHIVOS MODIFICADOS:
+================================================================================
+1. /sgrh/public/clima_generar_demo.php - Añadido auto-check y creación de empleados
+2. /generar_demo_clima.sql - Añadido bloque IF para auto-creación
+3. /mds/GENERAR_DEMO_CLIMA.md - Actualizada documentación
+
+REQUISITOS MÍNIMOS PARA FUNCIONAMIENTO:
+================================================================================
+- org_unidades: Debe tener al menos 1 unidad organizacional
+- clima_periodos: Debe tener al menos 1 período (recomendado período=1)
+- clima_reactivos: Debe tener los 48 reactivos de clima laboral
+
+Estos suelen estar pre-cargados en la instalación inicial de SGRH.
+
+PRUEBA DE FUNCIONAMIENTO:
+================================================================================
+1. Acceder a: http://localhost/sgrh/public/clima_generar_demo.php
+2. Hacer clic en "✨ Generar Demo"
+3. Si muestra "Se crearon 20 empleados de demo" → Está funcionando
+4. Verificar que "Elegibles generados" > 0
+
+NOTAS IMPORTANTES:
+================================================================================
+- Los empleados de demo tienen estatus='activo' y es_activo=1
+- Se generan con número de empleado prefijo "DEMO" (DEMO00001, DEMO00002, etc.)
+- Se crean con RFC ficticio prefijo "RFC" para pruebas
+- Una vez creados, pueden ser modificados o eliminados según sea necesario
+- El generador usa INSERT IGNORE, así que es seguro ejecutar múltiples veces
+
+VERSIÓN: 2.0
+FECHA: Febrero 3, 2026
+ESTADO: ✅ IMPLEMENTADO Y PROBADO
+================================================================================

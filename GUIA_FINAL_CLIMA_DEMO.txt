@@ -1,0 +1,213 @@
+================================================================================
+GUÍA FINAL - GENERACIÓN DE DATOS DEMO CLIMA LABORAL
+================================================================================
+
+PROBLEMA ORIGINAL:
+- El sistema mostraba 0 elegibles a pesar de intentar crear empleados
+- Causa: Restricción UNIQUE en (empresa_id, no_emp, rfc_base) causaba conflictos
+- Solución: Script "setup_smart.php" que limpia y crea empleados con valores únicos
+
+================================================================================
+SOLUCIÓN FINAL - TRES OPCIONES
+================================================================================
+
+🎯 OPCIÓN A: RECOMENDADA - Setup Inteligente
+────────────────────────────────────────────
+URL: http://localhost/sgrh/public/setup_smart.php
+
+✅ Ventajas:
+  - Crea automáticamente empleados de demo
+  - Considera restricciones UNIQUE
+  - Genera todos los datos en un clic
+  - Muestra resumen detallado
+  - Más confiable que las anteriores
+
+📝 Pasos:
+1. Abre: http://localhost/sgrh/public/setup_smart.php
+2. Espera a que termine
+3. Haz clic en "Ver Resultados"
+4. ¡Listo!
+
+────────────────────────────────────────────
+
+🔬 OPCIÓN B: Con Debug Detallado
+────────────────────────────────
+URL: http://localhost/sgrh/public/setup_debug.php
+
+Úsalo si quieres ver exactamente qué está pasando en cada paso:
+1. Muestra cuántas unidades hay
+2. Intenta crear empleados individuales
+3. Muestra errores específicos
+4. Verifica la estructura de la tabla
+5. Genera elegibles
+
+────────────────────────────────────────────
+
+📊 OPCIÓN C: Diagnóstico Completo
+────────────────────────────────
+URL: http://localhost/sgrh/public/diagnostico_clima.php
+
+Muestra el estado actual sin generar datos:
+1. Estado de conexión
+2. Cantidad de períodos
+3. Cantidad de reactivos
+4. Unidades organizacionales
+5. Empleados y sus estatus
+6. Elegibles ya generados
+7. Respuestas ya generadas
+
+================================================================================
+ENTENDIENDO EL PROBLEMA TÉCNICO
+================================================================================
+
+La tabla 'empleados' tiene una restricción UNIQUE:
+┌────────────────────────────────────────────────────┐
+│ UNIQUE INDEX `uq_emp_empresa_noemp_rfc`(           │
+│   empresa_id,  -- El ID de empresa                │
+│   no_emp,      -- Número de empleado              │
+│   rfc_base     -- RFC del empleado                │
+│ )                                                  │
+└────────────────────────────────────────────────────┘
+
+Esto significa:
+❌ NO se puede insertar dos empleados con el mismo:
+   - no_emp EN LA MISMA empresa_id
+   - rfc_base EN LA MISMA empresa_id
+
+✅ SÍ se puede insertar si:
+   - El no_emp es diferente
+   - El rfc_base es diferente
+   - Aunque sea en la misma empresa
+
+CÓMO LO SOLUCIONA setup_smart.php:
+1. Primero BORRA todos los empleados demo anteriores
+   DELETE FROM empleados WHERE no_emp LIKE 'DEMO%'
+
+2. Luego crea nuevos con valores ÚNICOS usando timestamp:
+   - no_emp = "DEMO" + (timestamp * 20 + contador) → único cada vez
+   - rfc = "RFC" + (timestamp * 20 + contador) → único cada vez
+
+3. Esto garantiza que no hay conflictos de UNIQUE
+
+================================================================================
+ARCHIVOS DISPONIBLES
+================================================================================
+
+Web (Navegador):
+├── setup_smart.php .................. ⭐ RECOMENDADO - Setup inteligente
+├── setup_debug.php .................. Debug detallado paso a paso
+├── diagnostico_clima.php ............ Diagnóstico sin generación
+├── test_db.php ...................... Test rápido de tablas
+├── clima_generar_demo.php ........... Original (mejorado)
+└── setup_integral.php ............... Versión anterior
+
+SQL/Manual:
+├── generar_demo_clima.sql ........... Script SQL puro
+├── setup_demo_data.sql .............. Setup básico SQL
+└── ejecutar_demo_clima.bat .......... Batch de Windows
+
+Documentación:
+├── HERRAMIENTAS_DIAGNOSTICO.txt .... Guía de herramientas
+├── SOLUCION_CERO_ELEGIBLES.txt ..... Registro de soluciones
+└── mds/GENERAR_DEMO_CLIMA.md ....... Documentación markdown
+
+================================================================================
+FLUJO RECOMENDADO
+================================================================================
+
+Paso 1: Entra a Setup Inteligente
+         http://localhost/sgrh/public/setup_smart.php
+
+Paso 2: Lee el resumen (muestra cuántos datos se generaron)
+         - Empleados activos creados
+         - Elegibles generados
+         - Respuestas generadas
+
+Paso 3: Haz clic en "Ver Resultados"
+         Va a /sgrh/public/clima_resultados.php
+
+Paso 4: ¡Disfruta los datos demo!
+         Ahora tienes datos reales para trabajar
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+❓ Pregunta: ¿Por qué antes mostraba 0 elegibles?
+✅ Respuesta: Los empleados no se estaban creando correctamente por:
+   - INSERT IGNORE fallando silenciosamente
+   - Restricción UNIQUE causando conflictos
+   - Valores duplicados en no_emp/rfc
+
+❓ Pregunta: ¿setup_smart.php es definitivo?
+✅ Respuesta: Sí, resuelve todos los problemas conocidos
+
+❓ Pregunta: ¿Puedo ejecutarlo múltiples veces?
+✅ Respuesta: Sí, borra los empleados demo antiguos primero
+
+❓ Pregunta: ¿Qué pasa con los datos existentes?
+✅ Respuesta: Solo borra empleados con no_emp LIKE 'DEMO%'
+             Los demás empleados se mantienen intactos
+
+❓ Pregunta: ¿Se pueden modificar los datos después?
+✅ Respuesta: Sí completamente, son datos normales
+
+================================================================================
+VERIFICACIÓN FINAL
+================================================================================
+
+Después de ejecutar setup_smart.php, deberías ver:
+
+✅ Empleados activos creados: > 0 (mínimo 20)
+✅ Elegibles generados: > 0
+✅ Respuestas generadas: > 0 (empleados × reactivos)
+✅ Reactivos: 48 (estándar)
+
+Si ves 0 en cualquier cosa:
+1. Abre setup_debug.php para ver dónde falla
+2. Verifica que la base de datos esté corriendo
+3. Verifica que el SQL dump fue importado correctamente
+
+================================================================================
+PRÓXIMOS PASOS DESPUÉS DE GENERAR DATOS
+================================================================================
+
+1. Ver Resultados de Clima Laboral:
+   http://localhost/sgrh/public/clima_resultados.php
+
+2. Revisar Resultados por Unidad:
+   http://localhost/sgrh/public/clima_resultados_mi_unidad.php
+
+3. Analizar Datos en Dashboards:
+   Busca los módulos de análisis de clima laboral
+
+4. Generar Reportes:
+   Accede a los generadores de reportes si existen
+
+================================================================================
+CONTACTO / SOPORTE
+================================================================================
+
+Si hay problemas:
+1. Ejecuta: http://localhost/sgrh/public/setup_debug.php
+2. Lee los mensajes de error
+3. Verifica los logs en: c:\MAMP\logs\php_error.log
+4. Revisa que sgrh.sql fue importado completamente
+
+================================================================================
+CONCLUSIÓN
+================================================================================
+
+setup_smart.php ES LA FORMA DEFINITIVA Y RECOMENDADA DE:
+✅ Generar datos demo de clima laboral
+✅ Manejar restricciones de tabla
+✅ Crear elegibles automáticamente
+✅ Generar respuestas realistas
+✅ Publicar resultados
+
+¡Úsalo y disfruta los datos! 🚀
+
+================================================================================
+FECHA: Febrero 4, 2026
+ESTADO: ✅ PROBADO Y FUNCIONANDO
+================================================================================

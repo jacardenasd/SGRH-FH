@@ -32,6 +32,7 @@ Mis resultados: /public/clima_resultados_mi_unidad.php
 ```
 Encuesta imprimible: /public/clima_encuesta_impresion.php
 Captura de respuestas: /public/clima_captura_respuestas.php
+Análisis de respuestas abiertas: /public/clima_analisis_abiertas.php
 ```
 
 ### Para Administradores
@@ -68,6 +69,7 @@ Planes de acción: /public/clima_planes.php
 | `clima_elegibles_detalle.php` | Detalle elegibles | Admin |
 | **`clima_encuesta_impresion.php`** | **Impresión (NUEVO)** | **RH** |
 | **`clima_captura_respuestas.php`** | **Captura papel (NUEVO)** | **RH** |
+| **`clima_analisis_abiertas.php`** | **Análisis respuestas abiertas (NUEVO)** | **Admin** |
 
 ### Base de Datos
 | Tabla | Campos Principales |
@@ -105,6 +107,7 @@ Planes de acción: /public/clima_planes.php
 | `REFERENCIA_RAPIDA_PAPEL.md` | RH (rápido) | Resumen 1 página |
 | `GUIA_IMPRESION_RAPIDA.md` | RH, Empleados | 📖 Cómo imprimir encuesta optimizada 2 páginas |
 | `GUIA_CAPTURA_ANONIMA.md` | RH Coordinadores | 🔒 Cómo capturar encuestas anónimas (NEW) |
+| **`ANALISIS_RESPUESTAS_ABIERTAS.md`** | **Admin** | **📊 Guía completa de análisis de texto (NEW)** |
 | `GUIA_ACTIVAR_CORREOS.md` | Admin | Configurar notificaciones |
 | `GUIA_PERMISOS_ALCANCE.md` | Admin | Roles y permisos |
 | `GUIA_ACCESO_USUARIOS.md` | Admin | Acceso y autenticación |

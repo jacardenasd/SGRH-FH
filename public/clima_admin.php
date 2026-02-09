@@ -235,6 +235,18 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
           </div>
         </div>
 
+        <!-- Publicar resultados -->
+        <div class="col-md-4 mb-3">
+          <div class="card bg-light">
+            <div class="card-body text-center">
+              <i class="icon-megaphone icon-3x text-danger mb-3"></i>
+              <h6 class="font-weight-semibold mb-2">Publicar resultados</h6>
+              <p class="text-muted mb-3">Publicar/despublicar por período y unidad</p>
+              <a href="publicar_por_unidad.php" class="btn btn-danger btn-sm btn-block">Acceder</a>
+            </div>
+          </div>
+        </div>
+
         <!-- Dimensiones y reactivos -->
         <div class="col-md-4 mb-3">
           <div class="card bg-light">
@@ -294,6 +306,32 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
             </div>
           </div>
         </div>
+
+        <!-- Captura automática con IA -->
+        <div class="col-md-4 mb-3">
+          <div class="card bg-light border-primary">
+            <div class="card-body text-center">
+              <i class="icon-magic-wand icon-3x text-primary mb-3"></i>
+              <h6 class="font-weight-semibold mb-2">Captura con IA <span class="badge badge-primary">NUEVO</span></h6>
+              <p class="text-muted mb-3">Procesar PDFs escaneados automáticamente</p>
+              <a href="clima_captura_ia.php" class="btn btn-primary btn-sm btn-block">
+                <i class="icon-upload4 mr-2"></i>Procesar OCR
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Análisis de respuestas abiertas -->
+        <div class="col-md-4 mb-3">
+          <div class="card bg-light">
+            <div class="card-body text-center">
+              <i class="icon-comment-discussion icon-3x text-indigo mb-3"></i>
+              <h6 class="font-weight-semibold mb-2">Respuestas abiertas</h6>
+              <p class="text-muted mb-3">Analizar y agrupar comentarios abiertos</p>
+              <a href="clima_analisis_abiertas.php" class="btn btn-indigo btn-sm btn-block">Analizar</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -314,7 +352,8 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
           <ul>
             <li>Imprimir encuesta usando "Encuesta imprimible"</li>
             <li>Distribuir al personal y recopilar respuestas</li>
-            <li>Capturar respuestas en el sistema usando "Captura en papel"</li>
+            <li>Capturar respuestas manualmente usando "Captura en papel" O</li>
+            <li>Procesar automáticamente con "Captura con IA" (requiere Tesseract OCR)</li>
           </ul>
         </li>
         <li><strong>Monitorear participación</strong>: Revisa avance por Dirección</li>

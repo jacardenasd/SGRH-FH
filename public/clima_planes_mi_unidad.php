@@ -70,8 +70,43 @@ if ($mi_empleado_data) {
 // Permitir acceso a todos - mostrar mensaje informativo si no es líder
 $es_lider = ($mi_liderazgo !== null);
 
-$mi_unidad_id = $mi_liderazgo ? (int)$mi_liderazgo['unidad_id'] : 0;
-$mi_unidad_nombre = $mi_liderazgo ? $mi_liderazgo['unidad_nombre'] : '';
+$mi_unidad_id_default = $mi_liderazgo ? (int)$mi_liderazgo['unidad_id'] : 0;
+
+// Obtener todas las unidades accesibles por el usuario
+// Si es admin, puede ver todas las unidades
+if (can('organizacion.admin') || can('clima.admin')) {
+    $stmt_unidades = $pdo->prepare("
+        SELECT DISTINCT u.unidad_id, u.nombre as unidad_nombre
+        FROM org_unidades u
+        WHERE u.empresa_id = ?
+        ORDER BY u.nombre
+    ");
+    $stmt_unidades->execute([$empresa_id]);
+} else {
+    $stmt_unidades = $pdo->prepare("
+        SELECT DISTINCT e.unidad_id, u.nombre as unidad_nombre
+        FROM usuario_empresas ue
+        INNER JOIN empleados e ON e.empleado_id = ue.empleado_id
+        INNER JOIN org_unidades u ON u.unidad_id = e.unidad_id
+        WHERE ue.usuario_id = ? AND ue.empresa_id = ? AND ue.estatus = 1
+        ORDER BY u.nombre
+    ");
+    $stmt_unidades->execute([$usuario_id, $empresa_id]);
+}
+$unidades_disponibles = $stmt_unidades->fetchAll(PDO::FETCH_ASSOC);
+
+// Filtro de unidad (tomar del GET o usar la unidad por defecto)
+$unidad_id_filtro = isset($_GET['unidad_id']) ? (int)$_GET['unidad_id'] : $mi_unidad_id_default;
+$mi_unidad_id = $unidad_id_filtro;
+
+// Obtener nombre de la unidad seleccionada
+$mi_unidad_nombre = '';
+foreach ($unidades_disponibles as $u) {
+    if ($u['unidad_id'] == $mi_unidad_id) {
+        $mi_unidad_nombre = $u['unidad_nombre'];
+        break;
+    }
+}
 
 $flash = null;
 $flash_type = 'info';
@@ -216,8 +251,7 @@ if ($periodo_id_filtro > 0) {
         $stmt_d->execute([$periodo_id_filtro, $empresa_id, $mi_unidad_id, $did]);
         $row_d = $stmt_d->fetch(PDO::FETCH_ASSOC);
         $prom_dim_1_3 = $row_d ? (float)$row_d['promedio'] : 0.0;
-        $prom_dim_0_100 = $prom_dim_1_3 > 0 ? ((3 - $prom_dim_1_3) / 2) * 100 : 0.0;
-
+            $prom_dim_0_100 = $prom_dim_1_3 > 0 ? (125 - $prom_dim_1_3 * 25) : 0.0;
         $promedios_dimensiones[$did] = round($prom_dim_0_100, 2);
     }
 }
@@ -331,7 +365,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
   <?php if (!empty($periodos)): ?>
 
-  <!-- Filtro de periodo -->
+  <!-- Filtro de periodo y unidad -->
   <div class="card">
     <div class="card-header bg-light">
       <h6 class="card-title mb-0"><i class="icon-filter3 mr-2"></i>Filtrar Planes</h6>
@@ -347,18 +381,33 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
           </option>
           <?php endforeach; ?>
         </select>
-        <?php if ($periodo_id_filtro > 0): ?>
+
+        <?php if (count($unidades_disponibles) > 1): ?>
+        <label class="ml-3 mr-2 font-weight-semibold">Unidad:</label>
+        <select name="unidad_id" class="form-control mr-2" onchange="this.form.submit()">
+          <?php foreach ($unidades_disponibles as $u): ?>
+          <option value="<?php echo (int)$u['unidad_id']; ?>" <?php echo ((int)$u['unidad_id'] === $mi_unidad_id) ? 'selected' : ''; ?>>
+            🏢 <?php echo h($u['unidad_nombre']); ?>
+          </option>
+          <?php endforeach; ?>
+        </select>
+        <?php else: ?>
+        <!-- Preserve unit filter when only one unit is available -->
+        <input type="hidden" name="unidad_id" value="<?php echo (int)$mi_unidad_id; ?>">
+        <?php endif; ?>
+
+        <?php if ($periodo_id_filtro > 0 || (isset($_GET['unidad_id']) && count($unidades_disponibles) > 1)): ?>
         <a href="?" class="btn btn-light btn-sm ml-2">
-          <i class="icon-cross2 mr-1"></i> Limpiar filtro
+          <i class="icon-cross2 mr-1"></i> Limpiar filtros
         </a>
         <?php endif; ?>
       </form>
       <small class="text-muted d-block mt-2">
         <i class="icon-info22 mr-1"></i>
         <?php if ($periodo_id_filtro > 0): ?>
-          Mostrando planes del periodo seleccionado.
+          Mostrando planes del periodo seleccionado<?php if (count($unidades_disponibles) > 1): ?> para <strong><?php echo h($mi_unidad_nombre); ?></strong><?php endif; ?>.
         <?php else: ?>
-          Mostrando <strong>todos los planes de acción</strong> de tu Dirección.
+          Mostrando <strong>todos los planes de acción</strong><?php if (count($unidades_disponibles) > 1): ?> de <strong><?php echo h($mi_unidad_nombre); ?></strong><?php endif; ?>.
         <?php endif; ?>
       </small>
     </div>

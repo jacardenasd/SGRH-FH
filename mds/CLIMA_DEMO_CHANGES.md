@@ -22,12 +22,13 @@ Cambios en `generar_respuestas_clima()`:
 Fórmula actualizada en 6 instancias:
 ```php
 // Conversión de escala 1-3 a 0-100% con límites
-min(100, max(0, (($prom - 1) / 2) * 100))
+min(100, max(0, (125 - $prom * 25)))
 ```
 
 Esto garantiza:
-- 1 → 0%
-- 2 → 50%
+- 1 → 100%
+- 2 → 75%
+- 3 → 50%
 - 3 → 100%
 - Valores nunca exceden 100% ni caen debajo de 0%
 

@@ -1,0 +1,147 @@
+✅ CORRECCIONES FINALES APLICADAS
+================================================================================
+
+ERRORES CORREGIDOS:
+
+1. ❌ Error: Unknown column 'activo' 
+   ✅ Solución: Cambiado a 'elegible'
+
+2. ❌ Error: Unknown column 'e.estado'
+   ✅ Solución: Cambiado a 'e.estatus' (columna correcta en tabla empleados)
+
+3. ❌ Error: Unknown column 'completado' in clima_elegibles
+   ✅ Solución: Removido UPDATE en clima_elegibles (no tiene esas columnas)
+              Usar solo INSERT en clima_envios (tabla correcta)
+
+================================================================================
+ARCHIVOS CORREGIDOS
+================================================================================
+
+generar_demo_clima.sql
+├─ Línea ~50: elegible = 1 ✅
+├─ Línea ~61: e.estatus = 'activo' ✅
+└─ Sin UPDATE innecesarios ✅
+
+clima_generar_demo.php
+├─ Línea ~52: Cambio e.estado → e.estatus ✅
+├─ Línea ~85: elegible = 1 ✅
+├─ Removido UPDATE clima_elegibles (incorrecto) ✅
+├─ INSERT en clima_envios (correcto) ✅
+└─ Sin duplicaciones ✅
+
+================================================================================
+TABLAS CORRECTAS UTILIZADAS
+================================================================================
+
+✅ clima_elegibles
+   ├─ periodo_id
+   ├─ empleado_id
+   ├─ empresa_id
+   ├─ unidad_id
+   ├─ elegible (1 o 0)
+   ├─ motivo_no_elegible
+   └─ created_at
+
+✅ clima_respuestas
+   ├─ periodo_id
+   ├─ empresa_id
+   ├─ unidad_id
+   ├─ empleado_id
+   ├─ reactivo_id
+   ├─ valor (1-3)
+   ├─ fecha_respuesta
+   ├─ ip
+   └─ user_agent
+
+✅ clima_envios
+   ├─ periodo_id
+   ├─ empleado_id
+   ├─ empresa_id
+   ├─ unidad_id
+   ├─ completado (1 = completado)
+   ├─ completado_at (fecha completado)
+   ├─ ip
+   └─ user_agent
+
+✅ clima_publicacion
+   ├─ periodo_id
+   ├─ empresa_id
+   ├─ unidad_id
+   ├─ publicado (1 = publicado)
+   └─ fecha_publicacion
+
+✅ empleados
+   ├─ empleado_id
+   ├─ empresa_id
+   ├─ unidad_id
+   ├─ estatus (ENUM: 'activo', 'baja', 'suspendido') ✅ CORRECTO
+   └─ ... otros campos
+
+================================================================================
+¿AHORA QUÉ?
+================================================================================
+
+1. Abre en navegador:
+   http://localhost/sgrh/public/clima_generar_demo.php
+
+2. Prueba las acciones:
+   ✅ Limpiar Datos
+   ✅ Generar Demo
+
+3. Si todavía hay errores:
+   → Revisa que existan:
+     • Período activo en clima_periodos
+     • Reactivos en clima_reactivos
+     • Empleados activos (estatus = 'activo')
+
+4. Ver resultados:
+   http://localhost/sgrh/public/clima_resultados_mi_unidad.php
+
+================================================================================
+RESUMEN DE CAMBIOS
+================================================================================
+
+CAMPO          ANTES              AHORA
+──────────────────────────────────────────
+Columna        activo             elegible ✅
+Columna        estado             estatus ✅
+Tabla          clima_elegibles    clima_envios ✅
+Tabla          clima_aplicaciones REMOVIDO ✅
+
+================================================================================
+VERIFICAR EN BD
+================================================================================
+
+Después de generar, ejecuta:
+
+-- Ver elegibles
+SELECT COUNT(*) AS elegibles 
+FROM clima_elegibles 
+WHERE periodo_id = 1 AND elegible = 1;
+
+-- Ver respuestas
+SELECT COUNT(*) AS respuestas 
+FROM clima_respuestas 
+WHERE periodo_id = 1;
+
+-- Ver envios completados
+SELECT COUNT(*) AS envios 
+FROM clima_envios 
+WHERE periodo_id = 1 AND completado = 1;
+
+-- Promedio general
+SELECT ROUND((AVG(valor) - 1) / 2 * 100, 1) AS promedio
+FROM clima_respuestas 
+WHERE periodo_id = 1;
+
+================================================================================
+LISTO PARA USAR ✅
+================================================================================
+
+Todos los errores han sido corregidos.
+Los scripts ahora usan las columnas y tablas correctas.
+
+¡Prueba nuevamente!
+
+Fecha: Febrero 3, 2026
+Sistema: SGRH v2.0+

@@ -90,8 +90,9 @@ if ($periodo) {
     $stmt_g->execute([$periodo_id, $empresa_id]);
     $row_g = $stmt_g->fetch(PDO::FETCH_ASSOC);
     $prom_1_3 = $row_g ? (float)$row_g['promedio_global'] : 0.0;
-    // Convertir escala 1-3 a 0-100: ((3 - valor) / 2) * 100
-    $prom_0_100 = $prom_1_3 > 0 ? ((3 - $prom_1_3) / 2) * 100 : 0.0;
+    // Convertir escala 1-3 a 0-100: (125 - valor * 25)
+    // Respuesta 1 = 100%, 2 = 75%, 3 = 50%
+    $prom_0_100 = $prom_1_3 > 0 ? (125 - $prom_1_3 * 25) : 0.0;
     $resumen_global = array(
         'promedio_global' => round($prom_0_100, 2),
         'promedio_1_3' => round($prom_1_3, 2)
@@ -145,7 +146,7 @@ if ($periodo) {
             $stmt_d->execute([$periodo_id, $empresa_id, $uid, $did]);
             $row_d = $stmt_d->fetch(PDO::FETCH_ASSOC);
             $prom_dim_1_3 = $row_d ? (float)$row_d['promedio'] : 0.0;
-            $prom_dim_0_100 = $prom_dim_1_3 > 0 ? ((3 - $prom_dim_1_3) / 2) * 100 : 0.0;
+            $prom_dim_0_100 = $prom_dim_1_3 > 0 ? (125 - $prom_dim_1_3 * 25) : 0.0;
 
             $promedios_dim[] = array(
                 'dimension_id' => $did,
@@ -157,7 +158,7 @@ if ($periodo) {
 
         // Convertir promedio unidad a escala 0-100
         $prom_u_1_3 = (float)$unidad['promedio_unidad'];
-        $prom_u_0_100 = $prom_u_1_3 > 0 ? ((3 - $prom_u_1_3) / 2) * 100 : 0.0;
+        $prom_u_0_100 = $prom_u_1_3 > 0 ? (125 - $prom_u_1_3 * 25) : 0.0;
 
         $ranking_unidades[$idx]['dimensiones'] = $promedios_dim;
         $ranking_unidades[$idx]['promedio_unidad'] = round($prom_u_0_100, 2);
@@ -196,7 +197,7 @@ if ($periodo) {
     $demograficos['sexo'] = array();
     foreach ($rows_sexo as $row) {
         $prom_1_3 = (float)$row['promedio'];
-        $prom_0_100 = $prom_1_3 > 0 ? ((3 - $prom_1_3) / 2) * 100 : 0.0;
+        $prom_0_100 = $prom_1_3 > 0 ? (125 - $prom_1_3 * 25) : 0.0;
         $sexo_label = $row['categoria'];
         if ($sexo_label === 'M') $sexo_label = 'Masculino';
         elseif ($sexo_label === 'F') $sexo_label = 'Femenino';
@@ -293,7 +294,7 @@ if ($periodo) {
     $demograficos['edad'] = array();
     foreach ($rows_edad as $row) {
         $prom_1_3 = (float)$row['promedio'];
-        $prom_0_100 = $prom_1_3 > 0 ? ((3 - $prom_1_3) / 2) * 100 : 0.0;
+        $prom_0_100 = $prom_1_3 > 0 ? (125 - $prom_1_3 * 25) : 0.0;
         $demograficos['edad'][] = array(
             'categoria' => $row['categoria'],
             'promedio' => round($prom_0_100, 2)
@@ -329,7 +330,7 @@ if ($periodo) {
     $demograficos['antiguedad'] = array();
     foreach ($rows_antiguedad as $row) {
         $prom_1_3 = (float)$row['promedio'];
-        $prom_0_100 = $prom_1_3 > 0 ? ((3 - $prom_1_3) / 2) * 100 : 0.0;
+        $prom_0_100 = $prom_1_3 > 0 ? (125 - $prom_1_3 * 25) : 0.0;
         $demograficos['antiguedad'][] = array(
             'categoria' => $row['categoria'],
             'promedio' => round($prom_0_100, 2)
@@ -653,7 +654,7 @@ foreach ($dimensiones as $dim) {
     $stmt_dg->execute([$periodo_id, $empresa_id, $did]);
     $row_dg = $stmt_dg->fetch(PDO::FETCH_ASSOC);
     $prom_1_3 = $row_dg ? (float)$row_dg['promedio'] : 0.0;
-    $prom_0_100 = $prom_1_3 > 0 ? ((3 - $prom_1_3) / 2) * 100 : 0.0;
+    $prom_0_100 = $prom_1_3 > 0 ? (125 - $prom_1_3 * 25) : 0.0;
     $promedios_dim_global[] = array(
         'nombre' => $dim['nombre'],
         'promedio' => round($prom_0_100, 2)
