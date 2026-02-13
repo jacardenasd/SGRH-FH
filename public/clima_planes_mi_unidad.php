@@ -29,7 +29,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 // Verificar si el usuario es líder de alguna unidad
 // (comprobando si otros empleados tienen su no_emp como jefe_no_emp)
 $stmt_lider = $pdo->prepare("
-    SELECT DISTINCT e.unidad_id, u.nombre as unidad_nombre
+  SELECT DISTINCT e.unidad_id, u.nombre as unidad_nombre, e.no_emp
     FROM usuario_empresas ue
     INNER JOIN empleados e ON e.empleado_id = ue.empleado_id
     LEFT JOIN org_unidades u ON u.unidad_id = e.unidad_id

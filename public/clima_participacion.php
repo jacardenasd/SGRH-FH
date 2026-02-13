@@ -91,28 +91,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($action === 'toggle_publicacion') {
 
-            // Regla 90%: calcular participación (con tabla de respuestas vacía funciona perfecto)
+            // Regla 90%: calcular participación (incluye anónimas y identificadas)
             $sql_pct = "
                 SELECT
-                  COUNT(*) AS total_elegibles,
-                  SUM(CASE WHEN r.empleado_id IS NOT NULL THEN 1 ELSE 0 END) AS respondidos
+                  COUNT(DISTINCT e.empleado_id) AS total_elegibles,
+                  COUNT(DISTINCT r.empleado_id) AS respondidos_identificados,
+                  COALESCE(a.anonimas_completas, 0) AS anonimas_completas
                 FROM clima_elegibles e
                 LEFT JOIN (
                     SELECT DISTINCT periodo_id, empleado_id
                     FROM clima_respuestas
-                    WHERE periodo_id = ?
+                    WHERE periodo_id = ? AND empleado_id IS NOT NULL
                 ) r ON r.periodo_id = e.periodo_id AND r.empleado_id = e.empleado_id
+                LEFT JOIN (
+                    SELECT 
+                        unidad_id,
+                        COUNT(DISTINCT grupo_respuestas) as anonimas_completas
+                    FROM (
+                        SELECT 
+                            unidad_id,
+                            FLOOR(respuesta_id / (SELECT COUNT(*) FROM clima_reactivos WHERE activo=1)) as grupo_respuestas,
+                            COUNT(*) as respuestas_en_grupo
+                        FROM clima_respuestas
+                        WHERE periodo_id = ? AND empleado_id IS NULL
+                        GROUP BY unidad_id, grupo_respuestas
+                        HAVING COUNT(*) >= (SELECT COUNT(*) FROM clima_reactivos WHERE activo=1)
+                    ) subq
+                    GROUP BY unidad_id
+                ) a ON a.unidad_id = e.unidad_id
                 WHERE e.periodo_id = ?
                   AND e.empresa_id = ?
                   AND e.unidad_id = ?
                   AND e.elegible = 1
             ";
             $st = $pdo->prepare($sql_pct);
-            $st->execute([$pid, $pid, $empresa_id, $uid]);
+            $st->execute([$pid, $pid, $pid, $empresa_id, $uid]);
             $row = $st->fetch(PDO::FETCH_ASSOC);
 
             $total_e = (int)($row['total_elegibles'] ?? 0);
-            $resp = (int)($row['respondidos'] ?? 0);
+            $resp_ident = (int)($row['respondidos_identificados'] ?? 0);
+            $resp_anon = (int)($row['anonimas_completas'] ?? 0);
+            $resp = $resp_ident + $resp_anon;
             $pct = ($total_e > 0) ? round(($resp * 100) / $total_e, 2) : 0.0;
 
             if ($habilitar === 1) {
@@ -162,16 +181,16 @@ $detalle = [];
 
 if ($periodo) {
 
-    // Resumen empresa (solo elegibles)
+    // Resumen empresa - Paso 1: Contar elegibles y respondidos identificados
     $sql_res = "
         SELECT
-          COUNT(*) AS total_elegibles,
-          SUM(CASE WHEN r.empleado_id IS NOT NULL THEN 1 ELSE 0 END) AS respondidos
+          COUNT(DISTINCT e.empleado_id) AS total_elegibles,
+          COUNT(DISTINCT r.empleado_id) AS respondidos_identificados
         FROM clima_elegibles e
         LEFT JOIN (
             SELECT DISTINCT periodo_id, empleado_id
             FROM clima_respuestas
-            WHERE periodo_id = ?
+            WHERE periodo_id = ? AND empleado_id IS NOT NULL
         ) r ON r.periodo_id = e.periodo_id AND r.empleado_id = e.empleado_id
         WHERE e.periodo_id = ?
           AND e.empresa_id = ?
@@ -182,20 +201,47 @@ if ($periodo) {
     $row = $st->fetch(PDO::FETCH_ASSOC);
 
     $total_e = (int)($row['total_elegibles'] ?? 0);
-    $resp = (int)($row['respondidos'] ?? 0);
+    $resp_ident = (int)($row['respondidos_identificados'] ?? 0);
+
+    // Paso 2: Contar respuestas anónimas completas (por separado)
+    $sql_anon = "
+        SELECT 
+            COUNT(DISTINCT grupo_respuestas) as anonimas_completas
+        FROM (
+            SELECT 
+                FLOOR(respuesta_id / (SELECT COUNT(*) FROM clima_reactivos WHERE activo=1)) as grupo_respuestas,
+                COUNT(*) as respuestas_en_grupo
+            FROM clima_respuestas cr
+            INNER JOIN clima_elegibles ce ON ce.periodo_id = cr.periodo_id AND ce.unidad_id = cr.unidad_id
+            WHERE cr.periodo_id = ? 
+              AND cr.empleado_id IS NULL
+              AND ce.empresa_id = ?
+              AND ce.elegible = 1
+            GROUP BY grupo_respuestas
+            HAVING COUNT(*) >= (SELECT COUNT(*) FROM clima_reactivos WHERE activo=1)
+        ) subq
+    ";
+    $st_anon = $pdo->prepare($sql_anon);
+    $st_anon->execute([$periodo_id, $empresa_id]);
+    $row_anon = $st_anon->fetch(PDO::FETCH_ASSOC);
+    $resp_anon = (int)($row_anon['anonimas_completas'] ?? 0);
+    
+    $resp = $resp_ident + $resp_anon;
     $pct = ($total_e > 0) ? round(($resp * 100) / $total_e, 2) : 0.0;
 
     $resumen = ['total_elegibles' => $total_e, 'respondidos' => $resp, 'pct' => $pct];
 
-    // Detalle por unidad + publicación
+    // Detalle por unidad + publicación (incluye anónimas)
     $sql_det = "
         SELECT
           e.unidad_id,
           u.nombre AS unidad_nombre,
-          COUNT(*) AS total_elegibles,
-          SUM(CASE WHEN r.empleado_id IS NOT NULL THEN 1 ELSE 0 END) AS respondidos,
+          COUNT(DISTINCT e.empleado_id) AS total_elegibles,
+          COUNT(DISTINCT r.empleado_id) AS respondidos_identificados,
+          COALESCE(a.anonimas_completas, 0) AS anonimas_completas,
+          (COUNT(DISTINCT r.empleado_id) + COALESCE(a.anonimas_completas, 0)) AS respondidos,
           ROUND(
-            (SUM(CASE WHEN r.empleado_id IS NOT NULL THEN 1 ELSE 0 END) * 100) / NULLIF(COUNT(*),0)
+            ((COUNT(DISTINCT r.empleado_id) + COALESCE(a.anonimas_completas, 0)) * 100) / NULLIF(COUNT(DISTINCT e.empleado_id),0)
           , 2) AS pct,
           COALESCE(p.habilitado, 0) AS publicado
         FROM clima_elegibles e
@@ -203,8 +249,24 @@ if ($periodo) {
         LEFT JOIN (
             SELECT DISTINCT periodo_id, empleado_id
             FROM clima_respuestas
-            WHERE periodo_id = ?
+            WHERE periodo_id = ? AND empleado_id IS NOT NULL
         ) r ON r.periodo_id = e.periodo_id AND r.empleado_id = e.empleado_id
+        LEFT JOIN (
+            SELECT 
+                unidad_id,
+                COUNT(DISTINCT grupo_respuestas) as anonimas_completas
+            FROM (
+                SELECT 
+                    unidad_id,
+                    FLOOR(respuesta_id / (SELECT COUNT(*) FROM clima_reactivos WHERE activo=1)) as grupo_respuestas,
+                    COUNT(*) as respuestas_en_grupo
+                FROM clima_respuestas
+                WHERE periodo_id = ? AND empleado_id IS NULL
+                GROUP BY unidad_id, grupo_respuestas
+                HAVING COUNT(*) >= (SELECT COUNT(*) FROM clima_reactivos WHERE activo=1)
+            ) subq
+            GROUP BY unidad_id
+        ) a ON a.unidad_id = e.unidad_id
         LEFT JOIN clima_publicacion p
           ON p.periodo_id = e.periodo_id
          AND p.empresa_id = e.empresa_id
@@ -212,11 +274,11 @@ if ($periodo) {
         WHERE e.periodo_id = ?
           AND e.empresa_id = ?
           AND e.elegible = 1
-        GROUP BY e.unidad_id, u.nombre, p.habilitado
+        GROUP BY e.unidad_id, u.nombre, a.anonimas_completas, p.habilitado
         ORDER BY u.nombre
     ";
     $dst = $pdo->prepare($sql_det);
-    $dst->execute([$periodo_id, $periodo_id, $empresa_id]);
+    $dst->execute([$periodo_id, $periodo_id, $periodo_id, $empresa_id]);
     $detalle = $dst->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -282,14 +344,14 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
         <div class="col-md-6">
           <?php if ($periodo): ?>
             <div class="border rounded p-2">
-              <div class="text-muted">Resumen empresa (solo elegibles)</div>
+              <div class="text-muted">Resumen empresa (elegibles + anónimas)</div>
               <div class="h5 mb-0">
                 Elegibles: <?= (int)$resumen['total_elegibles'] ?> |
                 Respondidos: <?= (int)$resumen['respondidos'] ?> |
                 Participación: <?= h($resumen['pct']) ?>%
               </div>
               <small class="text-muted">
-                Nota: Si nadie ha contestado, Respondidos=0 y Participación=0% (esto es esperado).
+                Nota: Incluye respuestas identificadas y anónimas.
                 Regla: publicación por unidad requiere ≥ 90%.
               </small>
             </div>

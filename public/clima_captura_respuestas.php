@@ -46,11 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $periodo_id = isset($_POST['periodo_id']) ? (int)$_POST['periodo_id'] : 0;
             $empleado_id = isset($_POST['empleado_id']) ? (int)$_POST['empleado_id'] : 0;
             $unidad_id = isset($_POST['unidad_id']) ? (int)$_POST['unidad_id'] : 0;
+            $adscripcion_id = isset($_POST['adscripcion_id']) ? (int)$_POST['adscripcion_id'] : 0;
             $es_anonima = isset($_POST['es_anonima']) && $_POST['es_anonima'] === '1';
             
             // DEBUG: Mostrar exactamente qué llega en POST
             error_log("POST COMPLETO: " . json_encode($_POST));
-            error_log("POST PARSED: periodo_id=$periodo_id, empleado_id=$empleado_id, unidad_id=$unidad_id, es_anonima=" . ($es_anonima ? 'SI' : 'NO'));
+            error_log("POST PARSED: periodo_id=$periodo_id, empleado_id=$empleado_id, unidad_id=$unidad_id, adscripcion_id=$adscripcion_id, es_anonima=" . ($es_anonima ? 'SI' : 'NO'));
 
             if ($periodo_id <= 0) throw new Exception('Período inválido');
 
@@ -72,6 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Para anónimas, usar NULL como empleado_id
                 $empleado_id = null;
                 if ($unidad_id <= 0) throw new Exception('Unidad inválida para captura anónima');
+                // Para anónimas, adscripcion_id debe venir del formulario
+                if ($adscripcion_id <= 0) $adscripcion_id = null;
             }
 
             // Procesando respuestas Likert (valores 1-3)
@@ -85,12 +88,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     // Validación estricta: valor debe estar entre 1 y 3
                     if ($reactivo_id > 0 && $valor >= 1 && $valor <= 3) {
-                        $ins = $pdo->prepare("
-                            INSERT INTO clima_respuestas (periodo_id, empleado_id, reactivo_id, valor, fecha_respuesta)
-                            VALUES (?, ?, ?, ?, NOW())
-                            ON DUPLICATE KEY UPDATE valor = VALUES(valor), fecha_respuesta = VALUES(fecha_respuesta)
-                        ");
-                        $result = $ins->execute([$periodo_id, $empleado_id, $reactivo_id, $valor]);
+                        if ($es_anonima) {
+                            // Para anónimas: INSERT simple para permitir múltiples respuestas de la misma unidad
+                            $ins = $pdo->prepare("
+                                INSERT INTO clima_respuestas (periodo_id, empleado_id, unidad_id, adscripcion_id, reactivo_id, valor, fecha_respuesta)
+                                VALUES (?, ?, ?, ?, ?, ?, NOW())
+                            ");
+                            $result = $ins->execute([$periodo_id, $empleado_id, $unidad_id, $adscripcion_id, $reactivo_id, $valor]);
+                        } else {
+                            // Para identificadas: UPDATE si ya existe (permite edición)
+                            $ins = $pdo->prepare("
+                                INSERT INTO clima_respuestas (periodo_id, empleado_id, unidad_id, adscripcion_id, reactivo_id, valor, fecha_respuesta)
+                                VALUES (?, ?, ?, ?, ?, ?, NOW())
+                                ON DUPLICATE KEY UPDATE valor = VALUES(valor), fecha_respuesta = VALUES(fecha_respuesta)
+                            ");
+                            $result = $ins->execute([$periodo_id, $empleado_id, $unidad_id, $adscripcion_id, $reactivo_id, $valor]);
+                        }
                         
                         // Debug: guardar info del insert
                         $debug_inserts[] = [
@@ -115,20 +128,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $respuesta = trim((string)$value);
 
                     if ($pregunta_id > 0 && !empty($respuesta)) {
-                        $ins = $pdo->prepare("
-                            INSERT INTO clima_respuestas_abiertas 
-                            (periodo_id, empleado_id, empresa_id, unidad_id, pregunta_id, respuesta, fecha_respuesta)
-                            VALUES (?, ?, ?, ?, ?, ?, NOW())
-                            ON DUPLICATE KEY UPDATE respuesta = VALUES(respuesta), fecha_respuesta = VALUES(fecha_respuesta)
-                        ");
-                        $ins->execute([$periodo_id, $empleado_id, $empresa_id, $unidad_id, $pregunta_id, $respuesta]);
+                        if ($es_anonima) {
+                            // Para anónimas: INSERT simple para permitir múltiples respuestas
+                            $ins = $pdo->prepare("
+                                INSERT INTO clima_respuestas_abiertas 
+                                (periodo_id, empleado_id, empresa_id, unidad_id, adscripcion_id, pregunta_id, respuesta, fecha_respuesta)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+                            ");
+                            $ins->execute([$periodo_id, $empleado_id, $empresa_id, $unidad_id, $adscripcion_id, $pregunta_id, $respuesta]);
+                        } else {
+                            // Para identificadas: UPDATE si ya existe
+                            $ins = $pdo->prepare("
+                                INSERT INTO clima_respuestas_abiertas 
+                                (periodo_id, empleado_id, empresa_id, unidad_id, adscripcion_id, pregunta_id, respuesta, fecha_respuesta)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+                                ON DUPLICATE KEY UPDATE respuesta = VALUES(respuesta), fecha_respuesta = VALUES(fecha_respuesta)
+                            ");
+                            $ins->execute([$periodo_id, $empleado_id, $empresa_id, $unidad_id, $adscripcion_id, $pregunta_id, $respuesta]);
+                        }
                     }
                 }
             }
 
             // DEBUG: Logging antes de commit
             error_log("=== DEBUG CLIMA CAPTURA ===");
-            error_log("Periodo: $periodo_id, Empleado: " . ($empleado_id ?: 'NULL') . ", Unidad: $unidad_id");
+            error_log("Periodo: $periodo_id, Empleado: " . ($empleado_id ?: 'NULL') . ", Unidad: $unidad_id, Adscripcion: " . ($adscripcion_id ?: 'NULL'));
             error_log("Total inserts intentados: $inserts_count");
             error_log("Primeros 3 inserts: " . json_encode(array_slice($debug_inserts, 0, 3)));
             error_log("En transacción: " . ($pdo->inTransaction() ? 'SI' : 'NO'));
@@ -141,8 +165,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $flash = "✓ Respuestas guardadas correctamente ($inserts_count preguntas registradas - Captura $tipo)";
             $flash_type = 'success';
 
-            // Redirigir a la misma página con confirmación de guardado
-            header('Location: clima_captura_respuestas.php?guardado=1');
+            // Redirigir según el tipo de captura
+            if ($es_anonima) {
+                // Para anónimas: volver a modo anónimo con el mismo departamento
+                $dept_id_redirect = $departamento_anonimo > 0 ? $departamento_anonimo : (isset($_POST['departamento_anonimo']) ? (int)$_POST['departamento_anonimo'] : 0);
+                header('Location: clima_captura_respuestas.php?guardado=1&periodo_id=' . $periodo_id . '&tipo_captura=anonima' . ($dept_id_redirect > 0 ? '&departamento_anonimo=' . $dept_id_redirect : ''));
+            } else {
+                // Para identificadas: volver al mismo empleado para permitir edición
+                header('Location: clima_captura_respuestas.php?guardado=1&periodo_id=' . $periodo_id . '&tipo_captura=identificada&sel_empleado_id=' . $empleado_id);
+            }
             exit;
 
         } catch (Exception $e) {
@@ -156,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Debug info (comentar después de resolver)
             error_log("Error en clima_captura: " . $e->getMessage());
-            error_log("POST data: periodo_id=$periodo_id, empleado_id=$empleado_id, unidad_id=$unidad_id, es_anonima=" . ($es_anonima ? 'SI' : 'NO'));
+            error_log("POST data: periodo_id=$periodo_id, empleado_id=$empleado_id, unidad_id=$unidad_id, adscripcion_id=$adscripcion_id, es_anonima=" . ($es_anonima ? 'SI' : 'NO'));
         }
     }
 }
@@ -169,12 +200,19 @@ $periodo_id_get = isset($_GET['periodo_id']) ? (int)$_GET['periodo_id'] : 0;
 $empleado_id_get = isset($_GET['sel_empleado_id']) ? (int)$_GET['sel_empleado_id'] : (isset($_GET['empleado_id']) ? (int)$_GET['empleado_id'] : 0);
 $tipo_captura_get = isset($_GET['tipo_captura']) ? (string)$_GET['tipo_captura'] : 'identificada';
 $unidad_anonima_get = isset($_GET['unidad_anonima']) ? (int)$_GET['unidad_anonima'] : 0;
+$departamento_anonimo_get = isset($_GET['departamento_anonimo']) ? (int)$_GET['departamento_anonimo'] : 0;
 
 // Usar los valores de GET para inicializar
 $periodo_id = $periodo_id_get;
 $empleado_id = $empleado_id_get;
 $tipo_captura = $tipo_captura_get;
 $unidad_anonima = $unidad_anonima_get;
+$departamento_anonimo = $departamento_anonimo_get;
+
+// IMPORTANTE: Limpiar empleado_id si estamos en modo anónimo
+if ($tipo_captura === 'anonima') {
+    $empleado_id = 0;
+}
 
 // DEBUG: Log lo que recibimos en GET
 error_log("GET PARAMS: periodo_id=" . (isset($_GET['periodo_id']) ? $_GET['periodo_id'] : 'VACIO') . 
@@ -208,12 +246,14 @@ if ($periodo_id > 0) {
 $empleados_elegibles = array();
 if ($periodo_id > 0) {
     $emp_stmt = $pdo->prepare("
-        SELECT DISTINCT ce.empleado_id, us.nombre, us.apellido_paterno, u.nombre as unidad, ce.unidad_id
+        SELECT DISTINCT ce.empleado_id, us.nombre, us.apellido_paterno, u.nombre as unidad, ce.unidad_id,
+               a.nombre as departamento
         FROM clima_elegibles ce
         INNER JOIN empleados e ON e.empleado_id = ce.empleado_id
         INNER JOIN usuario_empresas ue ON ue.empleado_id = e.empleado_id AND ue.empresa_id = e.empresa_id
         INNER JOIN usuarios us ON us.usuario_id = ue.usuario_id
         LEFT JOIN org_unidades u ON u.unidad_id = ce.unidad_id
+        LEFT JOIN org_adscripciones a ON a.adscripcion_id = e.adscripcion_id
         WHERE ce.periodo_id = ? AND ce.empresa_id = ? AND ce.elegible = 1
         ORDER BY us.nombre, us.apellido_paterno
     ");
@@ -224,22 +264,35 @@ if ($periodo_id > 0) {
 // Datos del empleado seleccionado (para modo identificado)
 $empleado_info = null;
 $unidad_info = null;
+$departamento_info = null;
 $es_anonima = false;
 $ya_fue_capturado = false;
-if ($tipo_captura === 'anonima' && $unidad_anonima > 0) {
+if ($tipo_captura === 'anonima' && $departamento_anonimo > 0) {
     $es_anonima = true;
-    // Para anónima, obtener nombre de unidad
-    $ust = $pdo->prepare("SELECT unidad_id, nombre FROM org_unidades WHERE unidad_id = ? LIMIT 1");
-    $ust->execute([$unidad_anonima]);
-    $unidad_info = $ust->fetch(PDO::FETCH_ASSOC);
+    // Para anónima, obtener nombre de departamento y unidad
+    $dept_stmt = $pdo->prepare("
+        SELECT a.adscripcion_id, a.nombre as departamento, a.unidad_id, u.nombre as unidad
+        FROM org_adscripciones a
+        LEFT JOIN org_unidades u ON u.unidad_id = a.unidad_id
+        WHERE a.adscripcion_id = ?
+        LIMIT 1
+    ");
+    $dept_stmt->execute([$departamento_anonimo]);
+    $departamento_info = $dept_stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Asignar unidad_id desde el departamento para las respuestas
+    if ($departamento_info) {
+        $unidad_anonima = (int)$departamento_info['unidad_id'];
+    }
 } elseif ($empleado_id > 0 && $periodo_id > 0) {
     $est = $pdo->prepare("
-        SELECT us.nombre, us.apellido_paterno, ce.unidad_id, u.nombre as unidad
+        SELECT us.nombre, us.apellido_paterno, ce.unidad_id, u.nombre as unidad, a.nombre as departamento, e.adscripcion_id
         FROM empleados e
         INNER JOIN usuario_empresas ue ON ue.empleado_id = e.empleado_id AND ue.empresa_id = e.empresa_id
         INNER JOIN usuarios us ON us.usuario_id = ue.usuario_id
         INNER JOIN clima_elegibles ce ON ce.empleado_id = e.empleado_id
         LEFT JOIN org_unidades u ON u.unidad_id = ce.unidad_id
+        LEFT JOIN org_adscripciones a ON a.adscripcion_id = e.adscripcion_id
         WHERE e.empleado_id = ? AND ce.periodo_id = ? AND ce.empresa_id = ?
         LIMIT 1
     ");
@@ -272,9 +325,15 @@ foreach ($dimensiones as $d) {
 $resp_map = array();
 $abiertas_map = array();
 
+// DEBUG: Log para diagnosticar carga de respuestas
+error_log("=== CARGA DE RESPUESTAS PREVIAS ===");
+error_log("periodo_id: $periodo_id, empleado_id: $empleado_id, es_anonima: " . ($es_anonima ? 'SI' : 'NO') . ", unidad_anonima: $unidad_anonima");
+error_log("Condición: " . (($periodo_id > 0 && !$es_anonima && $empleado_id > 0) ? "CARGAR respuestas identificadas" : "NO CARGAR"));
+
 if ($periodo_id > 0) {
     if (!$es_anonima && $empleado_id > 0) {
         // Modo identificada: cargar respuestas del empleado
+        error_log("Cargando respuestas del empleado $empleado_id en periodo $periodo_id");
         $resp_stmt = $pdo->prepare("
             SELECT reactivo_id, valor FROM clima_respuestas
             WHERE periodo_id = ? AND empleado_id = ?
@@ -283,6 +342,7 @@ if ($periodo_id > 0) {
         while ($r = $resp_stmt->fetch(PDO::FETCH_ASSOC)) {
             $resp_map[(int)$r['reactivo_id']] = (int)$r['valor'];
         }
+        error_log("Respuestas cargadas: " . count($resp_map));
         
         // Respuestas abiertas previas - modo identificada
         $abt_stmt = $pdo->prepare("
@@ -293,28 +353,19 @@ if ($periodo_id > 0) {
         while ($r = $abt_stmt->fetch(PDO::FETCH_ASSOC)) {
             $abiertas_map[(int)$r['pregunta_id']] = $r['respuesta'];
         }
+        error_log("Respuestas abiertas cargadas: " . count($abiertas_map));
     } elseif ($es_anonima && $unidad_anonima > 0) {
-        // Modo anónimo: cargar respuestas de la unidad con empleado_id = NULL
-        $resp_stmt = $pdo->prepare("
-            SELECT reactivo_id, valor FROM clima_respuestas
-            WHERE periodo_id = ? AND empleado_id IS NULL
-        ");
-        $resp_stmt->execute([$periodo_id]);
-        while ($r = $resp_stmt->fetch(PDO::FETCH_ASSOC)) {
-            $resp_map[(int)$r['reactivo_id']] = (int)$r['valor'];
-        }
-        
-        // Respuestas abiertas anónimas
-        $abt_anonima = $pdo->prepare("
-            SELECT pregunta_id, respuesta FROM clima_respuestas_abiertas
-            WHERE periodo_id = ? AND empleado_id IS NULL AND unidad_id = ?
-        ");
-        $abt_anonima->execute([$periodo_id, $unidad_anonima]);
-        while ($r = $abt_anonima->fetch(PDO::FETCH_ASSOC)) {
-            $abiertas_map[(int)$r['pregunta_id']] = $r['respuesta'];
-        }
+        // Modo anónimo: NO cargar respuestas previas
+        // Cada captura anónima es independiente, no se "editan" respuestas anteriores
+        // Las respuestas se acumulan para el análisis agregado
+        // $resp_map y $abiertas_map quedan vacíos intencionalmente
+        error_log("Modo ANÓNIMO: NO se cargan respuestas previas (esto es correcto)");
+    } else {
+        error_log("No se carga nada: periodo_id=$periodo_id, es_anonima=" . ($es_anonima ? 'SI' : 'NO') . ", empleado_id=$empleado_id, unidad_anonima=$unidad_anonima");
     }
 }
+
+error_log("=== RESULTADO: resp_map=" . count($resp_map) . " items, abiertas_map=" . count($abiertas_map) . " items ===");
 
 // Preguntas abiertas
 $preguntas_abiertas = array();
@@ -414,7 +465,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                                     👤 Identificada (por empleado)
                                 </option>
                                 <option value="anonima" <?php echo isset($_GET['tipo_captura']) && $_GET['tipo_captura'] === 'anonima' ? 'selected' : ''; ?>>
-                                    🔒 Anónima (por unidad)
+                                    🔒 Anónima (por departamento)
                                 </option>
                             </select>
                         </div>
@@ -427,7 +478,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
             <div class="card">
                 <div class="card-header header-elements-inline">
                     <h5 class="card-title">
-                     Seleccionar <?php if ($tipo_captura !== 'anonima'): ?> empleado <?php else: ?> unidad <?php endif; ?>
+                     Seleccionar <?php if ($tipo_captura !== 'anonima'): ?> empleado <?php else: ?> departamento <?php endif; ?>
                 </h5>
                 </div>
                 <div class="card-body">
@@ -441,7 +492,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                                     <option value="">-- Seleccione empleado --</option>
                                     <?php foreach ($empleados_elegibles as $e): ?>
                                     <option value="<?php echo (int)$e['empleado_id']; ?>" <?php echo $empleado_id == (int)$e['empleado_id'] ? 'selected' : ''; ?>>
-                                        <?php echo h($e['nombre'] . ' ' . $e['apellido_paterno']); ?> (<?php echo h($e['unidad'] ?? 'Sin área'); ?>)
+                                        <?php echo h($e['nombre'] . ' ' . $e['apellido_paterno']); ?> - <?php echo h($e['departamento'] ?? 'Sin departamento'); ?> (<?php echo h($e['unidad'] ?? 'Sin área'); ?>)
                                     </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -449,21 +500,65 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                             <?php endif; ?>
                             <?php if ($tipo_captura === 'anonima'): ?>
                             <div class="form-group w-100 mb-2">
-                                <select id="selector_anonimo" name="unidad_anonima" class="form-control w-100" onchange="this.form.submit();">
-                                    <option value="">-- Seleccione unidad --</option>
+                                <select id="selector_anonimo" name="departamento_anonimo" class="form-control w-100" onchange="this.form.submit();">
+                                    <option value="">-- Seleccione departamento --</option>
                                     <?php 
-                                    $unidades_unicas = array();
+                                    // Obtener departamentos únicos de empleados elegibles
+                                    $departamentos_unicos = array();
                                     foreach ($empleados_elegibles as $e) {
-                                        if (!empty($e['unidad'])) {
-                                            $unidades_unicas[(int)$e['unidad_id']] = $e['unidad'];
+                                        if (!empty($e['departamento']) && isset($e['unidad_id'])) {
+                                            // Necesitamos obtener el adscripcion_id
+                                            $key = $e['departamento'] . '|' . $e['unidad_id'];
+                                            if (!isset($departamentos_unicos[$key])) {
+                                                $departamentos_unicos[$key] = [
+                                                    'departamento' => $e['departamento'],
+                                                    'unidad' => $e['unidad'] ?? 'Sin unidad',
+                                                    'unidad_id' => $e['unidad_id']
+                                                ];
+                                            }
                                         }
                                     }
-                                    foreach ($unidades_unicas as $uid => $uname): 
+                                    
+                                    // Obtener adscripcion_ids para los departamentos
+                                    if (!empty($departamentos_unicos)) {
+                                        $dept_map = array();
+                                        foreach ($departamentos_unicos as $info) {
+                                            $dept_query = $pdo->prepare("
+                                                SELECT a.adscripcion_id, a.nombre, a.unidad_id, u.nombre as unidad_nombre
+                                                FROM org_adscripciones a
+                                                LEFT JOIN org_unidades u ON u.unidad_id = a.unidad_id
+                                                WHERE a.nombre = ? AND a.unidad_id = ?
+                                                LIMIT 1
+                                            ");
+                                            $dept_query->execute([$info['departamento'], $info['unidad_id']]);
+                                            $dept_row = $dept_query->fetch(PDO::FETCH_ASSOC);
+                                            if ($dept_row) {
+                                                $dept_map[(int)$dept_row['adscripcion_id']] = [
+                                                    'nombre' => $dept_row['nombre'],
+                                                    'unidad_id' => $dept_row['unidad_id'],
+                                                    'unidad_nombre' => $dept_row['unidad_nombre'] ?? 'Sin unidad'
+                                                ];
+                                            }
+                                        }
+                                        
+                                        // Ordenar por unidad y luego por departamento
+                                        uasort($dept_map, function($a, $b) {
+                                            $unidad_cmp = strcmp($a['unidad_nombre'], $b['unidad_nombre']);
+                                            if ($unidad_cmp !== 0) {
+                                                return $unidad_cmp;
+                                            }
+                                            return strcmp($a['nombre'], $b['nombre']);
+                                        });
+                                        
+                                        foreach ($dept_map as $dept_id => $dept_data):
                                     ?>
-                                    <option value="<?php echo $uid; ?>">
-                                        <?php echo h($uname); ?>
+                                    <option value="<?php echo $dept_id; ?>" <?php echo $departamento_anonimo == $dept_id ? 'selected' : ''; ?>>
+                                        <?php echo h($dept_data['nombre'] . ' (' . $dept_data['unidad_nombre'] . ')'); ?>
                                     </option>
-                                    <?php endforeach; ?>
+                                    <?php 
+                                        endforeach;
+                                    }
+                                    ?>
                                 </select>
                             </div>
                             <?php endif; ?>
@@ -476,7 +571,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
 
     </div>
 
-    <?php if (((($empleado_info && !$es_anonima) || ($es_anonima && $unidad_anonima > 0))) && $periodo): ?>
+    <?php if (((($empleado_info && !$es_anonima) || ($es_anonima && $departamento_anonimo > 0))) && $periodo): ?>
     
     <!-- Alerta si ya fue capturado -->
     <?php if (!$es_anonima && $ya_fue_capturado): ?>
@@ -498,13 +593,21 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                     <h5 class="card-title mb-1">
                         <i class="icon-edit mr-2"></i>
                         <?php if ($es_anonima): ?>
-                            🔒 Captura Anónima - <strong><?php echo h($unidad_info['nombre']); ?></strong>
+                            🔒 Captura Anónima - <strong><?php echo h($departamento_info['departamento'] ?? 'Departamento'); ?></strong>
                         <?php else: ?>
                             👤 Captura Identificada - <span class="text-primary font-weight-bold"><?php echo isset($empleado_info['no_emp']) ? h($empleado_info['no_emp']) : ''; ?></span> <strong><?php echo h($empleado_info['nombre'] . ' ' . $empleado_info['apellido_paterno']); ?></strong>
                         <?php endif; ?>
                     </h5>
                     <div class="text-muted small mt-1">
-                        <span class="mr-3"><strong>Unidad:</strong> <?php echo h(($es_anonima ? $unidad_info['nombre'] : $empleado_info['unidad']) ?? 'Sin asignar'); ?></span>
+                        <?php if ($es_anonima): ?>
+                        <span class="mr-3"><strong>Departamento:</strong> <?php echo h($departamento_info['departamento'] ?? 'Sin asignar'); ?></span>
+                        <span class="mr-3"><strong>Unidad:</strong> <?php echo h($departamento_info['unidad'] ?? 'Sin asignar'); ?></span>
+                        <?php else: ?>
+                        <span class="mr-3"><strong>Unidad:</strong> <?php echo h($empleado_info['unidad'] ?? 'Sin asignar'); ?></span>
+                        <?php if (isset($empleado_info['departamento'])): ?>
+                        <span class="mr-3"><strong>Departamento:</strong> <?php echo h($empleado_info['departamento'] ?? 'Sin asignar'); ?></span>
+                        <?php endif; ?>
+                        <?php endif; ?>
                         <span><strong>Período:</strong> Año <?php echo (int)$periodo['anio']; ?></span>
                     </div>
                 </div>
@@ -519,11 +622,13 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                 <input type="hidden" name="periodo_id" value="<?php echo (int)$periodo_id_get; ?>">
                 <input type="hidden" name="es_anonima" value="<?php echo $es_anonima ? '1' : '0'; ?>">
                 <?php if ($es_anonima): ?>
-                    <input type="hidden" name="unidad_id" value="<?php echo (int)$unidad_anonima_get; ?>">
+                    <input type="hidden" name="unidad_id" value="<?php echo (int)$unidad_anonima; ?>">
+                    <input type="hidden" name="adscripcion_id" value="<?php echo (int)$departamento_anonimo; ?>">
                     <input type="hidden" name="empleado_id" value="">
                 <?php else: ?>
                     <input type="hidden" name="empleado_id" value="<?php echo (int)$empleado_id_get; ?>">
                     <input type="hidden" name="unidad_id" value="<?php echo (int)$empleado_info['unidad_id']; ?>">
+                    <input type="hidden" name="adscripcion_id" value="<?php echo isset($empleado_info['adscripcion_id']) ? (int)$empleado_info['adscripcion_id'] : ''; ?>">
                 <?php endif; ?>
 
 
@@ -590,7 +695,8 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
                                 inputmode="numeric" 
                                 placeholder="1-3" 
                                 required 
-                                maxlength="10"
+                                maxlength="1"
+                                oninput="if(this.value.length > 1) this.value = this.value.slice(0,1); if(this.value < 1 || this.value > 3) this.value = '';"
                                 value="<?php echo ($valor_actual >= 1 && $valor_actual <= 3) ? (int)$valor_actual : ''; ?>"
                                 data-reactivo="<?php echo $rid; ?>"
                             >
@@ -665,7 +771,7 @@ require_once __DIR__ . '/../includes/layout/content_open.php';
     <?php elseif ($periodo_id > 0 && $tipo_captura === 'anonima' && $unidad_anonima <= 0): ?>
     <div class="alert alert-info mt-3">
         <i class="icon-shield3 mr-2"></i>
-        Selecciona una unidad/área para capturar respuestas anónimas.
+        Selecciona un departamento para capturar respuestas anónimas.
     </div>
     <?php endif; ?>
 
@@ -689,6 +795,44 @@ document.addEventListener('DOMContentLoaded', function() {
             language: 'es'
         });
     }
+    
+    // Validación adicional para inputs de respuestas Likert (solo 1 dígito del 1-3)
+    var likertInputs = document.querySelectorAll('input.likert-input[name^="r_"]');
+    likertInputs.forEach(function(input) {
+        // Prevenir entrada de más de 1 carácter
+        input.addEventListener('input', function(e) {
+            // Limitar a 1 carácter
+            if (this.value.length > 1) {
+                this.value = this.value.slice(0, 1);
+            }
+            // Solo permitir 1, 2 o 3
+            var val = parseInt(this.value, 10);
+            if (isNaN(val) || val < 1 || val > 3) {
+                if (this.value !== '') {
+                    this.value = '';
+                }
+            }
+        });
+        
+        // Prevenir teclas no numéricas
+        input.addEventListener('keypress', function(e) {
+            var char = String.fromCharCode(e.which);
+            if (!/[1-3]/.test(char)) {
+                e.preventDefault();
+            }
+        });
+        
+        // Validar al perder el foco
+        input.addEventListener('blur', function() {
+            var val = parseInt(this.value, 10);
+            if (this.value !== '' && (isNaN(val) || val < 1 || val > 3)) {
+                this.value = '';
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    });
 });
 
 function actualizarModoCaptura() {
@@ -721,8 +865,8 @@ function validarYGuardar() {
             }
         } else {
             var numVal = parseInt(valor, 10);
-            if (isNaN(numVal) || numVal < 1 || numVal > 5) {
-                invalidos.push('Reactivo ' + rid + ': debe ser entre 1 y 5');
+            if (isNaN(numVal) || numVal < 1 || numVal > 3) {
+                invalidos.push('Reactivo ' + rid + ': debe ser entre 1 y 3');
             }
         }
     });

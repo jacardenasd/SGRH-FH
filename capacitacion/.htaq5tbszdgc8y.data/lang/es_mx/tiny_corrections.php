@@ -1,0 +1,54 @@
+<?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+/**
+ * Strings for component 'tiny_corrections', language 'es_mx', version '4.4'.
+ *
+ * @package     tiny_corrections
+ * @category    string
+ * @copyright   1999 Martin Dougiamas and contributors
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+$string['addcomment'] = 'Añadir';
+$string['addmark'] = 'Añadir una marca de corrección';
+$string['button_addcorrection'] = 'Añadir corrección';
+$string['button_removecorrection'] = 'Quitar corrección';
+$string['corrections:canmarkup'] = 'Usar markup';
+$string['corrtext'] = 'Comentario';
+$string['corrtype'] = 'Tipo de corrección';
+$string['corrtypes'] = 'Tipos de corrección';
+$string['corrtypes_default'] = 'a = pluralización
+c = conjugación
+d = determinante
+g = gramática/sintaxis
+m = palabra(s) faltante(s)
+o = ortografía
+p = preposición
+t = tiempo verbal
+v = vocabulario
+... = puntuación
+? = otro';
+$string['corrtypes_desc'] = 'Introduzca un tipo de corrección por línea, con el formato "abreviatura = descripción".<br><strong>Advertencia:</strong> ¡cada abreviatura debe ser única!';
+$string['dialogtitle'] = 'Agregar/modificar una corrección';
+$string['displayfulltext'] = 'Mostrar texto con marcas de corrección';
+$string['fulltexttitle'] = 'Texto con marcas de corrección';
+$string['pluginname'] = 'Correcciones en Tiny';
+$string['privacy:metadata'] = 'El plugin para Correcciones en Tiny no almacena ningún dato personal.';
+$string['removemark'] = 'Eliminar esta marca de corrección';
+$string['settings'] = 'Configuración de correcciones de texto en línea';

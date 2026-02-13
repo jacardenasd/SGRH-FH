@@ -1,0 +1,73 @@
+Array
+(
+    [success] => 1
+    [periodo_id] => 3
+    [respuestas] => Array
+        (
+            [0] => Array
+                (
+                    [reactivo_id] => 1
+                    [texto_reactivo] => Entiendo los objetivos prioritarios de mi área para este año.
+                    [valor] => 1
+                    [confianza] => 85
+                    [metodo] => patron_estructurado
+                )
+
+            [1] => Array
+                (
+                    [reactivo_id] => 9
+                    [texto_reactivo] => Los roles entre áreas están bien delimitados para evitar duplicidad o retrabajo.
+                    [valor] => 1
+                    [confianza] => 85
+                    [metodo] => patron_estructurado
+                )
+
+            [2] => Array
+                (
+                    [reactivo_id] => 33
+                    [texto_reactivo] => Cuento con herramientas y sistemas adecuados para realizar mi trabajo.
+                    [valor] => 3
+                    [confianza] => 85
+                    [metodo] => patron_estructurado
+                )
+
+            [3] => Array
+                (
+                    [reactivo_id] => 10
+                    [texto_reactivo] => La coordinación entre puestos (jefaturas/supervisión/operación) es efectiva.
+                    [valor] => 1
+                    [confianza] => 85
+                    [metodo] => patron_estructurado
+                )
+
+            [4] => Array
+                (
+                    [reactivo_id] => 46
+                    [texto_reactivo] => Las reglas y políticas se aplican de manera consistente.
+                    [valor] => 3
+                    [confianza] => 85
+                    [metodo] => patron_estructurado
+                )
+
+        )
+
+    [respuestas_abiertas] => Array
+        (
+            [0] => Array
+                (
+                    [pregunta_id] => 1
+                    [pregunta_texto] => ¿Qué es lo que más valoras de trabajar en tu área actualmente?
+                    [respuesta] => ¿QUÉ ES LO QUE MÁS E DE TRABAJAR EN TU ÁREA A 5 Y
+                )
+
+        )
+
+    [confianza_promedio] => 85
+    [warnings] => Array
+        (
+            [0] => No se detectó información de empleado. Captura anónima.
+            [1] => No se detectaron marcas en la plantilla (OMR).
+        )
+
+    [es_anonima] => 1
+)

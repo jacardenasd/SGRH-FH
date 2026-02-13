@@ -1,0 +1,9 @@
+Array
+(
+    [success] => 
+    [error] => PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+    [respuestas] => Array
+        (
+        )
+
+)

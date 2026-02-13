@@ -1,0 +1,460 @@
+Array
+(
+    [success] => 1
+    [periodo_id] => 3
+    [respuestas] => Array
+        (
+            [0] => Array
+                (
+                    [reactivo_id] => 1
+                    [texto_reactivo] => Entiendo los objetivos prioritarios de mi área para este año.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [1] => Array
+                (
+                    [reactivo_id] => 5
+                    [texto_reactivo] => Conozco con claridad mis responsabilidades principales.
+                    [valor] => 1
+                    [confianza] => 22
+                    [metodo] => omr_marca
+                )
+
+            [2] => Array
+                (
+                    [reactivo_id] => 9
+                    [texto_reactivo] => Los roles entre áreas están bien delimitados para evitar duplicidad o retrabajo.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [3] => Array
+                (
+                    [reactivo_id] => 13
+                    [texto_reactivo] => Mi jefe inmediato comunica expectativas claras sobre el desempeño.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [4] => Array
+                (
+                    [reactivo_id] => 17
+                    [texto_reactivo] => El trabajo bien hecho es reconocido en mi equipo.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [5] => Array
+                (
+                    [reactivo_id] => 21
+                    [texto_reactivo] => Tengo oportunidades para aprender y mejorar mis habilidades.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [6] => Array
+                (
+                    [reactivo_id] => 25
+                    [texto_reactivo] => La información necesaria para mi trabajo llega completa y a tiempo.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [7] => Array
+                (
+                    [reactivo_id] => 29
+                    [texto_reactivo] => Las áreas colaboran para resolver problemas y evitar retrabajos.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [8] => Array
+                (
+                    [reactivo_id] => 33
+                    [texto_reactivo] => Cuento con herramientas y sistemas adecuados para realizar mi trabajo.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [9] => Array
+                (
+                    [reactivo_id] => 37
+                    [texto_reactivo] => Los procesos de trabajo facilitan la eficiencia (evitan burocracia innecesaria).
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [10] => Array
+                (
+                    [reactivo_id] => 41
+                    [texto_reactivo] => La carga de trabajo es razonable la mayor parte del tiempo.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [11] => Array
+                (
+                    [reactivo_id] => 45
+                    [texto_reactivo] => En mi área se promueve un trato respetuoso y profesional.
+                    [valor] => 1
+                    [confianza] => 36
+                    [metodo] => omr_marca
+                )
+
+            [12] => Array
+                (
+                    [reactivo_id] => 2
+                    [texto_reactivo] => Mi trabajo contribuye de manera clara al propósito y resultados de la empresa.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [13] => Array
+                (
+                    [reactivo_id] => 6
+                    [texto_reactivo] => Sé qué se espera de mí en términos de calidad y tiempos de entrega.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [14] => Array
+                (
+                    [reactivo_id] => 10
+                    [texto_reactivo] => La coordinación entre puestos (jefaturas/supervisión/operación) es efectiva.
+                    [valor] => 1
+                    [confianza] => 17
+                    [metodo] => omr_marca
+                )
+
+            [15] => Array
+                (
+                    [reactivo_id] => 14
+                    [texto_reactivo] => Recibo seguimiento oportuno y orientación cuando lo necesito.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [16] => Array
+                (
+                    [reactivo_id] => 18
+                    [texto_reactivo] => El reconocimiento se otorga de manera justa y basada en resultados.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [17] => Array
+                (
+                    [reactivo_id] => 22
+                    [texto_reactivo] => Recibo retroalimentación útil para desarrollarme profesionalmente.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [18] => Array
+                (
+                    [reactivo_id] => 26
+                    [texto_reactivo] => Los cambios relevantes se comunican con anticipación suficiente.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [19] => Array
+                (
+                    [reactivo_id] => 30
+                    [texto_reactivo] => Se respetan acuerdos y compromisos entre áreas.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [20] => Array
+                (
+                    [reactivo_id] => 34
+                    [texto_reactivo] => Los sistemas que utilizo funcionan de forma estable.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [21] => Array
+                (
+                    [reactivo_id] => 38
+                    [texto_reactivo] => Los tiempos de respuesta de áreas de soporte son adecuados.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [22] => Array
+                (
+                    [reactivo_id] => 42
+                    [texto_reactivo] => Puedo mantener un equilibrio razonable entre trabajo y vida personal.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [23] => Array
+                (
+                    [reactivo_id] => 46
+                    [texto_reactivo] => Las reglas y políticas se aplican de manera consistente.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [24] => Array
+                (
+                    [reactivo_id] => 3
+                    [texto_reactivo] => Las prioridades se comunican con claridad y se mantienen estables la mayor parte del tiempo.
+                    [valor] => 1
+                    [confianza] => 32
+                    [metodo] => omr_marca
+                )
+
+            [25] => Array
+                (
+                    [reactivo_id] => 7
+                    [texto_reactivo] => Cuando hay cambios en mis actividades, se aclara el alcance y la prioridad.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [26] => Array
+                (
+                    [reactivo_id] => 11
+                    [texto_reactivo] => Los procesos clave están definidos y se siguen de manera consistente.
+                    [valor] => 1
+                    [confianza] => 25
+                    [metodo] => omr_marca
+                )
+
+            [27] => Array
+                (
+                    [reactivo_id] => 15
+                    [texto_reactivo] => Puedo expresar inquietudes o riesgos con confianza y respeto.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [28] => Array
+                (
+                    [reactivo_id] => 19
+                    [texto_reactivo] => Se valoran los esfuerzos adicionales cuando la operación lo requiere.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [29] => Array
+                (
+                    [reactivo_id] => 23
+                    [texto_reactivo] => Mi jefe inmediato impulsa mi crecimiento y aprendizaje.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [30] => Array
+                (
+                    [reactivo_id] => 27
+                    [texto_reactivo] => Las instrucciones o solicitudes suelen ser claras y sin ambigüedades.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [31] => Array
+                (
+                    [reactivo_id] => 31
+                    [texto_reactivo] => Existe disposición para apoyar a otras áreas cuando se requiere.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [32] => Array
+                (
+                    [reactivo_id] => 35
+                    [texto_reactivo] => Tengo acceso a la información y recursos necesarios para cumplir mis entregables.
+                    [valor] => 1
+                    [confianza] => 8
+                    [metodo] => omr_marca
+                )
+
+            [33] => Array
+                (
+                    [reactivo_id] => 39
+                    [texto_reactivo] => Se promueve la mejora continua para simplificar y hacer más efectivo el trabajo.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [34] => Array
+                (
+                    [reactivo_id] => 43
+                    [texto_reactivo] => Me siento seguro(a) reportando riesgos o condiciones inseguras.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [35] => Array
+                (
+                    [reactivo_id] => 47
+                    [texto_reactivo] => Las decisiones que afectan al personal se toman de manera justa.
+                    [valor] => 2
+                    [confianza] => 28
+                    [metodo] => omr_marca
+                )
+
+            [36] => Array
+                (
+                    [reactivo_id] => 4
+                    [texto_reactivo] => Sé cómo se medirá el éxito de mi trabajo (metas/indicadores/entregables).
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [37] => Array
+                (
+                    [reactivo_id] => 8
+                    [texto_reactivo] => Tengo claridad sobre a quién acudir para resolver dudas o escalar problemas.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [38] => Array
+                (
+                    [reactivo_id] => 12
+                    [texto_reactivo] => Las decisiones se toman con criterios claros, no por improvisación.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [39] => Array
+                (
+                    [reactivo_id] => 16
+                    [texto_reactivo] => Mi jefe inmediato actúa con coherencia entre lo que dice y lo que hace.
+                    [valor] => 1
+                    [confianza] => 20
+                    [metodo] => omr_marca
+                )
+
+            [40] => Array
+                (
+                    [reactivo_id] => 20
+                    [texto_reactivo] => Me siento valorado(a) por las contribuciones que realizo.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [41] => Array
+                (
+                    [reactivo_id] => 24
+                    [texto_reactivo] => La empresa ofrece capacitación relevante para mi función.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [42] => Array
+                (
+                    [reactivo_id] => 28
+                    [texto_reactivo] => La comunicación en mi equipo es abierta y respetuosa.
+                    [valor] => 1
+                    [confianza] => 6
+                    [metodo] => omr_marca
+                )
+
+            [43] => Array
+                (
+                    [reactivo_id] => 32
+                    [texto_reactivo] => Cuando hay desacuerdos, se gestionan con enfoque a soluciones.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [44] => Array
+                (
+                    [reactivo_id] => 36
+                    [texto_reactivo] => Las fallas de herramientas/sistemas se atienden con oportunidad.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [45] => Array
+                (
+                    [reactivo_id] => 40
+                    [texto_reactivo] => Los problemas recurrentes se atienden de raíz, no solo de manera temporal.
+                    [valor] => 1
+                    [confianza] => 21
+                    [metodo] => omr_marca
+                )
+
+            [46] => Array
+                (
+                    [reactivo_id] => 44
+                    [texto_reactivo] => En general, la empresa cuida el bienestar del personal.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+            [47] => Array
+                (
+                    [reactivo_id] => 48
+                    [texto_reactivo] => Me siento tratado(a) con equidad y respeto en mi entorno de trabajo.
+                    [valor] => 0
+                    [confianza] => 0
+                    [metodo] => omr_marca
+                )
+
+        )
+
+    [respuestas_abiertas] => Array
+        (
+            [0] => Array
+                (
+                    [pregunta_id] => 1
+                    [pregunta_texto] => ¿Qué es lo que más valoras de trabajar en tu área actualmente?
+                    [respuesta] => ¿QUÉ ES LO QUE MÁS E DE TRABAJAR EN TU ÁREA A 5 Y
+                )
+
+        )
+
+    [confianza_promedio] => 4
+    [warnings] => Array
+        (
+            [0] => No se detectó información de empleado. Captura anónima.
+            [1] => Respuestas detectadas por marcas (OMR). Revise antes de guardar.
+        )
+
+    [es_anonima] => 1
+)

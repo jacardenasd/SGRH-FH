@@ -1,0 +1,52 @@
+<?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+/**
+ * Strings for component 'fileconverter_onedrive', language 'es_mx', version '4.4'.
+ *
+ * @package     fileconverter_onedrive
+ * @category    string
+ * @copyright   1999 Martin Dougiamas and contributors
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+$string['chunkfileopenfail'] = 'No se puede abrir el archivo para habilitar la fragmentación.';
+$string['conversionfailed'] = 'Prueba de conversión fallida: {$a}';
+$string['conversionrequestfailed'] = 'La solicitud para convertir un archivo en OneDrive falló porque {$a}.';
+$string['disabled'] = 'Deshabilitado';
+$string['downloadfailed'] = 'Moodle no pudo descargar el archivo convertido de Microsoft.';
+$string['issuer'] = 'Servicio OAuth 2';
+$string['issuer_help'] = 'El servicio OAuth 2 usado para acceder a Microsoft OneDrive.';
+$string['missingfileextension'] = 'El archivo a convertir no parece tener una extensión al final de su nombre.';
+$string['missinguploadid'] = 'El intento de carga falló. No había ningún ID de carga presente en la respuesta de la llamada REST de carga.';
+$string['nodownloadurl'] = 'La API de conversión de Microsoft Graph no envió una URL al documento convertido';
+$string['pluginname'] = 'Microsoft OneDrive';
+$string['privacy:metadata:fileconverter_onedrive:externalpurpose'] = 'Esta información es enviada a la API de Microsoft OneDrive para que el archivo sea convertido a un formato alterno. El archivo es temporalmente almacenado en Microsoft OneDrive y es eliminado después de que se haya hecho la conversión.';
+$string['privacy:metadata:fileconverter_onedrive:filecontent'] = 'Elcontenido del archivo.';
+$string['privacy:metadata:fileconverter_onedrive:params'] = 'Los parámetros de la consulta pasados al API de Microsoft OneDrive.';
+$string['remotedeletefailed'] = 'No se pudo eliminar el archivo remoto en OneDrive porque {$a}.';
+$string['test_conversion'] = 'Probar conversión de documento';
+$string['test_conversionnotready'] = 'Este convertidor de documento no está configurado apropiadamente.';
+$string['test_conversionready'] = 'Este convertidor de documento  está configurado apropiadamente.';
+$string['test_converter'] = 'Probar si este convertidor de documento está configurado apropiadamente.';
+$string['test_issuerinvalid'] = 'El servicio OAuth en la configuración del convertidor de documento está configurado a un valor inválido.';
+$string['test_issuernotconnected'] = 'El servicio OAuth en la configuración del convertidor de documento no tiene una cuenta del sistema conectada.';
+$string['test_issuernotenabled'] = 'El servicio OAuth en la configuración del convertidor de documento no está habilitado.';
+$string['test_issuernotset'] = 'El servicio OAuth necesita ser configurado en las configuraciones del convertidor de documento.';
+$string['uploadfailed'] = 'El archivo no se cargó en Microsoft OneDrive.';
+$string['uploadprepfailed'] = 'No se pudo crear una sesión de carga.';

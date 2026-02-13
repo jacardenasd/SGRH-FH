@@ -1,0 +1,63 @@
+Array
+(
+    [success] => 1
+    [periodo_id] => 3
+    [respuestas] => Array
+        (
+            [0] => Array
+                (
+                    [reactivo_id] => 1
+                    [texto_reactivo] => Entiendo los objetivos prioritarios de mi área para este año.
+                    [valor] => 1
+                    [confianza] => 85
+                    [metodo] => patron_estructurado
+                )
+
+            [1] => Array
+                (
+                    [reactivo_id] => 9
+                    [texto_reactivo] => Los roles entre áreas están bien delimitados para evitar duplicidad o retrabajo.
+                    [valor] => 3
+                    [confianza] => 85
+                    [metodo] => patron_estructurado
+                )
+
+            [2] => Array
+                (
+                    [reactivo_id] => 10
+                    [texto_reactivo] => La coordinación entre puestos (jefaturas/supervisión/operación) es efectiva.
+                    [valor] => 1
+                    [confianza] => 85
+                    [metodo] => patron_estructurado
+                )
+
+            [3] => Array
+                (
+                    [reactivo_id] => 42
+                    [texto_reactivo] => Puedo mantener un equilibrio razonable entre trabajo y vida personal.
+                    [valor] => 3
+                    [confianza] => 85
+                    [metodo] => patron_estructurado
+                )
+
+        )
+
+    [respuestas_abiertas] => Array
+        (
+            [0] => Array
+                (
+                    [pregunta_id] => 1
+                    [pregunta_texto] => ¿Qué es lo que más valoras de trabajar en tu área actualmente?
+                    [respuesta] => ¿QUÉ ES LO QUE MÁS VALORAS DE TRABAJAR EN TU ÁREA ACTUALMENTE? *
+                )
+
+        )
+
+    [confianza_promedio] => 85
+    [warnings] => Array
+        (
+            [0] => No se detectó información de empleado. Captura anónima.
+        )
+
+    [es_anonima] => 1
+)

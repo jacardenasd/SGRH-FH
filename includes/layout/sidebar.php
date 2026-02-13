@@ -41,6 +41,7 @@ $admin_active = in_array($active_menu, [
   'admin_org_centros_trabajo',
   'admin_org_plantilla',
   'admin_documentos',
+  'admin_pagos_proveedores',
   'clima_admin',
   'clima_captura',
   'clima_periodos',
@@ -253,6 +254,15 @@ $clima_user_active = in_array($active_menu, [
 
               <li class="nav-item-divider"></li>
 
+              <?php endif; ?>
+
+              <?php if (can('pagos_proveedores.admin')): ?>
+              <li class="nav-item">
+                <a href="<?php echo ASSET_BASE; ?>public/admin_pagos_proveedores.php"
+                  class="nav-link <?php echo is_active('admin_pagos_proveedores', $active_menu); ?>">
+                  Pagos a Proveedores
+                </a>
+              </li>
               <?php endif; ?>
 
               <?php if (can('admin.documentos')): ?>

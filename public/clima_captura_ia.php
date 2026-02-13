@@ -70,7 +70,7 @@ function verificar_tesseract() {
 $tesseract_disponible = verificar_tesseract();
 
 // =====================================================
-// PROCESAR PDF/IMAGEN CON OCR
+// PROCESAR PDF/IMAGEN CON OCR (MÚLTIPLES ARCHIVOS)
 // =====================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'procesar_pdf') {
     try {
@@ -78,17 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             throw new Exception('Tesseract OCR no está instalado. Por favor instálelo primero.');
         }
 
-        if (!isset($_FILES['archivo_pdf']) || $_FILES['archivo_pdf']['error'] !== UPLOAD_ERR_OK) {
-            throw new Exception('Error al cargar el archivo. Por favor intente nuevamente.');
-        }
-
-        $archivo = $_FILES['archivo_pdf'];
-        $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
-        
-        // Validar extensión
-        $extensiones_permitidas = ['pdf', 'png', 'jpg', 'jpeg', 'tiff', 'tif'];
-        if (!in_array($extension, $extensiones_permitidas)) {
-            throw new Exception('Formato no permitido. Use: PDF, PNG, JPG, JPEG o TIFF');
+        if (!isset($_FILES['archivos_pdf']) || empty($_FILES['archivos_pdf']['name'][0])) {
+            throw new Exception('Error al cargar los archivos. Por favor intente nuevamente.');
         }
 
         $periodo_id = isset($_POST['periodo_id']) ? (int)$_POST['periodo_id'] : 0;
@@ -102,30 +93,144 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             mkdir($temp_dir, 0755, true);
         }
 
-        // Generar nombre único para archivo temporal
-        $temp_filename = uniqid('ocr_', true);
-        $temp_filepath = $temp_dir . '/' . $temp_filename . '.' . $extension;
-        
-        // Mover archivo cargado
-        if (!move_uploaded_file($archivo['tmp_name'], $temp_filepath)) {
-            throw new Exception('Error al guardar archivo temporal');
-        }
-
-        // Procesar con Tesseract
         require_once __DIR__ . '/../includes/clima_ocr_processor.php';
         $processor = new ClimaOCRProcessor($pdo, $tesseract_disponible);
         
-        $resultados_ocr = $processor->procesarArchivo($temp_filepath, $periodo_id, $empresa_id);
+        // Extensiones permitidas
+        $extensiones_permitidas = ['pdf', 'png', 'jpg', 'jpeg', 'tiff', 'tif'];
         
-        // Limpiar archivo temporal
-        @unlink($temp_filepath);
-
+        // Procesar múltiples archivos
+        $archivos_procesados = 0;
+        $archivos_con_errores = 0;
+        $texto_combinado = '';
+        $archivos_errores_detalle = [];
+        
+        $num_archivos = count($_FILES['archivos_pdf']['name']);
+        error_log("📁 Procesando $num_archivos archivo(s)");
+        
+        for ($i = 0; $i < $num_archivos; $i++) {
+            // Verificar si el archivo actual tiene error
+            if ($_FILES['archivos_pdf']['error'][$i] !== UPLOAD_ERR_OK) {
+                $archivos_con_errores++;
+                $archivos_errores_detalle[] = $_FILES['archivos_pdf']['name'][$i] . ' (error de carga)';
+                continue;
+            }
+            
+            $nombre_archivo = $_FILES['archivos_pdf']['name'][$i];
+            $tmp_name = $_FILES['archivos_pdf']['tmp_name'][$i];
+            $extension = strtolower(pathinfo($nombre_archivo, PATHINFO_EXTENSION));
+            
+            // Validar extensión
+            if (!in_array($extension, $extensiones_permitidas)) {
+                $archivos_con_errores++;
+                $archivos_errores_detalle[] = $nombre_archivo . ' (formato no válido)';
+                continue;
+            }
+            
+            // Validar tamaño (10MB máximo)
+            if ($_FILES['archivos_pdf']['size'][$i] > 10 * 1024 * 1024) {
+                $archivos_con_errores++;
+                $archivos_errores_detalle[] = $nombre_archivo . ' (tamaño > 10MB)';
+                continue;
+            }
+            
+            try {
+                // Generar nombre único para archivo temporal
+                $temp_filename = uniqid('ocr_' . $i . '_', true);
+                $temp_filepath = $temp_dir . '/' . $temp_filename . '.' . $extension;
+                
+                // Mover archivo cargado
+                if (!move_uploaded_file($tmp_name, $temp_filepath)) {
+                    throw new Exception('Error al guardar archivo temporal');
+                }
+                
+                error_log("📄 Procesando: $nombre_archivo");
+                
+                // Procesar con Tesseract
+                $resultado_individual = $processor->procesarArchivo($temp_filepath, $periodo_id, $empresa_id);
+                
+                // Si es el primer archivo, usar sus resultados como base
+                if ($archivos_procesados === 0) {
+                    $resultados_ocr = $resultado_individual;
+                } else {
+                    // Combinar respuestas de archivos subsecuentes
+                    if (isset($resultado_individual['respuestas']) && is_array($resultado_individual['respuestas'])) {
+                        // Agregar respuestas que no estén ya
+                        foreach ($resultado_individual['respuestas'] as $resp) {
+                            $ya_existe = false;
+                            foreach ($resultados_ocr['respuestas'] as $resp_existente) {
+                                if ($resp_existente['reactivo_id'] === $resp['reactivo_id']) {
+                                    $ya_existe = true;
+                                    break;
+                                }
+                            }
+                            if (!$ya_existe) {
+                                $resultados_ocr['respuestas'][] = $resp;
+                            }
+                        }
+                    }
+                    
+                    // Combinar respuestas abiertas
+                    if (isset($resultado_individual['respuestas_abiertas']) && is_array($resultado_individual['respuestas_abiertas'])) {
+                        if (!isset($resultados_ocr['respuestas_abiertas'])) {
+                            $resultados_ocr['respuestas_abiertas'] = [];
+                        }
+                        $resultados_ocr['respuestas_abiertas'] = array_merge(
+                            $resultados_ocr['respuestas_abiertas'], 
+                            $resultado_individual['respuestas_abiertas']
+                        );
+                    }
+                    
+                    // Combinar warnings
+                    if (isset($resultado_individual['warnings']) && is_array($resultado_individual['warnings'])) {
+                        $resultados_ocr['warnings'] = array_merge(
+                            $resultados_ocr['warnings'], 
+                            $resultado_individual['warnings']
+                        );
+                    }
+                }
+                
+                // Limpiar archivo temporal
+                @unlink($temp_filepath);
+                
+                $archivos_procesados++;
+                error_log("✓ Archivo procesado: $nombre_archivo");
+                
+            } catch (Exception $e) {
+                $archivos_con_errores++;
+                $archivos_errores_detalle[] = $nombre_archivo . ' (' . $e->getMessage() . ')';
+                error_log("✗ Error procesando $nombre_archivo: " . $e->getMessage());
+                @unlink($temp_filepath);
+            }
+        }
+        
+        // DEBUG: Guardar resultados en archivo temporal
+        if (isset($resultados_ocr)) {
+            $debug_file = $temp_dir . '/debug_resultado_' . uniqid() . '.txt';
+            file_put_contents($debug_file, print_r($resultados_ocr, true));
+        }
+        
+        // Preparar mensajes
+        if ($archivos_procesados === 0) {
+            throw new Exception('No se pudo procesar ningún archivo. ' . implode(', ', $archivos_errores_detalle));
+        }
+        
         if ($resultados_ocr['success']) {
-            $flash = '✓ Archivo procesado correctamente. Revise los resultados antes de guardar.';
+            $flash = "✓ Procesados $archivos_procesados de $num_archivos archivo(s) correctamente. Revise los resultados antes de guardar.";
+            if ($archivos_con_errores > 0) {
+                $flash .= " ($archivos_con_errores con errores)";
+            }
             $flash_type = 'success';
         } else {
-            $flash = '⚠ El archivo fue procesado pero se encontraron algunos problemas. Por favor revise.';
+            $flash = "⚠ Se procesaron $archivos_procesados archivo(s) pero se encontraron algunos problemas. Por favor revise.";
             $flash_type = 'warning';
+        }
+        
+        // Agregar información de archivos procesados
+        $resultados_ocr['archivos_procesados'] = $archivos_procesados;
+        $resultados_ocr['archivos_con_errores'] = $archivos_con_errores;
+        if (!empty($archivos_errores_detalle)) {
+            $resultados_ocr['warnings'][] = 'Archivos con errores: ' . implode(', ', $archivos_errores_detalle);
         }
 
     } catch (Exception $e) {
@@ -203,13 +308,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         $flash = "✓ Respuestas guardadas exitosamente ($inserts_count preguntas registradas via OCR)";
         $flash_type = 'success';
+        
+        // Limpiar los resultados OCR después de guardar exitosamente
+        $resultados_ocr = null;
 
         header('Location: clima_captura_ia.php?guardado=1&periodo=' . $periodo_id);
         exit;
 
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {
-            $pdo->commit();
+            $pdo->rollBack(); // CORREGIR: Usar rollBack en lugar de commit
         }
         $flash = '✗ Error al guardar: ' . $e->getMessage();
         $flash_type = 'danger';
@@ -242,57 +350,46 @@ $unidades_stmt = $pdo->prepare("
 $unidades_stmt->execute([$empresa_id]);
 $unidades_list = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// =======================
+// LAYOUT
+// =======================
+$page_title = 'Captura Automática con OCR - Clima Laboral';
+$active_menu = 'clima_admin';
+
+$extra_css = [
+  'global_assets/css/icons/icomoon/styles.min.css',
+];
+
+require_once __DIR__ . '/../includes/layout/head.php';
+require_once __DIR__ . '/../includes/layout/navbar.php';
+require_once __DIR__ . '/../includes/layout/sidebar.php';
+require_once __DIR__ . '/../includes/layout/content_open.php';
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Captura Automática con OCR - Clima Laboral</title>
-    <link rel="stylesheet" href="../global_assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../global_assets/css/material_icons.css">
-    <style>
-        body {
-            background-color: #f5f5f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .main-container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-        }
-        .card {
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 8px 8px 0 0 !important;
-            padding: 15px 20px;
-        }
+
+<style>
         .upload-zone {
             border: 2px dashed #ccc;
-            border-radius: 8px;
+            border-radius: 4px;
             padding: 40px;
             text-align: center;
             background-color: #fafafa;
             transition: all 0.3s;
-            cursor: pointer;
         }
         .upload-zone:hover {
-            border-color: #667eea;
-            background-color: #f0f0ff;
+            border-color: #2196F3;
+            background-color: #f0f7ff;
         }
         .upload-zone.dragover {
-            border-color: #667eea;
-            background-color: #e8e8ff;
+            border-color: #2196F3;
+            background-color: #e3f2fd;
+        }
+        .upload-zone.has-file {
+            border-color: #26A69A;
+            background-color: #e0f2f1;
         }
         .upload-icon {
             font-size: 48px;
-            color: #667eea;
+            color: #2196F3;
             margin-bottom: 15px;
         }
         .status-badge {
@@ -311,9 +408,9 @@ $unidades_list = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
             color: #721c24;
         }
         .resultado-item {
-            background-color: white;
+            background-color: #fafafa;
             border: 1px solid #e0e0e0;
-            border-radius: 6px;
+            border-radius: 4px;
             padding: 15px;
             margin-bottom: 10px;
         }
@@ -341,63 +438,50 @@ $unidades_list = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
             background-color: #f8d7da;
             color: #721c24;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-        }
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #5568d3 0%, #653a8a 100%);
-        }
         .progress-container {
             display: none;
             margin-top: 20px;
         }
-        .alert {
-            border-radius: 6px;
-        }
-    </style>
-</head>
-<body>
-    <div class="main-container">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="mb-1">
-                    <i class="material-icons" style="vertical-align: middle;">document_scanner</i>
-                    Captura Automática con OCR
-                </h2>
-                <p class="text-muted mb-0">Procesar encuestas escaneadas automáticamente con Tesseract</p>
-            </div>
-            <a href="clima_admin.php" class="btn btn-outline-secondary">
-                <i class="material-icons" style="vertical-align: middle; font-size: 18px;">arrow_back</i>
-                Volver
-            </a>
-        </div>
+</style>
 
-        <!-- Estado de Tesseract -->
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center">
-                        <i class="material-icons mr-3" style="font-size: 36px; color: <?php echo $tesseract_disponible ? '#28a745' : '#dc3545'; ?>">
-                            <?php echo $tesseract_disponible ? 'check_circle' : 'error'; ?>
-                        </i>
-                        <div>
-                            <h5 class="mb-1">Estado de Tesseract OCR</h5>
-                            <?php if ($tesseract_disponible): ?>
-                                <span class="status-badge status-instalado">✓ Instalado y disponible</span>
-                                <small class="d-block text-muted mt-1"><?php echo h($tesseract_disponible); ?></small>
-                            <?php else: ?>
-                                <span class="status-badge status-no-instalado">✗ No instalado</span>
-                                <small class="d-block text-danger mt-1">Se requiere instalación de Tesseract</small>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <?php if (!$tesseract_disponible): ?>
-                        <a href="#instrucciones-instalacion" class="btn btn-primary btn-sm">
-                            Ver Instrucciones de Instalación
-                        </a>
-                    <?php endif; ?>
+<div class="page-header page-header-light">
+  <div class="page-header-content header-elements-md-inline">
+    <div class="page-title d-flex">
+      <h4><i class="icon-document-text2 mr-2"></i> <span class="font-weight-semibold">Captura Automática con OCR</span></h4>
+      <a href="#" class="header-elements-toggle text-default d-md-none"><i class="icon-more"></i></a>
+    </div>
+    <div class="header-elements">
+      <a href="clima_admin.php" class="btn btn-link btn-sm text-body">
+        <i class="icon-arrow-left8 mr-2"></i> Volver
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Estado de Tesseract -->
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <i class="icon-<?php echo $tesseract_disponible ? 'checkmark-circle' : 'cross-circle'; ?> icon-3x mr-3" style="color: <?php echo $tesseract_disponible ? '#28a745' : '#dc3545'; ?>"></i>
+          <div>
+            <h5 class="mb-1">Estado de Tesseract OCR</h5>
+            <?php if ($tesseract_disponible): ?>
+              <span class="status-badge status-instalado">✓ Instalado y disponible</span>
+              <small class="d-block text-muted mt-1"><?php echo h($tesseract_disponible); ?></small>
+            <?php else: ?>
+              <span class="status-badge status-no-instalado">✗ No instalado</span>
+              <small class="d-block text-danger mt-1">Se requiere instalación de Tesseract</small>
+            <?php endif; ?>
+          </div>
+        </div>
+        <?php if (!$tesseract_disponible): ?>
+          <a href="#instrucciones-instalacion" class="btn btn-primary btn-sm">
+            Ver Instrucciones de Instalación
+          </a>
+        <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -418,14 +502,30 @@ $unidades_list = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endif; ?>
 
         <?php if ($tesseract_disponible): ?>
-            <!-- Formulario de Carga -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="material-icons" style="vertical-align: middle;">cloud_upload</i>
-                        Cargar Encuesta Escaneada
-                    </h5>
-                </div>
+            
+            <!-- Tips para mejores resultados -->
+            <div class="alert alert-info border-0 alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <span class="font-weight-semibold"><i class="icon-lightbulb4 mr-2"></i> Tips para mejores resultados de OCR:</span>
+                <ul class="list list-unstyled mt-2 mb-0">
+                    <li><i class="icon-arrow-right5 mr-2"></i><strong>Calidad de escaneo:</strong> Use resolución mínima de 300 DPI (preferible 600 DPI)</li>
+                    <li><i class="icon-arrow-right5 mr-2"></i><strong>Marcas visibles:</strong> Las marcas X o ✓ deben ser oscuras y claras</li>
+                    <li><i class="icon-arrow-right5 mr-2"></i><strong>Formato recomendado:</strong> PNG o JPEG son preferibles a PDF para una página</li>
+                    <li><i class="icon-arrow-right5 mr-2"></i><strong>Múltiples archivos:</strong> Puede cargar varias imágenes de una encuesta de múltiples páginas</li>
+                    <li><i class="icon-arrow-right5 mr-2"></i><strong>Iluminación:</strong> Documento escaneado con buena iluminación sin sombras</li>
+                    <li><i class="icon-arrow-right5 mr-2"></i><strong>Orientación:</strong> El documento debe estar derecho, no inclinado</li>
+                    <li><i class="icon-arrow-right5 mr-2"></i><strong>Revisión manual:</strong> Siempre revise las respuestas antes de guardar</li>
+                </ul>
+            </div>
+            
+  <!-- Formulario de Carga -->
+  <div class="card">
+    <div class="card-header header-elements-inline">
+      <h6 class="card-title">
+        <i class="icon-cloud-upload mr-2"></i>
+        Cargar Encuesta Escaneada
+      </h6>
+    </div>
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data" id="formUpload">
                         <input type="hidden" name="action" value="procesar_pdf">
@@ -434,7 +534,6 @@ $unidades_list = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="col-md-6">
                                 <label class="font-weight-bold">Período:</label>
                                 <select name="periodo_id" class="form-control" required>
-                                    <option value="">-- Seleccionar Período --</option>
                                     <?php foreach ($periodos_list as $p): ?>
                                         <option value="<?php echo $p['periodo_id']; ?>">
                                             <?php echo h($p['anio']); ?> 
@@ -446,17 +545,23 @@ $unidades_list = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
 
                         <div class="upload-zone" id="uploadZone">
-                            <i class="material-icons upload-icon">cloud_upload</i>
-                            <h5>Arrastre su archivo aquí o haga clic para seleccionar</h5>
-                            <p class="text-muted mb-0">Formatos aceptados: PDF, PNG, JPG, JPEG, TIFF (Máx. 10MB)</p>
-                            <input type="file" 
-                                   name="archivo_pdf" 
-                                   id="archivo_pdf" 
-                                   accept=".pdf,.png,.jpg,.jpeg,.tiff,.tif"
-                                   style="display: none;"
-                                   required>
-                            <div id="fileName" class="mt-3 font-weight-bold" style="display: none;"></div>
+                            <i class="icon-cloud-upload upload-icon"></i>
+                            <h5>Arrastre sus archivos aquí o haga clic para seleccionar</h5>
+                            <p class="text-muted mb-0">Formatos aceptados: PDF, PNG, JPG, JPEG, TIFF (Máx. 10MB por archivo)</p>
+                            <button type="button" class="btn btn-outline-primary mt-3" id="btnSelect">
+                                <i class="icon-folder-open"></i>
+                                Seleccionar archivos
+                            </button>
+                            <div id="fileName" class="mt-3" style="display: none;"></div>
                         </div>
+                        
+                        <input type="file" 
+                               name="archivos_pdf[]" 
+                               id="archivo_pdf" 
+                               accept=".pdf,.png,.jpg,.jpeg,.tiff,.tif"
+                               style="display: none;"
+                               multiple
+                               required>
 
                         <div class="progress-container" id="progressContainer">
                             <div class="progress" style="height: 25px;">
@@ -469,60 +574,126 @@ $unidades_list = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
 
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg" id="btnProcesar">
-                                <i class="material-icons" style="vertical-align: middle;">auto_fix_high</i>
+                            <button type="submit" class="btn btn-primary" id="btnProcesar" disabled>
+                                <i class="icon-magic-wand mr-2"></i>
                                 Procesar con OCR
                             </button>
+                            <p class="text-muted mt-2 mb-0">
+                                <small>Seleccione uno o más archivos y un período para procesar</small>
+                            </p>
                         </div>
                     </form>
                 </div>
             </div>
 
             <!-- Resultados del OCR -->
-            <?php if ($resultados_ocr && isset($resultados_ocr['respuestas'])): ?>
+            <?php if ($resultados_ocr): ?>
+                <?php 
+                // DEBUG: Mostrar contenido de resultados_ocr
+                if (isset($_GET['debug']) && $_GET['debug'] == '1') {
+                    echo '<pre class="alert alert-info">';
+                    echo 'DEBUG resultados_ocr:<br>';
+                    print_r($resultados_ocr);
+                    echo '</pre>';
+                }
+                ?>
                 <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="material-icons" style="vertical-align: middle;">fact_check</i>
+                    <div class="card-header header-elements-inline">
+                        <h6 class="card-title">
+                            <i class="icon-checkmark-circle mr-2"></i>
                             Resultados del Procesamiento - Validar antes de Guardar
-                        </h5>
+                        </h6>
                     </div>
                     <div class="card-body">
+                        
+                        <?php if (!empty($resultados_ocr['warnings'])): ?>
+                            <div class="alert alert-warning">
+                                <i class="icon-warning"></i>
+                                <strong>Advertencias del procesamiento OCR:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <?php foreach ($resultados_ocr['warnings'] as $warning): ?>
+                                        <li><?php echo h($warning); ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <?php if (isset($resultados_ocr['confianza_promedio']) && $resultados_ocr['confianza_promedio'] < 50): ?>
+                            <div class="alert alert-danger">
+                                <i class="icon-alert"></i>
+                                <strong>⚠️ ATENCIÓN: Confianza muy baja (<?php echo h($resultados_ocr['confianza_promedio']); ?>%)</strong>
+                                <p class="mb-0">Las respuestas detectadas son aproximaciones y DEBEN ser revisadas y corregidas manualmente antes de guardar. Compare con el documento original.</p>
+                            </div>
+                        <?php endif; ?>
+                        
                         <div class="alert alert-info">
-                            <i class="material-icons" style="vertical-align: middle;">info</i>
+                            <i class="icon-info22"></i>
                             <strong>Revise los resultados:</strong> Verifique que las respuestas detectadas sean correctas antes de guardar.
                             Puede modificar cualquier valor que no sea correcto.
+                            <?php if (isset($resultados_ocr['confianza_promedio']) && $resultados_ocr['confianza_promedio'] > 0): ?>
+                                <br><strong>Confianza promedio:</strong> <?php echo h($resultados_ocr['confianza_promedio']); ?>%
+                            <?php endif; ?>
                         </div>
 
                         <form method="POST" id="formValidar">
                             <input type="hidden" name="action" value="guardar_validado">
-                            <input type="hidden" name="periodo_id" value="<?php echo h($resultados_ocr['periodo_id']); ?>">
+                            <input type="hidden" name="periodo_id" value="<?php echo isset($resultados_ocr['periodo_id']) ? h($resultados_ocr['periodo_id']) : ''; ?>">
                             <input type="hidden" name="empleado_id" value="<?php echo isset($resultados_ocr['empleado_id']) ? h($resultados_ocr['empleado_id']) : ''; ?>">
                             <input type="hidden" name="unidad_id" value="<?php echo isset($resultados_ocr['unidad_id']) ? h($resultados_ocr['unidad_id']) : ''; ?>">
-                            <input type="hidden" name="es_anonima" value="<?php echo isset($resultados_ocr['es_anonima']) ? '1' : '0'; ?>">
+                            <input type="hidden" name="es_anonima" value="<?php echo (isset($resultados_ocr['es_anonima']) && $resultados_ocr['es_anonima']) ? '1' : '0'; ?>">
 
                             <?php if (isset($resultados_ocr['empleado_nombre'])): ?>
                                 <div class="alert alert-secondary">
+                                    <i class="icon-user"></i>
                                     <strong>Empleado detectado:</strong> <?php echo h($resultados_ocr['empleado_nombre']); ?>
                                 </div>
                             <?php endif; ?>
+                            
+                            <?php if (isset($resultados_ocr['es_anonima']) && $resultados_ocr['es_anonima']): ?>
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Unidad/Área (para captura anónima):</label>
+                                    <select name="unidad_id" class="form-control" required>
+                                        <option value="">-- Seleccionar Unidad --</option>
+                                        <?php foreach ($unidades_list as $u): ?>
+                                            <option value="<?php echo $u['unidad_id']; ?>">
+                                                <?php echo h($u['nombre']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            <?php endif; ?>
+                            <h6 class="mb-3">Respuestas Detectadas (<?php echo isset($resultados_ocr['respuestas']) ? count($resultados_ocr['respuestas']) : 0; ?>):</h6>
 
-                            <h6 class="mb-3">Respuestas Detectadas (<?php echo count($resultados_ocr['respuestas']); ?>):</h6>
-
-                            <?php foreach ($resultados_ocr['respuestas'] as $respuesta): ?>
+                            <?php if (isset($resultados_ocr['respuestas']) && !empty($resultados_ocr['respuestas'])): ?>
+                                
+                                <?php if (isset($resultados_ocr['confianza_promedio']) && $resultados_ocr['confianza_promedio'] == 0): ?>
+                                    <div class="alert alert-info">
+                                        <i class="icon-info22"></i>
+                                        <strong>Completación manual requerida:</strong>
+                                        <p class="mb-0">El sistema preparó una plantilla con todas las preguntas de la encuesta. Por favor, compare con el documento escaneado y marque la respuesta correcta para cada pregunta.</p>
+                                    </div>
+                                <?php endif; ?>
+                                
+                                <?php foreach ($resultados_ocr['respuestas'] as $respuesta): ?>
                                 <div class="resultado-item">
                                     <div class="reactivo-header">
-                                        Pregunta #<?php echo $respuesta['reactivo_id']; ?>: <?php echo h($respuesta['texto_reactivo']); ?>
+                                        <?php echo h($respuesta['texto_reactivo']); ?>
                                         
                                         <?php if (isset($respuesta['confianza'])): ?>
-                                            <?php
-                                            $confianza_class = 'confianza-baja';
-                                            if ($respuesta['confianza'] >= 90) $confianza_class = 'confianza-alta';
-                                            elseif ($respuesta['confianza'] >= 70) $confianza_class = 'confianza-media';
-                                            ?>
-                                            <span class="confianza-badge <?php echo $confianza_class; ?>">
-                                                Confianza: <?php echo $respuesta['confianza']; ?>%
-                                            </span>
+                                            <?php if ($respuesta['confianza'] == 0): ?>
+                                                <span class="badge badge-danger ml-2">
+                                                    <i class="icon-pencil"></i> REVISAR MANUALMENTE
+                                                </span>
+                                            <?php elseif ($respuesta['confianza'] > 0): ?>
+                                                <?php
+                                                $confianza_class = 'confianza-baja';
+                                                if ($respuesta['confianza'] >= 90) $confianza_class = 'confianza-alta';
+                                                elseif ($respuesta['confianza'] >= 70) $confianza_class = 'confianza-media';
+                                                ?>
+                                                <span class="confianza-badge <?php echo $confianza_class; ?>">
+                                                    Confianza: <?php echo $respuesta['confianza']; ?>%
+                                                </span>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </div>
                                     
@@ -549,6 +720,13 @@ $unidades_list = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
                                     </div>
                                 </div>
                             <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="alert alert-warning">
+                                    <i class="icon-warning"></i>
+                                    No se pudieron generar respuestas. Por favor, intenta de nuevo o contacta a soporte.
+
+                                </div>
+                            <?php endif; ?>
 
                             <?php if (isset($resultados_ocr['respuestas_abiertas']) && !empty($resultados_ocr['respuestas_abiertas'])): ?>
                                 <h6 class="mt-4 mb-3">Respuestas Abiertas Detectadas:</h6>
@@ -563,12 +741,16 @@ $unidades_list = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php endif; ?>
 
                             <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-success btn-lg">
-                                    <i class="material-icons" style="vertical-align: middle;">save</i>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="icon-floppy-disk mr-2"></i>
                                     Guardar Respuestas Validadas
                                 </button>
-                                <button type="button" class="btn btn-secondary btn-lg" onclick="location.reload()">
-                                    <i class="material-icons" style="vertical-align: middle;">cancel</i>
+                                <button type="button" class="btn btn-info" onclick="limpiarYProcesarNueva()">
+                                    <i class="icon-plus-circle2 mr-2"></i>
+                                    Procesar Nueva Encuesta
+                                </button>
+                                <button type="button" class="btn btn-light" onclick="location.reload()">
+                                    <i class="icon-cross2 mr-2"></i>
                                     Cancelar
                                 </button>
                             </div>
@@ -580,11 +762,11 @@ $unidades_list = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php else: ?>
             <!-- Instrucciones de Instalación -->
             <div class="card" id="instrucciones-instalacion">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0">
-                        <i class="material-icons" style="vertical-align: middle;">download</i>
+                <div class="card-header bg-danger header-elements-inline">
+                    <h6 class="card-title text-white">
+                        <i class="icon-download mr-2"></i>
                         Instalación de Tesseract OCR
-                    </h5>
+                    </h6>
                 </div>
                 <div class="card-body">
                     <h6 class="font-weight-bold">Para Windows:</h6>
@@ -612,56 +794,186 @@ $unidades_list = $unidades_stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
         <?php endif; ?>
-    </div>
 
-    <script src="../global_assets/js/jquery.min.js"></script>
-    <script src="../global_assets/js/bootstrap.bundle.min.js"></script>
-    <script>
+</div><!-- /content -->
+
+<?php
+require_once __DIR__ . '/../includes/layout/footer.php';
+?>
+
+<script>
         $(document).ready(function() {
             // Drag and drop functionality
             const uploadZone = document.getElementById('uploadZone');
             const fileInput = document.getElementById('archivo_pdf');
             const fileName = document.getElementById('fileName');
+            const btnProcesar = document.getElementById('btnProcesar');
 
-            uploadZone.addEventListener('click', () => fileInput.click());
+            if (!uploadZone || !fileInput) {
+                return;
+            }
+
+            // Prevent the browser from opening the file on drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((evt) => {
+                window.addEventListener(evt, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, { passive: false });
+                document.addEventListener(evt, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, { passive: false });
+            });
+
+            // Click handlers
+            const btnSelect = document.getElementById('btnSelect');
+            if (btnSelect) {
+                btnSelect.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fileInput.click();
+                });
+            }
+            
+            uploadZone.addEventListener('click', (e) => {
+                // Solo abrir si no se clickeó el botón
+                if (e.target !== btnSelect && !btnSelect.contains(e.target)) {
+                    fileInput.click();
+                }
+            });
 
             uploadZone.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 uploadZone.classList.add('dragover');
             });
 
-            uploadZone.addEventListener('dragleave', () => {
+            uploadZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
                 uploadZone.classList.remove('dragover');
             });
 
             uploadZone.addEventListener('drop', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 uploadZone.classList.remove('dragover');
+
+                const files = e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files : null;
+                if (files && files.length > 0) {
+                    // Asignar todos los archivos
+                    if (window.DataTransfer) {
+                        const dt = new DataTransfer();
+                        for (let i = 0; i < files.length; i++) {
+                            dt.items.add(files[i]);
+                        }
+                        fileInput.files = dt.files;
+                    } else {
+                        fileInput.files = files;
+                    }
+                    mostrarNombresArchivos(files);
+                }
+            });
+
+            function onFileChange() {
+                if (fileInput.files && fileInput.files.length > 0) {
+                    mostrarNombresArchivos(fileInput.files);
+                }
+            }
+
+            fileInput.addEventListener('change', onFileChange);
+            fileInput.addEventListener('input', onFileChange);
+
+            function mostrarNombresArchivos(files) {
+                let html = '';
+                let totalSize = 0;
+                let hasError = false;
                 
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    fileInput.files = files;
-                    mostrarNombreArchivo(files[0].name);
+                // Crear lista de archivos
+                html += '<div class="text-left">';
+                html += '<strong><i class="icon-checkmark-circle" style="color: #28a745;"></i> ' + files.length + ' archivo(s) seleccionado(s):</strong>';
+                html += '<ul class="list-unstyled mt-2 mb-0" style="max-height: 200px; overflow-y: auto;">';
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+                    totalSize += file.size;
+                    
+                    let iconColor = '#28a745';
+                    let iconClass = 'icon-file-check';
+                    let textClass = 'text-success';
+                    
+                    // Validar tamaño
+                    if (file.size > 10 * 1024 * 1024) {
+                        iconColor = '#dc3545';
+                        iconClass = 'icon-cross-circle';
+                        textClass = 'text-danger';
+                        hasError = true;
+                    }
+                    
+                    html += '<li class="' + textClass + '">';
+                    html += '<i class="' + iconClass + '" style="color: ' + iconColor + ';"></i> ';
+                    html += '<strong>' + (i + 1) + '.</strong> ' + file.name + ' <small>(' + sizeMb + ' MB)</small>';
+                    if (file.size > 10 * 1024 * 1024) {
+                        html += ' <span class="badge badge-danger">Muy grande</span>';
+                    }
+                    html += '</li>';
                 }
-            });
-
-            fileInput.addEventListener('change', function() {
-                if (this.files.length > 0) {
-                    mostrarNombreArchivo(this.files[0].name);
-                }
-            });
-
-            function mostrarNombreArchivo(nombre) {
-                fileName.textContent = '📄 ' + nombre;
+                
+                html += '</ul>';
+                
+                const totalSizeMb = (totalSize / (1024 * 1024)).toFixed(2);
+                html += '<small class="text-muted">Tamaño total: ' + totalSizeMb + ' MB</small>';
+                html += '</div>';
+                
+                fileName.innerHTML = html;
                 fileName.style.display = 'block';
+                uploadZone.classList.add('has-file');
+                
+                // Habilitar/deshabilitar botón según validación
+                if (btnProcesar) {
+                    btnProcesar.disabled = hasError;
+                }
+                
+                if (hasError) {
+                    fileName.innerHTML = '<div class="alert alert-danger mb-0"><i class="icon-cross-circle"></i> Algunos archivos son muy grandes. El tamaño máximo por archivo es 10 MB.</div>' + html;
+                }
             }
 
             // Mostrar progreso al enviar
-            $('#formUpload').on('submit', function() {
+            $('#formUpload').on('submit', function(e) {
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    e.preventDefault();
+                    alert('Seleccione un archivo antes de procesar.');
+                    return;
+                }
                 $('#progressContainer').show();
                 $('#btnProcesar').prop('disabled', true);
             });
+            
+            // Función para limpiar y procesar nueva encuesta
+            window.limpiarYProcesarNueva = function() {
+                // Limpiar archivo seleccionado
+                fileInput.value = '';
+                fileName.innerHTML = '';
+                fileName.style.display = 'none';
+                uploadZone.classList.remove('has-file');
+                
+                // Limpiar formulario de upload
+                document.getElementById('formUpload').reset();
+                
+                // Desactivar botón de procesamiento
+                if (btnProcesar) {
+                    btnProcesar.disabled = true;
+                }
+                
+                // Ocultar resultados previos scrolleando hacia arriba
+                window.scrollTo(0, 0);
+                
+                // Esperar a que usuario seleccione nuevo archivo
+                alert('Formulario limpiado. Seleccione el archivo de la siguiente encuesta para procesar.');
+            };
         });
-    </script>
-</body>
-</html>
+</script>
+
+<?php
+require_once __DIR__ . '/../includes/layout/content_close.php';
+?>

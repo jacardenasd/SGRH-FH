@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico Sistema OCR Clima</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2em; margin-bottom: 10px; }
+        .header p { opacity: 0.9; }
+        .content { padding: 40px; }
+        .diagnostic {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .diagnostic.success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .diagnostic.error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .diagnostic.warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+        .check-result {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+        .icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+            width: 30px;
+            text-align: center;
+        }
+        .step {
+            background: white;
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .step h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .step h3 .number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin: 10px 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            transition: 0.3s;
+        }
+        .button:hover { background: #764ba2; }
+        .button.success { background: #28a745; }
+        .button.success:hover { background: #218838; }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+        .success-msg {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error-msg {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Diagnóstico del Sistema OCR de Clima</h1>
+            <p>Verificar y configurar el sistema de captura de encuestas con OCR</p>
+        </div>
+        
+        <div class="content">
+            <!-- PASO 1: Verificar MAMP -->
+            <div class="step">
+                <h3><span class="number">1</span> Verificar MAMP y MySQL</h3>
+                <p>asegúrate de que MAMP está corriendo correctamente:</p>
+                
+                <ol style="margin: 15px 0; margin-left: 30px;">
+                    <li>Abre <strong>MAMP Control Panel</strong></li>
+                    <li>Verifica que los servicios Apache y MySQL estén <span class="success-msg">corriendo (verde)</span></li>
+                    <li>Si no están corriendo, haz clic en <strong>"Start Servers"</strong></li>
+                </ol>
+                
+                <p style="margin-top: 15px;"><strong>Once MAMP is running, open:</strong></p>
+                <p style="margin: 10px 0;"><code style="background: #f0f0f0; padding: 5px 10px; border-radius: 3px;">http://localhost:8888/sgrh/test_connection.php</code></p>
+                
+                <button class="button" onclick="window.open('http://localhost:8888/sgrh/test_connection.php', '_blank')">
+                    ✓ Verificar Conexión a BD
+                </button>
+            </div>
+            
+            <!-- PASO 2: Cargar datos demo -->
+            <div class="step">
+                <h3><span class="number">2</span> Cargar Datos de Demostración</h3>
+                <p>Si la conexión es exitosa pero no hay reactivos, necesitas cargar datos de ejemplo:</p>
+                
+                <div class="info-box">
+                    <strong>📌 Importante:</strong> El sistema requiere que existan preguntas (reactivos) en la base de datos. Sin ellas, OCR no funcionará.
+                </div>
+                
+                <h4 style="margin: 15px 0; color: #333;">Opción A: Cargar SQL automáticamente</h4>
+                <button class="button success" onclick="cargarDataDemo()">
+                    ⚡ Cargar Datos de Demo
+                </button>
+                <p style="font-size: 0.9em; color: #666; margin-top: 10px;">Esto creará: 3 dimensiones, 10 preguntas, 1 período y datos básicos</p>
+                
+                <h4 style="margin: 15px 0; color: #333;">Opción B: Cargar SQL manualmente</h4>
+                <p style="margin: 10px 0;">Abre <strong>phpMyAdmin</strong> (http://localhost:8888/phpMyAdmin/)</p>
+                <ol style="margin: 15px 0; margin-left: 30px;">
+                    <li>Selecciona la base de datos <strong>sgrh</strong></li>
+                    <li>Ve a la pestaña <strong>"SQL"</strong></li>
+                    <li>Copia y pega el contenido del archivo:</li>
+                </ol>
+                <div class="code-block">/sgrh/clima_demo_data.sql</div>
+                <p style="margin: 10px 0;">4. Haz clic en <strong>"Ejecutar"</strong></p>
+            </div>
+            
+            <!-- PASO 3: Probar OCR -->
+            <div class="step">
+                <h3><span class="number">3</span> Probar Captura con OCR</h3>
+                <p>Una vez que los reactivos estén cargados, puedes usar el sistema:</p>
+                
+                <button class="button success" onclick="window.open('http://localhost:8888/sgrh/public/clima_captura_ia.php', '_blank')">
+                    ✓ Ir a Captura OCR
+                </button>
+                
+                <div class="info-box">
+                    <strong>📌 Cómo usar:</strong>
+                    <ol style="margin: 10px 0 10px 20px;">
+                        <li>Selecciona un <strong>período</strong> de la encuesta</li>
+                        <li>Carga un PDF o imagen del formulario escaneado</li>
+                        <li>El sistema automáticamente:</li>
+                        <ul style="margin: 10px 0 0 20px;">
+                            <li>Extrae el texto con Tesseract OCR</li>
+                            <li>Intenta reconocer las respuestas</li>
+                            <li>Si no puede, genera una plantilla para completar manualmente</li>
+                        </ul>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- PASO 4: Solucionar problemas -->
+            <div class="step">
+                <h3><span class="number">4</span> Solucionar Problemas</h3>
+                
+                <h4 style="margin: 15px 0; color: #333;">❌ "No se puede conectar a la base de datos"</h4>
+                <ol style="margin: 10px 0 10px 20px;">
+                    <li>Verifica que MAMP esté corriendo (MySQL debe estar <span class="success-msg">verde</span>)</li>
+                    <li>Abre phpMyAdmin: http://localhost:8888/phpMyAdmin/</li>
+                    <li>Verifica que la BD <strong>sgrh</strong> exista</li>
+                </ol>
+                
+                <h4 style="margin: 15px 0; color: #333;">❌ "Respuestas Detectadas (0)"</h4>
+                <ol style="margin: 10px 0 10px 20px;">
+                    <li>Esto significa que <strong>no hay reactivos</strong> en la BD</li>
+                    <li>Sigue el <strong>Paso 2</strong> para cargar datos de demo</li>
+                    <li>Recarga la página y vuelve a intentar</li>
+                </ol>
+                
+                <h4 style="margin: 15px 0; color: #333;">❌ "Tesseract OCR no está instalado"</h4>
+                <ol style="margin: 10px 0 10px 20px;">
+                    <li>Descarga Tesseract: https://github.com/UB-Mannheim/tesseract/wiki</li>
+                    <li>Instala en: <code>C:\Program Files\Tesseract-OCR</code></li>
+                    <li>Reinicia el servidor</li>
+                </ol>
+            </div>
+            
+            <!-- ESTADO ACTUAL -->
+            <div class="step">
+                <h3><span class="number">?</span> Estado Actual del Sistema</h3>
+                <div id="statusContainer" style="margin-top: 20px;">
+                    <p style="text-align: center; color: #999;">Verificando...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function cargarDataDemo() {
+            if (!confirm('¿Deseas cargar los datos de demostración?\n\nEsto creará:\n• 3 dimensiones de clima\n• 10 preguntas (reactivos)\n• 1 período activo')) {
+                return;
+            }
+            
+            fetch('load_demo_data.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=load_demo'
+            })
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('statusContainer').innerHTML = html;
+                setTimeout(() => {
+                    document.getElementById('statusContainer').innerHTML += '<p style="margin-top: 20px; text-align: center;"><strong>✓ Datos cargados. Ahora puedes usar OCR.</strong></p>';
+                    document.getElementById('statusContainer').innerHTML += '<button class="button success" onclick="window.location.reload()" style="margin-top: 10px;">Recargar página</button>';
+                }, 1000);
+            })
+            .catch(e => {
+                document.getElementById('statusContainer').innerHTML = '<div class="diagnostic error"><div class="check-result"><span class="icon">✗</span><div>Error: ' + e.message + '</div></div></div>';
+            });
+        }
+        
+        // Verificar estado al cargar
+        fetch('test_connection.php')
+            .then(r => r.text())
+            .then(html => {
+                if (html.includes('erfolg')) {
+                    document.getElementById('statusContainer').innerHTML = '<div class="diagnostic success"><div class="check-result"><span class="icon">✓</span><div>Conexión a base de datos: <strong>EXITOSA</strong></div></div></div>';
+                } else {
+                    document.getElementById('statusContainer').innerHTML = '<div class="diagnostic error"><div class="check-result"><span class="icon">✗</span><div>Conexión a base de datos: <strong>FALLIDA</strong></div></div><p style="margin-top: 10px;">Asegúrate de que MAMP esté corriendo correctamente.</p></div>';
+                }
+            })
+            .catch(e => {
+                document.getElementById('statusContainer').innerHTML = '<div class="diagnostic error"><div class="check-result"><span class="icon">✗</span><div>No se puede verificar: ' + e.message + '</div></div></div>';
+            });
+    </script>
+</body>
+</html>

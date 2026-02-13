@@ -3100,3 +3100,772 @@ Stack trace:
 #0 C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php(236): PDO->prepare('\r\n    SELECT un...')
 #1 {main}
   thrown in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 236
+[09-Feb-2026 10:52:08 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-vsWDUGAy0aB-LJ5tuPJAgFl5tM_tX6Zo%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-0jIVCXT6iGIJWJZvAdPdFAi8Lbso0AjB" "-fC:/Users/subrh/AppData/Local/Temp/magick-VTXbKxTeOrc5uDG8h8olGLboL1_XlQR1"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 10:52:08 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 10:52:09 America/Mexico_City] PHP Warning:  Undefined array key "periodo_id" in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 505
+[09-Feb-2026 10:52:36 America/Mexico_City] GET PARAMS: periodo_id=VACIO, empleado_id=VACIO, tipo_captura=VACIO
+[09-Feb-2026 10:52:36 America/Mexico_City] PARSED: periodo_id=0, empleado_id=0, tipo_captura=identificada
+[09-Feb-2026 10:58:38 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-JhMArCZrozz9wdvzGvl2w47p1YdsWacD%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-A8gUpVPdN4oBlW7C51cNLs23jzzghZ8F" "-fC:/Users/subrh/AppData/Local/Temp/magick-l2ylkdRo3WKaU6I9Pbm3Lfkc0Gji4y73"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 10:58:38 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 10:58:38 America/Mexico_City] PHP Warning:  Undefined array key "periodo_id" in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 535
+[09-Feb-2026 11:06:52 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-Iqxdti7vLH6pabXD1DFon5kobxsogDlQ%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-uE540q6voyfbG34TYnu1sQMF3T8XUPCY" "-fC:/Users/subrh/AppData/Local/Temp/magick-sgL_ArRSXAvFyaEwEIC7_f0kfVMAo2Yg"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 11:06:52 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 11:06:52 America/Mexico_City] PHP Warning:  Undefined array key "periodo_id" in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 514
+[09-Feb-2026 11:08:44 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-uMrPq92_lcgrRTKkaSWq7SG0rhPn5JMX%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-44AmGsTUCbqRql9TkEvI1W3EAc6WdVcI" "-fC:/Users/subrh/AppData/Local/Temp/magick-ZVrn4DcZ0bjhmDiybRqnHv9G2MVT_Gcg"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 11:08:44 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 11:08:44 America/Mexico_City] PHP Warning:  Undefined array key "periodo_id" in C:\MAMP\htdocs\sgrh\public\clima_captura_ia.php on line 514
+[09-Feb-2026 11:10:29 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-3QfQ0d9mV_ncva3C1A3MV-yWxhVg-I0S%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-3kHl4fsCOKg34ijT9bxqYLYdghSG81bA" "-fC:/Users/subrh/AppData/Local/Temp/magick-ctbjKodedwI5z88Ta91lDb65tHPuLgeD"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 11:10:29 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 11:14:09 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-RX-IX3YG7gqEimH8LOrF56PCz7spLEcV%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-Dv5fsSnHMmDN74a1yUE3CFH-Q9TEA8Wq" "-fC:/Users/subrh/AppData/Local/Temp/magick-4TfQ5wJUSyAjluyhxTXy67odT6s8BsTR"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 11:14:09 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 11:14:27 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-THJj1CbMkDxKvNiCB_OfMau-BjCM8E0K%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-8EeFxU5TT0lUOMF0R2ZQOwlbD8FwQPzo" "-fC:/Users/subrh/AppData/Local/Temp/magick-6nzrCmNobEup7MzlRx3a4U3QbnuXoVA8"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 11:14:27 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 11:20:51 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-MeE66EYPl7hyDdxrLTrHGOdCkVQrYySB%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-oY-bR14yEztgKQl7mx0vcxxQZ9M8XI5V" "-fC:/Users/subrh/AppData/Local/Temp/magick-DiqpxxvBFlnlalj900ByEXh1qPNZIl9d"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 11:20:51 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 11:21:17 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-P3pwz0lTcsEB0s4bOwKKQcP-WCjWMMoa%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-vDHrzvVMVCDIqPC1DR3us18GRmCCVxZ4" "-fC:/Users/subrh/AppData/Local/Temp/magick-iNEzpgFEypWK-vjjYoeLGA_OuVqLPX7w"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 11:21:17 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 11:22:31 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-dfGkpzsoMcHoY_Ezn5WCVgZhJuQVJyHI%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-WdnMIz-CL8okpR5sP75yI3kbaNfo_Mfo" "-fC:/Users/subrh/AppData/Local/Temp/magick-IPD54XCag1R_rl1P7OytwPI7N1g0QS7W"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 11:22:31 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 11:29:28 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-eO6vQg2jgkjTHXwEgDrtcOZoCAV-4aCk%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-7YE50w6z--NwoK2wyO-CvhmUUdWeRWMp" "-fC:/Users/subrh/AppData/Local/Temp/magick-wUlqCEA_5nFaLIbgwMSTw5X7aaGZ1bEk"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 11:29:28 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 11:50:34 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-ehtepSgwsayzYtKSA_ebaK4PGMdoJ7aM%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-I_jELnclNrwJj2-AF_2v_p3GcuZWSwve" "-fC:/Users/subrh/AppData/Local/Temp/magick-0QJO3Amzo03_j2DEIFE3EcUxJEd9w6DH"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 11:50:34 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 11:50:49 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-oGuxpbUaX2_RLt2H3AsDuQz-4S9TrmKN%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-ibqaJ3KpsXn1GEiTsKETGdwUKLvLudxb" "-fC:/Users/subrh/AppData/Local/Temp/magick-6Eej2nLH8c95_C8KjbSLJC0-8AjM6Wit"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 11:50:49 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 11:57:48 America/Mexico_City] Error con Imagick: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r300x300"  "-sOutputFile=C:/Users/subrh/AppData/Local/Temp/magick-VXrClLu-pBQScq0wI-mGa_lsHXddZkq9%d" "-fC:/Users/subrh/AppData/Local/Temp/magick-FTojeygA0ARG9YniOAVmvigOHaEs3TYj" "-fC:/Users/subrh/AppData/Local/Temp/magick-GF1dIouTHoTsX8hlToQ3HBBrkZxDp_7h"' (El sistema no puede encontrar el archivo especificado.
+) @ error/delegate.c/ExternalDelegateCommand/510
+[09-Feb-2026 11:57:48 America/Mexico_City] Error en procesarArchivo: PDF detectado: Necesita instalar PHP Imagick para procesar PDFs. Alternativamente, convierta el PDF a imagen (PNG/JPG) manualmente.
+[09-Feb-2026 12:31:58 America/Mexico_City] ✓ Ghostscript encontrado: C:\Program Files\gs\gs10.06.0\bin\gswin64c.exe
+[09-Feb-2026 12:32:10 America/Mexico_City] ✓ PDF tiene 5 página(s)
+[09-Feb-2026 12:32:12 America/Mexico_City] ✓ Página 1 convertida a: page_698a282a9d168.png
+[09-Feb-2026 12:32:13 America/Mexico_City] ✓ Página 2 convertida a: page_698a282c217fe.png
+[09-Feb-2026 12:32:15 America/Mexico_City] ✓ Página 3 convertida a: page_698a282dc79f5.png
+[09-Feb-2026 12:32:17 America/Mexico_City] ✓ Página 4 convertida a: page_698a282f79ce2.png
+[09-Feb-2026 12:32:18 America/Mexico_City] ✓ Página 5 convertida a: page_698a28311f677.png
+[09-Feb-2026 12:32:22 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[09-Feb-2026 12:32:22 America/Mexico_City] ENCUESTA DE CLIMA LABORAL
+CONFIDENCIAL - Tus respuestas son anónimas y valiosas para nosotros
+AA
+¡ EMPRESA: ari SEXO: |
+| PARMA Hix Pago A MÉENicawn Plaseo. ia
+| UNIDAD / ÁREA: a EDAD: $0) DEPARTAMENTO:
+. Paonjccion Fanma 56 AÑY ALMA
+| ESCOLARIDAD:  ,-= ESTADO CIVIL: ANTIGUEDAD (años): ; :
+¿l OA DAA éM RD TE ap E JE
+Periodo: Año 2026 (2026-02-01 a 2026-03-31)
+Instrucciones:
+» Completa los dalos demográficos arriba (sin nombre).
++ Marca con y la opción (recuadro con ícono) que mejor 
+[09-Feb-2026 12:32:26 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[09-Feb-2026 12:32:26 America/Mexico_City] * Comunicación interna .
+9. La nformación necesaria para mi trabajo llega completa y a tiempo.
+Mc De acuerdo : ' Ez Parcialmente De acuerdo : , E En Desacuerdo :
+' E : 0)
+10. Los cambios relevantes se comunican con anticipafión suficiente.
+Es Totalmente De acuerdo ; Ea De acuerdo E E En Desacuerdo :
+11. Las instrucciones o solicitudes suelen ser claras y $in ambigiedades.
+Y ren De acuerdo . : Es. Parcialmente De acuerdo : : : ee En Desacuerdo
+12. La comunicación en mi equipo es abierta y res
+[09-Feb-2026 12:32:30 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[09-Feb-2026 12:32:30 America/Mexico_City] - Propósito y alineación
+21. Entiendo los objetivos prioritarios de mi área para este año.
+E Totalmente De acuerdo : ts Parcialmente De acuerdo ' : E En Desacuerdo
+no no
+22. Mi trabajo contribuye de manera clara al propósito y resultados de la empresa.
+. BY romero De acuerdo Ñ : (E Parcialmente De acuerdo E Ez En Desacuerdo
+23. " Las prioridades se comunican con claridad y se mantienen estables la mayor parte del tiempo.
+' ES: Totalmente De acuerdo pa Y rcnon De acuerdo : E En Desacuerdo
+2
+[09-Feb-2026 12:32:33 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[09-Feb-2026 12:32:33 America/Mexico_City] * Bienestar y balance
+33. La carga de trabajo es razonable la mayor parte de] tiempo.
+Es Tolalmente De acuerdo A De acuerdo 1 E En Desacuerdo :
+34. Puedo mantener un equilibrio razonable entre trabajo y vida personal,
+Y sona De acuerdo : E Parcialmente De acuerdo ' : E En Desacuerdo :
+35. Me siento seguro(a) reportando riesgos o condiciones inseguras.
+A a Ed 238 z :
+ES Totalmente De acuerdo ! 2 AN De acuerdo si E En Desacuerdo :
+Ma, d Mb sl :
+36. En general, la empresa cuida el bienestar del per
+[09-Feb-2026 12:32:39 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[09-Feb-2026 12:32:39 America/Mexico_City] .* Procesos y eficiencia
+45. Los procesos de trabajo facilitan la eficiencia (evitan burocracia innecesaria).
+€, Totalmente De acuerdo ) Va De acuerdo 7 : E En Desacuerdo
+46. Los tiempos de respuesta de áreas de soporle son adecuados.
+i= Totalmente De acuerdo ER E 5 Parcialmente De acuerdo dde Es En Desacuerdo
+47, Se promueve la mejora continua para simplificar y hacer más efectivo el trabajo,
+(E Totalmente De acuerdo : 7 Y caccamerna De acuerdo hn E En Desacuerdo
+48. Los problemas recurrent
+[09-Feb-2026 12:32:39 America/Mexico_City] 🔍 Iniciando análisis de texto. Bytes: 9018, Líneas: 180
+[09-Feb-2026 12:32:39 America/Mexico_City] ✓ Obtuvieron 48 reactivos de la BD
+[09-Feb-2026 12:32:39 America/Mexico_City] Método 1 (Patrones): 4 respuestas
+[09-Feb-2026 12:32:39 America/Mexico_City] ✓ Análisis completado. Respuestas: 4, Confianza: 85%
+[09-Feb-2026 12:34:17 America/Mexico_City] ✓ Ghostscript encontrado: C:\Program Files\gs\gs10.06.0\bin\gswin64c.exe
+[09-Feb-2026 12:34:29 America/Mexico_City] ✓ PDF tiene 5 página(s)
+[09-Feb-2026 12:34:30 America/Mexico_City] ✓ Página 1 convertida a: page_698a28b5299d7.png
+[09-Feb-2026 12:34:32 America/Mexico_City] ✓ Página 2 convertida a: page_698a28b6c29a2.png
+[09-Feb-2026 12:34:33 America/Mexico_City] ✓ Página 3 convertida a: page_698a28b822a80.png
+[09-Feb-2026 12:34:35 America/Mexico_City] ✓ Página 4 convertida a: page_698a28b9d5aa5.png
+[09-Feb-2026 12:34:36 America/Mexico_City] ✓ Página 5 convertida a: page_698a28bb6ffeb.png
+[09-Feb-2026 12:34:41 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[09-Feb-2026 12:34:41 America/Mexico_City] ENCUESTA DE CLIMA LABORAL
+CONFIDENCIAL - Tus respuestas son anónimas y valiosas para nosotros
+AA
+¡ EMPRESA: ari SEXO: |
+| PARMA Hix Pago A MÉENicawn Plaseo. ia
+| UNIDAD / ÁREA: a EDAD: $0) DEPARTAMENTO:
+. Paonjccion Fanma 56 AÑY ALMA
+| ESCOLARIDAD:  ,-= ESTADO CIVIL: ANTIGUEDAD (años): ; :
+¿l OA DAA éM RD TE ap E JE
+Periodo: Año 2026 (2026-02-01 a 2026-03-31)
+Instrucciones:
+» Completa los dalos demográficos arriba (sin nombre).
++ Marca con y la opción (recuadro con ícono) que mejor 
+[09-Feb-2026 12:34:44 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[09-Feb-2026 12:34:44 America/Mexico_City] * Comunicación interna .
+9. La nformación necesaria para mi trabajo llega completa y a tiempo.
+Mc De acuerdo : ' Ez Parcialmente De acuerdo : , E En Desacuerdo :
+' E : 0)
+10. Los cambios relevantes se comunican con anticipafión suficiente.
+Es Totalmente De acuerdo ; Ea De acuerdo E E En Desacuerdo :
+11. Las instrucciones o solicitudes suelen ser claras y $in ambigiedades.
+Y ren De acuerdo . : Es. Parcialmente De acuerdo : : : ee En Desacuerdo
+12. La comunicación en mi equipo es abierta y res
+[09-Feb-2026 12:34:48 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[09-Feb-2026 12:34:48 America/Mexico_City] - Propósito y alineación
+21. Entiendo los objetivos prioritarios de mi área para este año.
+E Totalmente De acuerdo : ts Parcialmente De acuerdo ' : E En Desacuerdo
+no no
+22. Mi trabajo contribuye de manera clara al propósito y resultados de la empresa.
+. BY romero De acuerdo Ñ : (E Parcialmente De acuerdo E Ez En Desacuerdo
+23. " Las prioridades se comunican con claridad y se mantienen estables la mayor parte del tiempo.
+' ES: Totalmente De acuerdo pa Y rcnon De acuerdo : E En Desacuerdo
+2
+[09-Feb-2026 12:34:51 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[09-Feb-2026 12:34:51 America/Mexico_City] * Bienestar y balance
+33. La carga de trabajo es razonable la mayor parte de] tiempo.
+Es Tolalmente De acuerdo A De acuerdo 1 E En Desacuerdo :
+34. Puedo mantener un equilibrio razonable entre trabajo y vida personal,
+Y sona De acuerdo : E Parcialmente De acuerdo ' : E En Desacuerdo :
+35. Me siento seguro(a) reportando riesgos o condiciones inseguras.
+A a Ed 238 z :
+ES Totalmente De acuerdo ! 2 AN De acuerdo si E En Desacuerdo :
+Ma, d Mb sl :
+36. En general, la empresa cuida el bienestar del per
+[09-Feb-2026 12:34:57 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[09-Feb-2026 12:34:57 America/Mexico_City] .* Procesos y eficiencia
+45. Los procesos de trabajo facilitan la eficiencia (evitan burocracia innecesaria).
+€, Totalmente De acuerdo ) Va De acuerdo 7 : E En Desacuerdo
+46. Los tiempos de respuesta de áreas de soporle son adecuados.
+i= Totalmente De acuerdo ER E 5 Parcialmente De acuerdo dde Es En Desacuerdo
+47, Se promueve la mejora continua para simplificar y hacer más efectivo el trabajo,
+(E Totalmente De acuerdo : 7 Y caccamerna De acuerdo hn E En Desacuerdo
+48. Los problemas recurrent
+[09-Feb-2026 12:34:57 America/Mexico_City] 🔍 Iniciando análisis de texto. Bytes: 9018, Líneas: 180
+[09-Feb-2026 12:34:57 America/Mexico_City] ✓ Obtuvieron 48 reactivos de la BD
+[09-Feb-2026 12:34:57 America/Mexico_City] Método 1 (Patrones): 4 respuestas
+[09-Feb-2026 12:34:57 America/Mexico_City] ✓ Análisis completado. Respuestas: 4, Confianza: 85%
+[11-Feb-2026 13:14:51 America/Mexico_City] ✓ Ghostscript encontrado: C:\Program Files\gs\gs10.06.0\bin\gswin64c.exe
+[11-Feb-2026 13:14:58 America/Mexico_City] ✓ PDF tiene 3 página(s)
+[11-Feb-2026 13:15:00 America/Mexico_City] ✓ Página 1 convertida a: page_698cd532e94e5.png
+[11-Feb-2026 13:15:02 America/Mexico_City] ✓ Página 2 convertida a: page_698cd534c1619.png
+[11-Feb-2026 13:15:04 America/Mexico_City] ✓ Página 3 convertida a: page_698cd5369257e.png
+[11-Feb-2026 13:15:09 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 13:15:09 America/Mexico_City] ENCUESTA DE CLIMA LABORAL
+CONFIDENCIAL - Tus respuestas son anónimas y valiosas para nosotros
+| EMPRESA: | SEXO: Y
+[ ea ce - ñ
+| Qtcoxca MISOGaaO Y ANNE Lemeni a ES
+| UNIDAD / ÁREA: ¿E EDAD: La DEPARTAMENTO: *
+1 rn ” y
+EE ANA ra ¡CNTRARSS
+| K—_—_——_——— ——_——_—_—_—_—_ _ _____---—
+| Lied D: ! SAN ANTIGUEDAD (años): j
+| ( NL LIV FO 9 y JeYu 1D)
+! E RRE RR RR RAR A RR E > + ++ + E asa 2d
+Periodo: Año 2026 (2026-02-01 a 2026-03-31)
+Instrucciones: ;
++ Completa 
+[11-Feb-2026 13:15:12 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 13:15:12 America/Mexico_City] * Bienestar y balance
+33. La carga de trabajo es razonable la mayor parte del tiempo.
+ES Totalmente De acuerdo (ll ; E En Desacuerdo
+34. Puedo mantener un equilibrio razonable entre trabajo y vida personal.
+pd Totalmente De acuerdo ! (Urna y : E En Desacuerdo y
+35. Me siento seguro(a) reportando riesgos o condiciones inseguras. o
+E Totalmente De acuerdo ¡ Ex Parcialmente De acuerdo (E prono. o
+36. En general, la empresa cuida el bienestar del persónal.
+K= Tolalmenle De acuerdo ! na E En Desacu
+[11-Feb-2026 13:15:17 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 13:15:17 America/Mexico_City] * Procesos y eficiencia
+45. Los procesos de trabajo facilitan la eficiencia (evitan burocracia innecesaria). >
+(2, Totalmente De acuerdo ¿1 (£2, Parcialmente De acuerdo | ESE
+46. Los tiempos de respuesta de áreas de soporte son adecuados.
+0 Ea E Y, > : '
+k=, Totalmente De acuerdo : arcialmente De acuerdo E Es En Desacuerdo
+47, Se promueve la mejora continua para simplificar y hacer más efectivo el trabajo.
+E Tolalmente De acuerdo : Gs Parcialmente De acuerdo
+pa
+48. Los problemas recurrentes 
+[11-Feb-2026 13:15:17 America/Mexico_City] 🔍 Iniciando análisis de texto. Bytes: 5189, Líneas: 105
+[11-Feb-2026 13:15:17 America/Mexico_City] ✓ Obtuvieron 48 reactivos de la BD
+[11-Feb-2026 13:15:17 America/Mexico_City] Método 1 (Patrones): 2 respuestas
+[11-Feb-2026 13:15:17 America/Mexico_City] ✓ Análisis completado. Respuestas: 2, Confianza: 85%
+[11-Feb-2026 13:22:02 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 13:22:02 America/Mexico_City] ENCUESTA DE CLIMA LABORAL
+CONFIDENCIAL - Tus respuestas son anónimas y valiosas para nosotros
+| EMPRESA: | SEXO: T
+[ e Lie - ñ
+| QUO MNSOGMAO e z C Lemen ES
+| UNIDAD / ÁREA: ¡a EDAD: La DEPARTAMENTO: Y
+1 rn ” y
+EE NA ba ¡CARAS
+| K—_—_———— ——_—_—_—_—_——_ _ ___—______—.
+¡ Lie ds D: ! SAN ANTIGUEDAD (años): j
+Ago hi llera ro 96 | Lera se)
+! E RR RA RE RR a > E II . a 2d
+Periodo: Año 2026 (2026-02-01 a 2026-03-31)
+Instrucciones: ;
++ Completa los dalos demogr
+[11-Feb-2026 13:22:02 America/Mexico_City] 🔍 Iniciando análisis de texto. Bytes: 2039, Líneas: 44
+[11-Feb-2026 13:22:02 America/Mexico_City] ✓ Obtuvieron 48 reactivos de la BD
+[11-Feb-2026 13:22:02 America/Mexico_City] Método 1 (Patrones): 1 respuestas
+[11-Feb-2026 13:22:02 America/Mexico_City] ✓ Análisis completado. Respuestas: 1, Confianza: 85%
+[11-Feb-2026 13:23:04 America/Mexico_City] 📁 Procesando 3 archivo(s)
+[11-Feb-2026 13:23:04 America/Mexico_City] 📄 Procesando: doc12975420260211131500_Página_1.png
+[11-Feb-2026 13:23:08 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 13:23:08 America/Mexico_City] ENCUESTA DE CLIMA LABORAL
+CONFIDENCIAL - Tus respuestas son anónimas y valiosas para nosotros
+| EMPRESA: | SEXO: T
+[ e Lie - ñ
+| QUO MNSOGMAO e z C Lemen ES
+| UNIDAD / ÁREA: ¡a EDAD: La DEPARTAMENTO: Y
+1 rn ” y
+EE NA ba ¡CARAS
+| K—_—_———— ——_—_—_—_—_——_ _ ___—______—.
+¡ Lie ds D: ! SAN ANTIGUEDAD (años): j
+Ago hi llera ro 96 | Lera se)
+! E RR RA RE RR a > E II . a 2d
+Periodo: Año 2026 (2026-02-01 a 2026-03-31)
+Instrucciones: ;
++ Completa los dalos demogr
+[11-Feb-2026 13:23:08 America/Mexico_City] 🔍 Iniciando análisis de texto. Bytes: 2039, Líneas: 44
+[11-Feb-2026 13:23:08 America/Mexico_City] ✓ Obtuvieron 48 reactivos de la BD
+[11-Feb-2026 13:23:08 America/Mexico_City] Método 1 (Patrones): 1 respuestas
+[11-Feb-2026 13:23:08 America/Mexico_City] ✓ Análisis completado. Respuestas: 1, Confianza: 85%
+[11-Feb-2026 13:23:08 America/Mexico_City] ✓ Archivo procesado: doc12975420260211131500_Página_1.png
+[11-Feb-2026 13:23:08 America/Mexico_City] 📄 Procesando: doc12975420260211131500_Página_2.png
+[11-Feb-2026 13:23:11 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 13:23:11 America/Mexico_City] * Bienestar y balance
+33. La carga de trabajo es razonable la mayor parte del tiempo.
+ES Totalmente De acuerdo (E Jeremias ; E En Desacuerdo
+34. Puedo mantener un equilibrio razonable entre trabajo y vida personal.
+pd Totalmente De acuerdo ! (Opa y : E En Desacuerdo d
+Ms ; 0) ; J
+35. Me siento seguro(a) reportando riesgos o condiciones inseguras. o
+Es Totalmente De acuerdo ¡ Cs: Parcialmente De acuerdo (E prono. o
+36. En general, la empresa cuida el bienestar del persónal.
+de Tolalmente De acu
+[11-Feb-2026 13:23:11 America/Mexico_City] 🔍 Iniciando análisis de texto. Bytes: 1704, Líneas: 33
+[11-Feb-2026 13:23:11 America/Mexico_City] ✓ Obtuvieron 48 reactivos de la BD
+[11-Feb-2026 13:23:11 America/Mexico_City] Método 1 (Patrones): 0 respuestas
+[11-Feb-2026 13:23:11 America/Mexico_City] Método 2 (Palabras clave): 0 respuestas
+[11-Feb-2026 13:23:11 America/Mexico_City] === MÉTODO SIMPLIFICADO ===
+[11-Feb-2026 13:23:11 America/Mexico_City] Total reactivos recibidos: 48
+[11-Feb-2026 13:23:11 America/Mexico_City] Longitud del texto: 1704
+[11-Feb-2026 13:23:11 America/Mexico_City] ✓ Generando plantilla manual con 48 preguntas
+[11-Feb-2026 13:23:11 America/Mexico_City] ✓ Generadas 48 respuestas plantilla para completar
+[11-Feb-2026 13:23:11 America/Mexico_City] Método 3 (Plantilla manual): 48 respuestas
+[11-Feb-2026 13:23:11 America/Mexico_City] ✓ Análisis completado. Respuestas: 48, Confianza: 0%
+[11-Feb-2026 13:23:11 America/Mexico_City] ✓ Archivo procesado: doc12975420260211131500_Página_2.png
+[11-Feb-2026 13:23:11 America/Mexico_City] 📄 Procesando: doc12975420260211131500_Página_3.png
+[11-Feb-2026 13:23:15 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 13:23:15 America/Mexico_City] * Procesos y eficiencia
+45. Los procesos de trabajo facilitan la eficiencia (evitan burocracia innecesaria). pa
+(2, Totalmente De acuerdo 11 (£2, Parcialmente De acuerdo | ESE
+46. Los tiempos de respuesta de áreas de soporte son adecuados.
+(í=; Totalmente De acuerdo : Parcialmente De acuerdo 1) Es En Desacuerdo
+47, Se promueve la mejora continua para simplificar y hacer más efectivo el trabajo.
+E Tolalmente De acuerdo i Gs Parcialmente De acuerdo
+pa
+48. Los problemas recurrentes se atienden 
+[11-Feb-2026 13:23:15 America/Mexico_City] 🔍 Iniciando análisis de texto. Bytes: 1473, Líneas: 33
+[11-Feb-2026 13:23:15 America/Mexico_City] ✓ Obtuvieron 48 reactivos de la BD
+[11-Feb-2026 13:23:15 America/Mexico_City] Método 1 (Patrones): 0 respuestas
+[11-Feb-2026 13:23:15 America/Mexico_City] Método 2 (Palabras clave): 0 respuestas
+[11-Feb-2026 13:23:15 America/Mexico_City] === MÉTODO SIMPLIFICADO ===
+[11-Feb-2026 13:23:15 America/Mexico_City] Total reactivos recibidos: 48
+[11-Feb-2026 13:23:15 America/Mexico_City] Longitud del texto: 1473
+[11-Feb-2026 13:23:15 America/Mexico_City] ✓ Generando plantilla manual con 48 preguntas
+[11-Feb-2026 13:23:15 America/Mexico_City] ✓ Generadas 48 respuestas plantilla para completar
+[11-Feb-2026 13:23:15 America/Mexico_City] Método 3 (Plantilla manual): 48 respuestas
+[11-Feb-2026 13:23:15 America/Mexico_City] ✓ Análisis completado. Respuestas: 48, Confianza: 0%
+[11-Feb-2026 13:23:15 America/Mexico_City] ✓ Archivo procesado: doc12975420260211131500_Página_3.png
+[11-Feb-2026 13:39:21 America/Mexico_City] 📁 Procesando 1 archivo(s)
+[11-Feb-2026 13:39:21 America/Mexico_City] 📄 Procesando: Doc1_convertido.png
+[11-Feb-2026 13:39:23 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 13:39:23 America/Mexico_City] * Liderazgo inmediato
+mi jefe inmediato comunica expectativas claras sobre el desempeño.
+E Totalmente De XA ES) Pecislmente De acuerdo Lo En Dessacuendo
+2. Recibo seguimiento oportuno y orientación cuando lo necesito.
+ES) Teeatmente De acuerdo E PS acuerda ES En Desacuero
+3. Puedo expresar inquietudes o riesgos con confianza y respeto.
+ES) Teaatmente: De acuerdo pS e acuerda E Enero
+A. Mi jefe inmediato actúa con coherencia entre lo que dice y lo que hace.
+2 - sl :
+ES) Testmente De acuerdo ES
+[11-Feb-2026 13:39:23 America/Mexico_City] 🔍 Iniciando análisis de texto. Bytes: 532, Líneas: 13
+[11-Feb-2026 13:39:23 America/Mexico_City] ✓ Obtuvieron 48 reactivos de la BD
+[11-Feb-2026 13:39:23 America/Mexico_City] Método 1 (Patrones): 0 respuestas
+[11-Feb-2026 13:39:23 America/Mexico_City] Método 2 (Palabras clave): 0 respuestas
+[11-Feb-2026 13:39:23 America/Mexico_City] === MÉTODO SIMPLIFICADO ===
+[11-Feb-2026 13:39:23 America/Mexico_City] Total reactivos recibidos: 48
+[11-Feb-2026 13:39:23 America/Mexico_City] Longitud del texto: 532
+[11-Feb-2026 13:39:23 America/Mexico_City] ✓ Generando plantilla manual con 48 preguntas
+[11-Feb-2026 13:39:23 America/Mexico_City] ✓ Generadas 48 respuestas plantilla para completar
+[11-Feb-2026 13:39:23 America/Mexico_City] Método 3 (Plantilla manual): 48 respuestas
+[11-Feb-2026 13:39:23 America/Mexico_City] ✓ Análisis completado. Respuestas: 48, Confianza: 0%
+[11-Feb-2026 13:39:23 America/Mexico_City] ✓ Archivo procesado: Doc1_convertido.png
+[11-Feb-2026 14:30:06 America/Mexico_City] 📁 Procesando 1 archivo(s)
+[11-Feb-2026 14:30:06 America/Mexico_City] 📄 Procesando: doc12899720260209115013_Parte1.pdf
+[11-Feb-2026 14:30:06 America/Mexico_City] ✓ Ghostscript encontrado: C:\Program Files\gs\gs10.06.0\bin\gswin64c.exe
+[11-Feb-2026 14:30:17 America/Mexico_City] ✓ PDF tiene 5 página(s)
+[11-Feb-2026 14:30:19 America/Mexico_City] ✓ Página 1 convertida a: page_698ce6d9b0d19.png
+[11-Feb-2026 14:30:20 America/Mexico_City] ✓ Página 2 convertida a: page_698ce6db6e9d6.png
+[11-Feb-2026 14:30:22 America/Mexico_City] ✓ Página 3 convertida a: page_698ce6dcce417.png
+[11-Feb-2026 14:30:23 America/Mexico_City] ✓ Página 4 convertida a: page_698ce6de2d768.png
+[11-Feb-2026 14:30:25 America/Mexico_City] ✓ Página 5 convertida a: page_698ce6df76b06.png
+[11-Feb-2026 14:30:30 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 14:30:30 America/Mexico_City] CONFIDENCIAL - Tus respuestas son anónimas y valiosas para nosotros
+mA
+EMPRESA: .-—y . , S
+PRESA La o SEXO EMENMO
+YIMa Ce Ñ A y '
+¿JINIDAD / ÁREA: . E= EDAD: . «—DEPARTAMENTO: A —
+Ud. ax ra ll Aros 60 =N Y
+SlRR ROA DA ESTADO CIVIL: ANTIGUEDAD (años):
+Bachillerato X=unMO e corada : a
+Periodo: Año 2026 (2026-02-01 a 2026-03-31)
+Instrucciones:
++ Completa los datos demográficos arriba (sin nombre).
+Í + Marca con Y la opción (recuadro con ¡cono) que mejor represente tu opinión.
++. E
+[11-Feb-2026 14:30:33 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 14:30:33 America/Mexico_City] * Comunicación interna
+9.  Lainformación necesaria para mi trabajo llega completa y a tiempo.
+(2 Totalmente De acuerdo fe Parcialmente De acuerdo Ex  EnDesacuerdo ys
+10. Los cambios relevantes se comunican con anticipación suficiente.
+La Leo Y É Y
+ES Totalmente De acuerdo E Parcialmente De acuerdo E En Desacuerdo
+11. Las instrucciones o solicitudes suelen ser claras y sin ambigúedades.
+na Lao ( e
+o Totalmente De acuerdo == Parcialmente De acuerdo e En Desacuerdo
+12. La comunicación en mi e
+[11-Feb-2026 14:30:36 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 14:30:36 America/Mexico_City] * Propósito y alineación
+21. Entiendo los objetivos prioritarios de mi área para este año.
+2 Totalmente De acuerdo [2 Parcialmente De acuerdo 4" E  EnDesacuerdo
+22. Mi trabajo contribuye de manera clara al propósito y resultados de la empresa.
+TL Totalmente De acuerdo les Parcialmente De acuerdo e En Desacuerdo e”
+= =
+23. Las prioridades se comunican con claridad y se mantienen estables la mayor parte del tiempo.
+22 Totalmente De acuerdo = Parcialmente De acuerdo E En Desacuerdo «TT
+24. 
+[11-Feb-2026 14:30:39 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 14:30:39 America/Mexico_City] * Bienestar y balance
+33. La carga de trabajo es razonable la mayor parte del tiempo.
+ES Totalmente De acuerdo e Parcialmente De acuerdo = En Desacuerdo TT
+34, Puedo mantener un equilibrio razonable entre trabajo y vida personal.
+2 Tolalmente De acuerdo e le Parcialmente De acuerdo E En Desacuerdo
+35. Me siento seguro(a) reportando riesgos o condiciones inseguras.
+TÍ Totalmente De acuerdo Y a Parcialmente De acuerdo E En Desacuerdo
+36. En general, la empresa cuida el bienestar del personal,
+Tot
+[11-Feb-2026 14:30:44 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 14:30:44 America/Mexico_City] * Procesos y eficiencia
+45. Los procesos de trabajo facilitan la eficiencia (evitan burocracia innecesaria).
+= Totalmente De acuerdo E Parcialmente De acuerdo e En Desacuerdo TT
+46. Los tiempos de respuesta de áreas de soporte son adecuados.
+= Totalmente De acuerdo 1 Parcialmente De acuerdo > E En Desacuerdo
+47. Se promueve la mejora continua para simplificar y hacer más efectivo el trabajo.
+= Totalmente De acuerdo E Parcialmente De acuerdo tre” GS En Desacuerdo
+48. Los problemas recurrentes
+[11-Feb-2026 14:30:44 America/Mexico_City] 🔍 Iniciando análisis de texto. Bytes: 9294, Líneas: 176
+[11-Feb-2026 14:30:44 America/Mexico_City] Método 1 (Patrones): 5 respuestas
+[11-Feb-2026 14:30:44 America/Mexico_City] ✓ Análisis completado. Respuestas: 5, Confianza: 85%
+[11-Feb-2026 14:30:45 America/Mexico_City] ✓ Archivo procesado: doc12899720260209115013_Parte1.pdf
+[11-Feb-2026 14:40:19 America/Mexico_City] 📁 Procesando 1 archivo(s)
+[11-Feb-2026 14:40:19 America/Mexico_City] 📄 Procesando: doc12899720260209115013_Parte1.pdf
+[11-Feb-2026 14:40:19 America/Mexico_City] ✓ Ghostscript encontrado: C:\Program Files\gs\gs10.06.0\bin\gswin64c.exe
+[11-Feb-2026 14:40:30 America/Mexico_City] ✓ PDF tiene 5 página(s)
+[11-Feb-2026 14:40:31 America/Mexico_City] ✓ Página 1 convertida a: page_698ce93e55b26.png
+[11-Feb-2026 14:40:33 America/Mexico_City] ✓ Página 2 convertida a: page_698ce93ff3105.png
+[11-Feb-2026 14:40:34 America/Mexico_City] ✓ Página 3 convertida a: page_698ce94135eb0.png
+[11-Feb-2026 14:40:35 America/Mexico_City] ✓ Página 4 convertida a: page_698ce942647db.png
+[11-Feb-2026 14:40:38 America/Mexico_City] ✓ Página 5 convertida a: page_698ce94388bc3.png
+[11-Feb-2026 14:40:42 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 14:40:42 America/Mexico_City] CONFIDENCIAL - Tus respuestas son anónimas y valiosas para nosotros
+mA
+EMPRESA: .-—y . , S
+PRESA La o SEXO EMENMO
+YIMa Ce Ñ A y '
+¿JINIDAD / ÁREA: . E= EDAD: . «—DEPARTAMENTO: A —
+Ud. ax ra ll Aros 60 =N Y
+SlRR ROA DA ESTADO CIVIL: ANTIGUEDAD (años):
+Bachillerato X=unMO e corada : a
+Periodo: Año 2026 (2026-02-01 a 2026-03-31)
+Instrucciones:
++ Completa los datos demográficos arriba (sin nombre).
+Í + Marca con Y la opción (recuadro con ¡cono) que mejor represente tu opinión.
++. E
+[11-Feb-2026 14:40:44 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 14:40:44 America/Mexico_City] * Comunicación interna
+9.  Lainformación necesaria para mi trabajo llega completa y a tiempo.
+(2 Totalmente De acuerdo fe Parcialmente De acuerdo Ex  EnDesacuerdo ys
+10. Los cambios relevantes se comunican con anticipación suficiente.
+La Leo Y É Y
+ES Totalmente De acuerdo E Parcialmente De acuerdo E En Desacuerdo
+11. Las instrucciones o solicitudes suelen ser claras y sin ambigúedades.
+na Lao ( e
+o Totalmente De acuerdo == Parcialmente De acuerdo e En Desacuerdo
+12. La comunicación en mi e
+[11-Feb-2026 14:40:47 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 14:40:47 America/Mexico_City] * Propósito y alineación
+21. Entiendo los objetivos prioritarios de mi área para este año.
+2 Totalmente De acuerdo [2 Parcialmente De acuerdo 4" E  EnDesacuerdo
+22. Mi trabajo contribuye de manera clara al propósito y resultados de la empresa.
+TL Totalmente De acuerdo les Parcialmente De acuerdo e En Desacuerdo e”
+= =
+23. Las prioridades se comunican con claridad y se mantienen estables la mayor parte del tiempo.
+22 Totalmente De acuerdo = Parcialmente De acuerdo E En Desacuerdo «TT
+24. 
+[11-Feb-2026 14:40:50 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 14:40:50 America/Mexico_City] * Bienestar y balance
+33. La carga de trabajo es razonable la mayor parte del tiempo.
+ES Totalmente De acuerdo e Parcialmente De acuerdo = En Desacuerdo TT
+34, Puedo mantener un equilibrio razonable entre trabajo y vida personal.
+2 Tolalmente De acuerdo e le Parcialmente De acuerdo E En Desacuerdo
+35. Me siento seguro(a) reportando riesgos o condiciones inseguras.
+TÍ Totalmente De acuerdo Y a Parcialmente De acuerdo E En Desacuerdo
+36. En general, la empresa cuida el bienestar del personal,
+Tot
+[11-Feb-2026 14:40:55 America/Mexico_City] === TEXTO EXTRAIDO POR OCR ===
+[11-Feb-2026 14:40:55 America/Mexico_City] * Procesos y eficiencia
+45. Los procesos de trabajo facilitan la eficiencia (evitan burocracia innecesaria).
+= Totalmente De acuerdo E Parcialmente De acuerdo e En Desacuerdo TT
+46. Los tiempos de respuesta de áreas de soporte son adecuados.
+= Totalmente De acuerdo 1 Parcialmente De acuerdo > E En Desacuerdo
+47. Se promueve la mejora continua para simplificar y hacer más efectivo el trabajo.
+= Totalmente De acuerdo E Parcialmente De acuerdo tre” GS En Desacuerdo
+48. Los problemas recurrentes
+[11-Feb-2026 14:40:55 America/Mexico_City] 🔍 Iniciando análisis de texto. Bytes: 9294, Líneas: 176
+[11-Feb-2026 14:40:55 America/Mexico_City] Método 1 (Patrones): 5 respuestas
+[11-Feb-2026 14:40:55 America/Mexico_City] ✓ Análisis completado. Respuestas: 5, Confianza: 85%
+[11-Feb-2026 14:40:56 America/Mexico_City] ✓ Archivo procesado: doc12899720260209115013_Parte1.pdf
+[11-Feb-2026 15:42:33 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.proveedores' doesn't exist in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php:405
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php(405): PDO->prepare('\r\n    SELECT\r\n ...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php on line 405
+[11-Feb-2026 15:42:49 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.proveedores' doesn't exist in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php:405
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php(405): PDO->prepare('\r\n    SELECT\r\n ...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php on line 405
+[11-Feb-2026 15:43:31 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.proveedores' doesn't exist in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php:405
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php(405): PDO->prepare('\r\n    SELECT\r\n ...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php on line 405
+[11-Feb-2026 15:43:34 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.proveedores' doesn't exist in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php:405
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php(405): PDO->prepare('\r\n    SELECT\r\n ...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php on line 405
+[11-Feb-2026 15:43:47 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.proveedores' doesn't exist in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php:405
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php(405): PDO->prepare('\r\n    SELECT\r\n ...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php on line 405
+[11-Feb-2026 15:44:13 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.proveedores' doesn't exist in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php:410
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php(410): PDO->prepare('\r\n    SELECT\r\n ...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php on line 410
+[11-Feb-2026 15:44:15 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.proveedores' doesn't exist in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php:410
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php(410): PDO->prepare('\r\n    SELECT\r\n ...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php on line 410
+[11-Feb-2026 15:44:29 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sgrh.proveedores' doesn't exist in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php:410
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php(410): PDO->prepare('\r\n    SELECT\r\n ...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\admin_pagos_proveedores.php on line 410
+[11-Feb-2026 15:56:45 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'username' in 'field list' in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php:37
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php(37): PDO->query('SELECT usuario_...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php on line 37
+[11-Feb-2026 15:56:52 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'username' in 'field list' in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php:37
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php(37): PDO->query('SELECT usuario_...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php on line 37
+[11-Feb-2026 15:57:25 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'username' in 'field list' in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php:52
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php(52): PDO->query('SELECT usuario_...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php on line 52
+[11-Feb-2026 15:58:22 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'username' in 'field list' in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php:52
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php(52): PDO->query('SELECT usuario_...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php on line 52
+[11-Feb-2026 15:58:22 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'username' in 'field list' in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php:52
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php(52): PDO->query('SELECT usuario_...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php on line 52
+[11-Feb-2026 15:58:39 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'username' in 'field list' in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php:52
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php(52): PDO->query('SELECT usuario_...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php on line 52
+[11-Feb-2026 16:00:25 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'username' in 'field list' in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php:52
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php(52): PDO->query('SELECT usuario_...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php on line 52
+[11-Feb-2026 16:00:26 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'username' in 'field list' in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php:52
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php(52): PDO->query('SELECT usuario_...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos.php on line 52
+[11-Feb-2026 16:00:31 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'username' in 'field list' in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos_v2.php:81
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos_v2.php(81): PDO->query('SELECT usuario_...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos_v2.php on line 81
+[11-Feb-2026 16:05:16 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'username' in 'field list' in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos_v2.php:81
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos_v2.php(81): PDO->query('SELECT usuario_...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\asignar_permisos_pagos_v2.php on line 81
+[11-Feb-2026 16:07:17 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'username' in 'field list' in C:\MAMP\htdocs\sgrh\public\ver_usuarios_activos.php:12
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\ver_usuarios_activos.php(12): PDO->query('SELECT usuario_...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\ver_usuarios_activos.php on line 12
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:09:16 America/Mexico_City] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\sgrh\public\asignar_rol_usuario.php on line 151
+[11-Feb-2026 16:15:43 America/Mexico_City] GET PARAMS: periodo_id=VACIO, empleado_id=VACIO, tipo_captura=VACIO
+[11-Feb-2026 16:15:43 America/Mexico_City] PARSED: periodo_id=0, empleado_id=0, tipo_captura=identificada
+[11-Feb-2026 16:15:43 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[11-Feb-2026 16:15:43 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: NO, unidad_anonima: 0
+[11-Feb-2026 16:15:43 America/Mexico_City] Condición: NO CARGAR
+[11-Feb-2026 16:15:43 America/Mexico_City] No se carga nada: periodo_id=3, es_anonima=NO, empleado_id=0, unidad_anonima=0
+[11-Feb-2026 16:15:43 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[11-Feb-2026 16:15:45 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[11-Feb-2026 16:15:45 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[11-Feb-2026 16:15:45 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[11-Feb-2026 16:15:45 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: NO, unidad_anonima: 0
+[11-Feb-2026 16:15:45 America/Mexico_City] Condición: NO CARGAR
+[11-Feb-2026 16:15:45 America/Mexico_City] No se carga nada: periodo_id=3, es_anonima=NO, empleado_id=0, unidad_anonima=0
+[11-Feb-2026 16:15:45 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[11-Feb-2026 16:15:47 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[11-Feb-2026 16:15:47 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[11-Feb-2026 16:15:47 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[11-Feb-2026 16:15:47 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: SI, unidad_anonima: 10
+[11-Feb-2026 16:15:47 America/Mexico_City] Condición: NO CARGAR
+[11-Feb-2026 16:15:47 America/Mexico_City] Modo ANÓNIMO: NO se cargan respuestas previas (esto es correcto)
+[11-Feb-2026 16:15:47 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 08:56:17 America/Mexico_City] GET PARAMS: periodo_id=VACIO, empleado_id=VACIO, tipo_captura=VACIO
+[12-Feb-2026 08:56:17 America/Mexico_City] PARSED: periodo_id=0, empleado_id=0, tipo_captura=identificada
+[12-Feb-2026 08:56:17 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 08:56:17 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: NO, unidad_anonima: 0
+[12-Feb-2026 08:56:17 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 08:56:17 America/Mexico_City] No se carga nada: periodo_id=3, es_anonima=NO, empleado_id=0, unidad_anonima=0
+[12-Feb-2026 08:56:17 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 08:56:19 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 08:56:19 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 08:56:19 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 08:56:19 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: NO, unidad_anonima: 0
+[12-Feb-2026 08:56:19 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 08:56:19 America/Mexico_City] No se carga nada: periodo_id=3, es_anonima=NO, empleado_id=0, unidad_anonima=0
+[12-Feb-2026 08:56:19 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 08:56:21 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 08:56:21 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 08:56:21 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 08:56:21 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: SI, unidad_anonima: 4
+[12-Feb-2026 08:56:21 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 08:56:21 America/Mexico_City] Modo ANÓNIMO: NO se cargan respuestas previas (esto es correcto)
+[12-Feb-2026 08:56:21 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 08:56:46 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=identificada
+[12-Feb-2026 08:56:46 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=identificada
+[12-Feb-2026 08:56:46 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 08:56:46 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: NO, unidad_anonima: 0
+[12-Feb-2026 08:56:46 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 08:56:46 America/Mexico_City] No se carga nada: periodo_id=3, es_anonima=NO, empleado_id=0, unidad_anonima=0
+[12-Feb-2026 08:56:46 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 08:56:47 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=340, tipo_captura=identificada
+[12-Feb-2026 08:56:47 America/Mexico_City] PARSED: periodo_id=3, empleado_id=340, tipo_captura=identificada
+[12-Feb-2026 08:56:47 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 08:56:47 America/Mexico_City] periodo_id: 3, empleado_id: 340, es_anonima: NO, unidad_anonima: 0
+[12-Feb-2026 08:56:47 America/Mexico_City] Condición: CARGAR respuestas identificadas
+[12-Feb-2026 08:56:47 America/Mexico_City] Cargando respuestas del empleado 340 en periodo 3
+[12-Feb-2026 08:56:47 America/Mexico_City] Respuestas cargadas: 0
+[12-Feb-2026 08:56:47 America/Mexico_City] Respuestas abiertas cargadas: 0
+[12-Feb-2026 08:56:47 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 08:58:42 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=340, tipo_captura=identificada
+[12-Feb-2026 08:58:42 America/Mexico_City] PARSED: periodo_id=3, empleado_id=340, tipo_captura=identificada
+[12-Feb-2026 08:58:42 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 08:58:42 America/Mexico_City] periodo_id: 3, empleado_id: 340, es_anonima: NO, unidad_anonima: 0
+[12-Feb-2026 08:58:42 America/Mexico_City] Condición: CARGAR respuestas identificadas
+[12-Feb-2026 08:58:42 America/Mexico_City] Cargando respuestas del empleado 340 en periodo 3
+[12-Feb-2026 08:58:42 America/Mexico_City] Respuestas cargadas: 0
+[12-Feb-2026 08:58:42 America/Mexico_City] Respuestas abiertas cargadas: 0
+[12-Feb-2026 08:58:42 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 09:02:49 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=340, tipo_captura=identificada
+[12-Feb-2026 09:02:49 America/Mexico_City] PARSED: periodo_id=3, empleado_id=340, tipo_captura=identificada
+[12-Feb-2026 09:02:49 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 09:02:49 America/Mexico_City] periodo_id: 3, empleado_id: 340, es_anonima: NO, unidad_anonima: 0
+[12-Feb-2026 09:02:49 America/Mexico_City] Condición: CARGAR respuestas identificadas
+[12-Feb-2026 09:02:49 America/Mexico_City] Cargando respuestas del empleado 340 en periodo 3
+[12-Feb-2026 09:02:49 America/Mexico_City] Respuestas cargadas: 0
+[12-Feb-2026 09:02:49 America/Mexico_City] Respuestas abiertas cargadas: 0
+[12-Feb-2026 09:02:49 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 09:02:52 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 09:02:52 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 09:02:52 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 09:02:52 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: NO, unidad_anonima: 0
+[12-Feb-2026 09:02:52 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 09:02:52 America/Mexico_City] No se carga nada: periodo_id=3, es_anonima=NO, empleado_id=0, unidad_anonima=0
+[12-Feb-2026 09:02:52 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 09:02:59 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 09:02:59 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 09:02:59 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 09:02:59 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: SI, unidad_anonima: 10
+[12-Feb-2026 09:02:59 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 09:02:59 America/Mexico_City] Modo ANÓNIMO: NO se cargan respuestas previas (esto es correcto)
+[12-Feb-2026 09:02:59 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 09:14:45 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 09:14:45 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 09:14:45 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 09:14:45 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: SI, unidad_anonima: 10
+[12-Feb-2026 09:14:45 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 09:14:45 America/Mexico_City] Modo ANÓNIMO: NO se cargan respuestas previas (esto es correcto)
+[12-Feb-2026 09:14:45 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 09:14:49 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 09:14:49 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 09:14:49 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 09:14:49 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: SI, unidad_anonima: 5
+[12-Feb-2026 09:14:49 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 09:14:49 America/Mexico_City] Modo ANÓNIMO: NO se cargan respuestas previas (esto es correcto)
+[12-Feb-2026 09:14:49 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 09:18:25 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 09:18:25 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 09:18:25 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 09:18:25 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: SI, unidad_anonima: 5
+[12-Feb-2026 09:18:25 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 09:18:25 America/Mexico_City] Modo ANÓNIMO: NO se cargan respuestas previas (esto es correcto)
+[12-Feb-2026 09:18:25 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 09:18:27 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 09:18:27 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 09:18:27 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 09:18:27 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: SI, unidad_anonima: 5
+[12-Feb-2026 09:18:27 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 09:18:27 America/Mexico_City] Modo ANÓNIMO: NO se cargan respuestas previas (esto es correcto)
+[12-Feb-2026 09:18:27 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 09:20:33 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 09:20:33 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 09:20:33 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 09:20:33 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: SI, unidad_anonima: 5
+[12-Feb-2026 09:20:33 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 09:20:33 America/Mexico_City] Modo ANÓNIMO: NO se cargan respuestas previas (esto es correcto)
+[12-Feb-2026 09:20:33 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 09:21:56 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 09:21:56 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 09:21:56 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 09:21:56 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: SI, unidad_anonima: 5
+[12-Feb-2026 09:21:56 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 09:21:56 America/Mexico_City] Modo ANÓNIMO: NO se cargan respuestas previas (esto es correcto)
+[12-Feb-2026 09:21:56 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 09:22:02 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 09:22:02 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 09:22:02 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 09:22:02 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: SI, unidad_anonima: 10
+[12-Feb-2026 09:22:02 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 09:22:02 America/Mexico_City] Modo ANÓNIMO: NO se cargan respuestas previas (esto es correcto)
+[12-Feb-2026 09:22:02 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 09:22:57 America/Mexico_City] POST COMPLETO: {"action":"guardar_respuestas","periodo_id":"3","es_anonima":"1","unidad_id":"10","adscripcion_id":"52","empleado_id":"","r_13":"3","r_14":"3","r_15":"3","r_16":"3","r_17":"3","r_18":"3","r_19":"3","r_20":"3","r_25":"3","r_26":"3","r_27":"3","r_28":"3","r_29":"3","r_30":"3","r_31":"3","r_32":"3","r_45":"3","r_46":"3","r_47":"3","r_48":"3","r_1":"3","r_2":"3","r_3":"3","r_4":"3","r_9":"3","r_10":"3","r_11":"3","r_12":"3","r_33":"3","r_34":"3","r_35":"3","r_36":"3","r_41":"3","r_42":"3","r_43":"3","r_44":"3","r_5":"3","r_6":"3","r_7":"3","r_8":"3","r_21":"3","r_22":"3","r_23":"3","r_24":"3","r_37":"3","r_38":"3","r_39":"3","r_40":"3","pa_1":"3","pa_2":"3","pa_5":"3","pa_7":"3"}
+[12-Feb-2026 09:22:57 America/Mexico_City] POST PARSED: periodo_id=3, empleado_id=0, unidad_id=10, adscripcion_id=52, es_anonima=SI
+[12-Feb-2026 09:22:57 America/Mexico_City] === DEBUG CLIMA CAPTURA ===
+[12-Feb-2026 09:22:57 America/Mexico_City] Periodo: 3, Empleado: NULL, Unidad: 10, Adscripcion: 52
+[12-Feb-2026 09:22:57 America/Mexico_City] Total inserts intentados: 48
+[12-Feb-2026 09:22:57 America/Mexico_City] Primeros 3 inserts: [{"reactivo":13,"valor":3,"result":true,"rowCount":1},{"reactivo":14,"valor":3,"result":true,"rowCount":1},{"reactivo":15,"valor":3,"result":true,"rowCount":1}]
+[12-Feb-2026 09:22:57 America/Mexico_City] En transacción: SI
+[12-Feb-2026 09:22:57 America/Mexico_City] COMMIT ejecutado exitosamente
+[12-Feb-2026 09:22:57 America/Mexico_City] PHP Warning:  Undefined variable $departamento_anonimo in C:\MAMP\htdocs\sgrh\public\clima_captura_respuestas.php on line 171
+[12-Feb-2026 09:22:57 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 09:22:57 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 09:22:57 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 09:22:57 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: NO, unidad_anonima: 0
+[12-Feb-2026 09:22:57 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 09:22:57 America/Mexico_City] No se carga nada: periodo_id=3, es_anonima=NO, empleado_id=0, unidad_anonima=0
+[12-Feb-2026 09:22:57 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 09:24:12 America/Mexico_City] GET PARAMS: periodo_id=3, empleado_id=VACIO, tipo_captura=anonima
+[12-Feb-2026 09:24:12 America/Mexico_City] PARSED: periodo_id=3, empleado_id=0, tipo_captura=anonima
+[12-Feb-2026 09:24:12 America/Mexico_City] === CARGA DE RESPUESTAS PREVIAS ===
+[12-Feb-2026 09:24:12 America/Mexico_City] periodo_id: 3, empleado_id: 0, es_anonima: SI, unidad_anonima: 5
+[12-Feb-2026 09:24:12 America/Mexico_City] Condición: NO CARGAR
+[12-Feb-2026 09:24:12 America/Mexico_City] Modo ANÓNIMO: NO se cargan respuestas previas (esto es correcto)
+[12-Feb-2026 09:24:12 America/Mexico_City] === RESULTADO: resp_map=0 items, abiertas_map=0 items ===
+[12-Feb-2026 11:52:32 America/Mexico_City] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ed.curp' in 'field list' in C:\MAMP\htdocs\sgrh\public\contratos_nuevo_empleado.php:110
+Stack trace:
+#0 C:\MAMP\htdocs\sgrh\public\contratos_nuevo_empleado.php(110): PDO->prepare('SELECT e.emplea...')
+#1 {main}
+  thrown in C:\MAMP\htdocs\sgrh\public\contratos_nuevo_empleado.php on line 110
+[13-Feb-2026 08:45:28 America/Mexico_City] PHP Warning:  Undefined array key "nombre" in C:\MAMP\htdocs\sgrh\public\contratos_gestionar.php on line 308
+[13-Feb-2026 08:45:28 America/Mexico_City] PHP Warning:  Undefined array key "apellido_paterno" in C:\MAMP\htdocs\sgrh\public\contratos_gestionar.php on line 309
+[13-Feb-2026 08:45:28 America/Mexico_City] PHP Warning:  Undefined array key "apellido_materno" in C:\MAMP\htdocs\sgrh\public\contratos_gestionar.php on line 310

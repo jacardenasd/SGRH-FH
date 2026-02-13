@@ -1,0 +1,454 @@
+Array
+(
+    [success] => 
+    [periodo_id] => 3
+    [respuestas] => Array
+        (
+            [0] => Array
+                (
+                    [reactivo_id] => 1
+                    [texto_reactivo] => 1. Entiendo los objetivos prioritarios de mi área para este año.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [1] => Array
+                (
+                    [reactivo_id] => 5
+                    [texto_reactivo] => 2. Conozco con claridad mis responsabilidades principales.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [2] => Array
+                (
+                    [reactivo_id] => 9
+                    [texto_reactivo] => 3. Los roles entre áreas están bien delimitados para evitar duplicidad o retrabajo.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [3] => Array
+                (
+                    [reactivo_id] => 13
+                    [texto_reactivo] => 4. Mi jefe inmediato comunica expectativas claras sobre el desempeño.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [4] => Array
+                (
+                    [reactivo_id] => 17
+                    [texto_reactivo] => 5. El trabajo bien hecho es reconocido en mi equipo.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [5] => Array
+                (
+                    [reactivo_id] => 21
+                    [texto_reactivo] => 6. Tengo oportunidades para aprender y mejorar mis habilidades.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [6] => Array
+                (
+                    [reactivo_id] => 25
+                    [texto_reactivo] => 7. La información necesaria para mi trabajo llega completa y a tiempo.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [7] => Array
+                (
+                    [reactivo_id] => 29
+                    [texto_reactivo] => 8. Las áreas colaboran para resolver problemas y evitar retrabajos.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [8] => Array
+                (
+                    [reactivo_id] => 33
+                    [texto_reactivo] => 9. Cuento con herramientas y sistemas adecuados para realizar mi trabajo.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [9] => Array
+                (
+                    [reactivo_id] => 37
+                    [texto_reactivo] => 10. Los procesos de trabajo facilitan la eficiencia (evitan burocracia innecesaria).
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [10] => Array
+                (
+                    [reactivo_id] => 41
+                    [texto_reactivo] => 11. La carga de trabajo es razonable la mayor parte del tiempo.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [11] => Array
+                (
+                    [reactivo_id] => 45
+                    [texto_reactivo] => 12. En mi área se promueve un trato respetuoso y profesional.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [12] => Array
+                (
+                    [reactivo_id] => 2
+                    [texto_reactivo] => 13. Mi trabajo contribuye de manera clara al propósito y resultados de la empresa.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [13] => Array
+                (
+                    [reactivo_id] => 6
+                    [texto_reactivo] => 14. Sé qué se espera de mí en términos de calidad y tiempos de entrega.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [14] => Array
+                (
+                    [reactivo_id] => 10
+                    [texto_reactivo] => 15. La coordinación entre puestos (jefaturas/supervisión/operación) es efectiva.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [15] => Array
+                (
+                    [reactivo_id] => 14
+                    [texto_reactivo] => 16. Recibo seguimiento oportuno y orientación cuando lo necesito.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [16] => Array
+                (
+                    [reactivo_id] => 18
+                    [texto_reactivo] => 17. El reconocimiento se otorga de manera justa y basada en resultados.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [17] => Array
+                (
+                    [reactivo_id] => 22
+                    [texto_reactivo] => 18. Recibo retroalimentación útil para desarrollarme profesionalmente.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [18] => Array
+                (
+                    [reactivo_id] => 26
+                    [texto_reactivo] => 19. Los cambios relevantes se comunican con anticipación suficiente.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [19] => Array
+                (
+                    [reactivo_id] => 30
+                    [texto_reactivo] => 20. Se respetan acuerdos y compromisos entre áreas.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [20] => Array
+                (
+                    [reactivo_id] => 34
+                    [texto_reactivo] => 21. Los sistemas que utilizo funcionan de forma estable.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [21] => Array
+                (
+                    [reactivo_id] => 38
+                    [texto_reactivo] => 22. Los tiempos de respuesta de áreas de soporte son adecuados.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [22] => Array
+                (
+                    [reactivo_id] => 42
+                    [texto_reactivo] => 23. Puedo mantener un equilibrio razonable entre trabajo y vida personal.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [23] => Array
+                (
+                    [reactivo_id] => 46
+                    [texto_reactivo] => 24. Las reglas y políticas se aplican de manera consistente.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [24] => Array
+                (
+                    [reactivo_id] => 3
+                    [texto_reactivo] => 25. Las prioridades se comunican con claridad y se mantienen estables la mayor parte del tiempo.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [25] => Array
+                (
+                    [reactivo_id] => 7
+                    [texto_reactivo] => 26. Cuando hay cambios en mis actividades, se aclara el alcance y la prioridad.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [26] => Array
+                (
+                    [reactivo_id] => 11
+                    [texto_reactivo] => 27. Los procesos clave están definidos y se siguen de manera consistente.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [27] => Array
+                (
+                    [reactivo_id] => 15
+                    [texto_reactivo] => 28. Puedo expresar inquietudes o riesgos con confianza y respeto.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [28] => Array
+                (
+                    [reactivo_id] => 19
+                    [texto_reactivo] => 29. Se valoran los esfuerzos adicionales cuando la operación lo requiere.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [29] => Array
+                (
+                    [reactivo_id] => 23
+                    [texto_reactivo] => 30. Mi jefe inmediato impulsa mi crecimiento y aprendizaje.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [30] => Array
+                (
+                    [reactivo_id] => 27
+                    [texto_reactivo] => 31. Las instrucciones o solicitudes suelen ser claras y sin ambigüedades.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [31] => Array
+                (
+                    [reactivo_id] => 31
+                    [texto_reactivo] => 32. Existe disposición para apoyar a otras áreas cuando se requiere.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [32] => Array
+                (
+                    [reactivo_id] => 35
+                    [texto_reactivo] => 33. Tengo acceso a la información y recursos necesarios para cumplir mis entregables.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [33] => Array
+                (
+                    [reactivo_id] => 39
+                    [texto_reactivo] => 34. Se promueve la mejora continua para simplificar y hacer más efectivo el trabajo.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [34] => Array
+                (
+                    [reactivo_id] => 43
+                    [texto_reactivo] => 35. Me siento seguro(a) reportando riesgos o condiciones inseguras.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [35] => Array
+                (
+                    [reactivo_id] => 47
+                    [texto_reactivo] => 36. Las decisiones que afectan al personal se toman de manera justa.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [36] => Array
+                (
+                    [reactivo_id] => 4
+                    [texto_reactivo] => 37. Sé cómo se medirá el éxito de mi trabajo (metas/indicadores/entregables).
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [37] => Array
+                (
+                    [reactivo_id] => 8
+                    [texto_reactivo] => 38. Tengo claridad sobre a quién acudir para resolver dudas o escalar problemas.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [38] => Array
+                (
+                    [reactivo_id] => 12
+                    [texto_reactivo] => 39. Las decisiones se toman con criterios claros, no por improvisación.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [39] => Array
+                (
+                    [reactivo_id] => 16
+                    [texto_reactivo] => 40. Mi jefe inmediato actúa con coherencia entre lo que dice y lo que hace.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [40] => Array
+                (
+                    [reactivo_id] => 20
+                    [texto_reactivo] => 41. Me siento valorado(a) por las contribuciones que realizo.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [41] => Array
+                (
+                    [reactivo_id] => 24
+                    [texto_reactivo] => 42. La empresa ofrece capacitación relevante para mi función.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [42] => Array
+                (
+                    [reactivo_id] => 28
+                    [texto_reactivo] => 43. La comunicación en mi equipo es abierta y respetuosa.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [43] => Array
+                (
+                    [reactivo_id] => 32
+                    [texto_reactivo] => 44. Cuando hay desacuerdos, se gestionan con enfoque a soluciones.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [44] => Array
+                (
+                    [reactivo_id] => 36
+                    [texto_reactivo] => 45. Las fallas de herramientas/sistemas se atienden con oportunidad.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [45] => Array
+                (
+                    [reactivo_id] => 40
+                    [texto_reactivo] => 46. Los problemas recurrentes se atienden de raíz, no solo de manera temporal.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [46] => Array
+                (
+                    [reactivo_id] => 44
+                    [texto_reactivo] => 47. En general, la empresa cuida el bienestar del personal.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+            [47] => Array
+                (
+                    [reactivo_id] => 48
+                    [texto_reactivo] => 48. Me siento tratado(a) con equidad y respeto en mi entorno de trabajo.
+                    [valor] => 2
+                    [confianza] => 0
+                    [metodo] => plantilla_manual
+                )
+
+        )
+
+    [respuestas_abiertas] => Array
+        (
+        )
+
+    [confianza_promedio] => 0
+    [warnings] => Array
+        (
+            [0] => No se detectó información de empleado. Captura anónima.
+            [1] => No se pudieron detectar respuestas automáticamente en el documento escaneado.
+            [2] => Complete TODAS las respuestas manualmente comparando con el documento original.
+        )
+
+    [es_anonima] => 1
+)

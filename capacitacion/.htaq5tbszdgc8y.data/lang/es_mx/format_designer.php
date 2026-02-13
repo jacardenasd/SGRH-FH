@@ -1,0 +1,496 @@
+<?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+/**
+ * Strings for component 'format_designer', language 'es_mx', version '4.4'.
+ *
+ * @package     format_designer
+ * @category    string
+ * @copyright   1999 Martin Dougiamas and contributors
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+$string['abovecoursecontents'] = 'Arriba de contenidos del curso';
+$string['accordion'] = 'Acordeón';
+$string['activity:calltoaction'] = 'Llamada a acción de actividad';
+$string['activity:completionbadge'] = 'Insignia de finalización de actividad';
+$string['activity:description'] = 'Descripción de actividad';
+$string['activity:icon'] = 'Ícono de actividad';
+$string['activity:modname'] = 'Nombre del módulo de actividad';
+$string['activity:title'] = 'Título de actividad';
+$string['activity:visits'] = 'Visitas de actividad';
+$string['activitydesclength'] = 'Recorte de descripción de actividad';
+$string['activitydesclength_desc'] = 'Esta configuración global determina si la descripción para actividades es o no recortada.<br><b>Recortar (Predetrminado)</b>: Esta opción recorta la descripción, mostrándola en un formato condensado, similar al del comportamiento actual.<br>
+<b>No recortar</b>: Elegir esta opción para mostrar la descripción exactamente como fue ingresada, sin recorte alguno.';
+$string['activitydesign'] = 'Diseño';
+$string['activitydisplaymode'] = 'Modo de visualización de actividad';
+$string['activitydisplaymode_help'] = 'Modo de visualización de actividad';
+$string['activityelementsdisplay'] = '<h5 class="font-weight-normal font-italic pt-2 pb-2" > estilos de Visibilidad de elementos de Actividad </h5>';
+$string['activitymasking'] = 'Máscra de actividad';
+$string['activityprogress'] = 'Barra extendida de progreso';
+$string['activityprogress_help'] = 'La Barra extendida de progreso muestra el progreso del estudiante, basado en el cálculo elegido del progreso del curso. Debajo de la Barra extendida del progreso, el progreso actual es proporcionado en forma de texto (con apoyo de las fechas esperadas de Gestión del Tiempo). Una herramientita proporciona enlaces a actividades, pre-requisitos o secciones.';
+$string['additionalcontent'] = 'Contenido adicional';
+$string['additionalcontent_help'] = 'Añada cualquier contenido adicional que quiera que aparezca al fondo del encabezado del curso.';
+$string['addnavigation'] = 'Añadir navegación en actividad';
+$string['addnewgroup'] = 'Añadir nuevo grupo';
+$string['addsections'] = 'Añadir secciones de diseñador';
+$string['addtocontacts'] = 'Añadir a contactos';
+$string['allactivities'] = 'Todas las actividades';
+$string['allcourses'] = 'Todos los cursos';
+$string['applyto'] = 'Aplicar el fondo a';
+$string['assignprecourses'] = 'Asignar cursos de pre-requisito';
+$string['auto'] = 'Auto';
+$string['autoenrolalready'] = 'Solo si no están ya inscrito';
+$string['autoenrolalways'] = 'Siempre';
+$string['backgroundcolor'] = 'Color del fondo';
+$string['backgroundgradient'] = 'Gradiente del fondo';
+$string['backgroundgradient_help'] = 'Generar un gradiente: <a href=\' https://cssgradient.io/\'>https://cssgradient.io/</a>. Pegar la propiedad del fondo (gradiente-lineal).';
+$string['backgroundimage'] = 'Imagen del fondo';
+$string['backgroundmasksection'] = '<h5 class="font-weight-normal font-italic pt-2 pb-2" > Estilos de MASCARA del Fondo del Módulo </h5>';
+$string['backgroundposition'] = 'Posición del Fondo';
+$string['backgroundposition_help'] = 'La imagen del fondo se enfocará en la posición dada';
+$string['backgroundrepeat'] = 'Repetir fondo';
+$string['backgroundrepeat_help'] = 'La imagen del fondo se mostrará repetida si no ajusta dentro del bloque de sección';
+$string['backgroundsection'] = '<h5 class="font-weight-normal font-italic pt-2 pb-2"  > Estilos del Fondo del Módulo </h5>';
+$string['backgroundsize'] = 'Tamaño del Fondo';
+$string['backgroundsize_help'] = 'La imágen del fondo se mostrará en el tamaño';
+$string['backtomaincourse'] = 'Regresar al curso principal';
+$string['belowcourseprogress'] = 'Debajo dl progreso del curso';
+$string['boxed'] = 'Encajonada';
+$string['bypurpose'] = 'Por propósito';
+$string['bytype'] = 'Por tipo';
+$string['calcourseprogress'] = 'Cálculo del preogreso del curso';
+$string['calcourseprogress_help'] = '<b> Criterio de finalización: </b> el progreso incluirá todos los criterios que sean condiciones para finalización del curso.<br>
+<b> Actividades relevante: </b> el progreso incluirá solo actividades que sean condiciones para la finalización del curso.<br>
+<b> Todas las actividades: </b> el progreso incluirá todas las actividades que tengan configurada monitoreo de finalización.<br>
+<b> Secciones: </b> el progreso estará basado en secciones, no en actividades.<br>';
+$string['calltoactioncontinue'] = 'Revisar {$a} <i class="fa fa-angle-double-right"></i>';
+$string['calltoactionrestricted'] = '<i class="fa fa-lock"></i>';
+$string['calltoactionstart'] = 'Abrir {$a} <i class="fa fa-angle-double-right"></i>';
+$string['calltoactionview'] = 'Revisar {$a} <i class="fa fa-angle-double-right"></i>';
+$string['calsectionprogress'] = 'Cálculo del progreso de sección';
+$string['calsectionprogress_help'] = '<b> Actividades relevantes: </b> el progreso incluirá solo actividades que sean condiciones para finalización del curso.<br>
+<b> Todas las actividades: </b> el progreso incluirá todas las actividades que tengan configurado monitoreo de finalización.<br>';
+$string['cards'] = 'Tarjetas';
+$string['categoriseheader'] = 'Tipo de sección';
+$string['centerbottom'] = 'Centro al Fondo';
+$string['centercenter'] = 'Centro Al Centro';
+$string['centertop'] = 'Centro Superior';
+$string['circles'] = 'Círculos';
+$string['circlesize'] = 'Tamaño del círculo';
+$string['collapse'] = 'Colapsado';
+$string['collapsiblesections'] = 'Secciones colapsables';
+$string['completeby'] = 'Completar para';
+$string['completed'] = 'Completado en';
+$string['completion-alt-auto-enabled'] = 'El sistema marca completado el elemento de acuerdo a las condiciones';
+$string['completion-alt-auto-fail'] = 'Completado (no obtuvo calificación aprobatoria)';
+$string['completion-alt-auto-n'] = 'No completado';
+$string['completion-alt-auto-n-override'] = 'No completado (configurado por {$a->overrideuser})';
+$string['completion-alt-auto-pass'] = 'Completado (logró calificación aprobatoria)';
+$string['completion-alt-auto-y'] = 'Completado';
+$string['completion-alt-auto-y-override'] = 'Completado (configurado por {$a->overrideuser})';
+$string['completion-alt-manual-enabled'] = 'Los estudiantes pueden marcar manualmente este elemento como completado';
+$string['completion-alt-manual-n'] = 'No completado. Seleccionar para marcar como completado.';
+$string['completion-alt-manual-n-override'] = 'No completado (configurado por {$a->overrideuser}). Seleccionar para marcar como completado.';
+$string['completion-alt-manual-y'] = 'Completado. Seleccionar para marcar como no completado.';
+$string['completion-alt-manual-y-override'] = 'Completado (configurado por {$a->overrideuser}). Seleccionar para marcar como no completado.';
+$string['completion-fail'] = 'Completado (no logró calificación aprobatoria)';
+$string['completion-n'] = 'No completado';
+$string['completion-n-override'] = 'No completado (configurado por {$a->overrideuser})';
+$string['completion-pass'] = 'Completado (logró calificación aprobatoria)';
+$string['completion-shorthand-alt-auto-enabled'] = 'El sistema marca completado este elemento de acuerdo a las condiciones';
+$string['completion-shorthand-alt-auto-fail'] = 'Reprobado <i class="fa fa-exclamation-triangle text-white"></i>';
+$string['completion-shorthand-alt-auto-n'] = 'No completado';
+$string['completion-shorthand-alt-auto-n-override'] = 'No completado <i class="fa fa-exclamation-triangle text-white"></i>';
+$string['completion-shorthand-alt-auto-pass'] = 'Completado (logró calificación aprobatoria)';
+$string['completion-shorthand-alt-auto-y'] = 'Completado';
+$string['completion-shorthand-alt-auto-y-override'] = 'Completado <i class="fa fa-exclamation-triangle text-white"></i>';
+$string['completion-shorthand-alt-manual-enabled'] = 'Los estudiantes pueden marcar como completado este elemento';
+$string['completion-shorthand-alt-manual-n'] = 'No completado';
+$string['completion-shorthand-alt-manual-n-override'] = 'No completado';
+$string['completion-shorthand-alt-manual-y'] = 'Completado';
+$string['completion-shorthand-alt-manual-y-override'] = 'Completado <i class="fa fa-exclamation-triangle text-white"></i>';
+$string['completion-shorthand-fail'] = 'Completado <i class="fa fa-exclamation-triangle text-white"></i>';
+$string['completion-shorthand-n'] = 'No completado';
+$string['completion-shorthand-n-override'] = 'No completado <i class="fa fa-exclamation-triangle text-white"></i>';
+$string['completion-shorthand-pass'] = 'Completado (obtuvo calificación aprobatoria)';
+$string['completion-shorthand-y'] = 'Completado';
+$string['completion-shorthand-y-override'] = 'Completado <i class="fa fa-exclamation-triangle text-white"></i>';
+$string['completion-y'] = 'Completado';
+$string['completion-y-override'] = 'Completado (configurado por {$a->overrideuser})';
+$string['completion_manual:aria:done'] = '{$a} está marcado como hecho. Presionar para deshacer.';
+$string['completion_manual:aria:markdone'] = 'Marcar {$a} como hecho';
+$string['completion_manual:done'] = 'Hecho en';
+$string['completion_manual:markdone'] = 'Marcar como hecho';
+$string['completion_manual:markdone:completeby'] = 'Marcar como hecho por';
+$string['completion_manual:markdone:duetoday'] = 'Marcar como hecho hoy';
+$string['completion_manual:markdone:overdue'] = 'Marcar como hecho retrasado';
+$string['completionbackgroundimage'] = 'Imagen del fondo (completado)';
+$string['completioncheckmark'] = 'Mostrar palomita al completar el curso';
+$string['completioncheckmark_help'] = 'Muestra una palomita en lugar del 100% en las donas.';
+$string['completioncriteria'] = 'Criterio de finalización';
+$string['completionicons'] = 'Casillas de finalización';
+$string['completionicons_help'] = 'Información de finalización basada en formato Diseñador';
+$string['completionindicator'] = 'Indicador del estao de finalización';
+$string['completionindicator_help'] = '<b> Deshabilitado: </b> no mostrar el indicador <br>
+<b> Debajo del progreso del curso: </b> mostrarlo debajo del progreso del curso (dependiendo de la configuración, esto podría ser, ya sea el círculo o la barra) <br>
+<b> Con metadatos del curso: </b> mostrarlo junto a la \'fecha de finalizacion del curso\' <br>';
+$string['completionstatusindicator'] = 'Indicador del estado de finalización';
+$string['completiontrackingautomatic'] = 'Completamiento automático';
+$string['completiontrackingmanual'] = 'Completamiento manual';
+$string['completiontrackingmissing'] = 'Activar monitoreo de finalización para mostrar fecha de finalización.';
+$string['configcoursefield'] = 'Ícono para {$a->name}';
+$string['configcoursefields'] = 'Campos del curso a mostrar';
+$string['configcoursefields_help'] = 'Seleccionar los campo del curso que serán mostrados en el encabezado del curso';
+$string['configcourseicons'] = 'Íconos de campos del curso';
+$string['configtitle'] = 'Opciones predeterminadas del diseñador';
+$string['contain'] = 'Contiene';
+$string['content'] = 'Contenido';
+$string['coursebackground'] = 'Fondo del Curso';
+$string['coursebackgroundcolor'] = 'Color del Fondo del Curso';
+$string['coursebackgroundcolor_help'] = 'Usar esta opción para elegir un color del fondo para todo el curso. Si un color es seleccionado aquí, será aplicado cmo el color del fondo para el curso. Esta configuración es opcional, y usted pude dejarla vacía si no quiere configurar un color específico del fondo.';
+$string['coursebackgroundimage'] = 'Imagen del Fondo del Curso';
+$string['coursebackgroundimage_help'] = 'Si desea tener una imagen como el fondo para todo el curs, usted puede subirla aquí. Una vez subida, esta imagen será mostrada como el fondo para todo el curso. Esta configuración es opcional, y usted puede dejarla vacía si prefiere no tener una imagen de fondo.';
+$string['coursebackgroundtransparent'] = 'Curso Transparente';
+$string['coursebackgroundtransparent_help'] = 'Si usted selecciona esta opción, el color de fondo de elementos del contenedor dentro del curso que aactualmente tengan un color de fondo serán configurados a transparente. Esto puede crear un efecto visualmente atractivo donde los elementos parecen flotar sobre el fondo.';
+$string['coursecompleted'] = 'Curso completado';
+$string['coursecompletiondate'] = 'Fecha de terminación del curso';
+$string['coursecompletiondate_help'] = 'Fecha de finalización del curso del estudiante mostrada en sección de Tiempo.';
+$string['coursecustomfields'] = 'Campos del curso';
+$string['coursecustomfields_help'] = '';
+$string['courseduedate'] = 'Fecha esperada del curso';
+$string['courseduedate_help'] = 'La fecha esperada del curso será mostrada en la sección del tiempo del curso; solamete funciona cuando las Herramientas de aprendizaje y la Herramienta de gestión del Tiempo están instaladas y habilitadas.';
+$string['courseexpirationdate'] = 'Fecha de expiración del curso';
+$string['courseheader'] = 'Encabezado del curso';
+$string['courseheaderbgcolor'] = 'Color del fondo';
+$string['courseheaderbgcolor_help'] = 'El color del fondo es aplicado tanto al encabezado como a la navegación secundaria.';
+$string['courseheaderbgimage'] = 'Imagen del fondo';
+$string['courseheaderbgimage_help'] = 'La imagen del fondo es usada para el encabezado del curso; no se usa para la navegación secundaria. Para asegurar buena legibilidad, especialmente cuando se empela un color claro del texto, por favor use un color apropiado para el fondo.';
+$string['courseheaderheight'] = 'Altura Mínima';
+$string['courseheaderheight_help'] = 'Especificar la altura mínima, en número, para el encabezado del curso.';
+$string['courseheadersize'] = 'Pantalla Completa';
+$string['courseheadersize_help'] = 'Si se habilita, el encabezado del curso tomará la altura completa de la pantalla.';
+$string['courseheadersummary'] = 'Resumen';
+$string['courseheadersummary_help'] = '<b>Deshabilitado</b>: Esta opción no mostrará ningún resumen en el encabezado.<br>
+<b>Recortado</b>: Seleccionar esta opción recortará el resumen del curso basado en la configuración global  "largo del recorte."<br>
+<b>Completo</b>: Elegir esta opción mostrará el resumen completo del curso.<br>';
+$string['courseheadertextcolor'] = 'Color del texto';
+$string['courseheadertextcolor_help'] = 'Para asegurar buena legibilidad, por favor use un color apropiado para el fondo para el encabezado del curso y la navegación secundaria, considerando el color del texto que se está usando.';
+$string['courseheadertimemanagement'] = 'Gestión del Tiempo';
+$string['courseheadertimemanagement_help'] = 'Seleccionar los elementos relacionados con el tiempo que desea mostrar en el encabezado del curso. Usted puede elegir múltiples opciones de la fecha de inicio de inscripción, fecha de fin de inscripción, fecha esperada, y fecha de completado.';
+$string['courseheadertype'] = 'Tipo';
+$string['courseheadertype_help'] = '<b>Ninguno</b>: esta opción no añadirá ningún encbezado a la página dle curso.<br>
+<b>Héroe</b>: Seleccionar esta opción hará que el encabezado abarque todo el ancho de la página, proporcionando una introducción al curso visualmente impactante.<br>
+<b>Contenido</b>:  Seleccionar esta opción configurará el ancho del encabezado para que coincida con los contenidos del curso, manteniendo un diseño más compacto.';
+$string['courseindex'] = 'Visibilidad del índice del curso';
+$string['courseindex_help'] = 'Gestionar la Visibilidad del menú del índice del curso';
+$string['courseindicator'] = 'Estado del curso:';
+$string['courseprerequisitepos'] = '';
+$string['courseprerequisitepos_help'] = 'Esta configuración le da control sobre el orden de los elementos del menú en el menú de navegación secundario. Los elementos del menú con valores negativos son añadidos antes de los elementos del menú del curso; los elementos del menú con valores positivos son añadidos después. Usualmente, esto le da más sentido a usar números positivos.';
+$string['courseprerequisites'] = 'Pre-requisitos del curso';
+$string['courseprerequisitestabhead'] = 'Mostrar el título de pestaña de pre-requisitos.';
+$string['courseprerequisitestabhead_help'] = 'Título de Pre-requisitos del curso';
+$string['courseprerequisitestitle'] = 'Título de Pre-requisitos';
+$string['courseprerequisitestitle_help'] = 'Título de pestaña de Pre-requisitos';
+$string['courseprogresstype'] = 'Progreso del Curso';
+$string['courseprogresstype_help'] = '<b>Deshabilitado</b>: Esta opción no mostrará ninguna información de progreso del curso en el encabezado.<br>
+<b>Barra de Progreso</b>: Seleccionar esta opción mostrará el progreso del curso como una barra, indicando visualmente que tanto del curso está completado.<br>
+<b>Dona</b>: Elegir esta opción mostrará el progreso del curso como un gráfico de una dona, proporcionando una representación visual del progreso.<br>';
+$string['coursesettings'] = 'Curso';
+$string['coursestartdate'] = 'Fecha de inicio del curso';
+$string['coursetype'] = 'Tipo de curso';
+$string['coursetype_help'] = 'El tablero Kanban configurado como tipo de curso, las secciones del curso serán mostradas horizontalmente.
+Las secciones colapsables no están funcionando en modo Kanban.';
+$string['cover'] = 'Cubierta';
+$string['create_purpose'] = 'Crear Propósito';
+$string['createprereqgroup'] = 'Crear grupo de pre-requisitos';
+$string['criteriacompleted'] = '{$a->completed} de {$a->count} criterios completados';
+$string['criteriaprogressinfo'] = 'Información de barra de progreso de criterios';
+$string['criteriaprogressinfo_help'] = 'Sugerencia: Haga clic en la barra de progreso de arriba para ver cuales actividades/pre-requisitos ya han sido completadas y cuales aun no han sido completadas.';
+$string['currentsection'] = 'La sección de diseñador';
+$string['customnameinactivityitem'] = 'Usar nombre personalizado en páginas de curso/sección';
+$string['customnameincourseindex'] = 'Usar nombre personalizado en índice del curso';
+$string['dateformat'] = 'Formato de fecha';
+$string['dateformat_help'] = 'Formato de fecha para información de finalización (por ejemplo: \'Completar para fecha x\' )';
+$string['delete_purpose'] = 'Eliminar propósito';
+$string['deletecheckgroup'] = '¿Está absolutamente seguro de querer liminar por completo al grupo {$a}, incluyendo los datos del grupo y de otro grupo?';
+$string['deletednotgroup'] = '¡No se pudo eliminar grupo {$a} !';
+$string['deletegroup'] = 'Eliminar grupo';
+$string['deletesection'] = 'Eliminar la sección de diseñador';
+$string['deletesuccess'] = 'Eliminado exitosamente';
+$string['designer:changesectionoptions'] = 'Cambiar opciones de sección, como por ejemplo, el tipo.';
+$string['designercustom_maskposition'] = 'Posición de Máscara Personalizada';
+$string['designercustom_masksize'] = 'Tamaño de Máscara Personalizada';
+$string['designercustombgposition'] = 'Posición del Fondo Personalizado';
+$string['designercustombgsize'] = 'Tamño del Fondo Personalizado';
+$string['desktopcolumn'] = 'Diseño de columnas - Escritorio';
+$string['desktopwidth'] = 'Ancho de sección en tamaño de escritorio';
+$string['desktopwidth_help'] = 'La sección solo será mostrada en el ancho seleccionado en tamaño escritorio. Solo funciona para \'una sección por página\'.';
+$string['disabled'] = 'Deshabilitado';
+$string['displaycourseprerequisites'] = 'Mostrar pre-requisitos del curso';
+$string['displaycourseprerequisites_help'] = 'Definir donde mostrar los cursos pre-requisitos';
+$string['displayheaderroleusers'] = 'Elegir el rol del staff';
+$string['displayheaderroleusers_help'] = 'Usuarios con estos roles seleccionados serán mostrados en el encabeado dle curso.';
+$string['displayoncourseandsectionpage'] = 'Mostrar en página de sección y de curso';
+$string['displayoncoursepage'] = 'Mostrar en página de curso';
+$string['displayonsectionpageonly'] = 'Mostrar solo en página de sección';
+$string['displayprogress'] = 'Mostrar Progreso';
+$string['displayunavailableactivities'] = 'Mostrar actividades no disponibles';
+$string['displayunavailableactivities_help'] = '<b> Ocultar </b> — las actividades no son mostradas si el usuario actual no tiene acceso a esta sección.
+<b> Mostrar </b> — las actividades son mostradas, aun y cuando el usuario actual no pueda acceder a ellas mientras estén visibles.';
+$string['done'] = 'Hecho';
+$string['donottrim'] = 'No recortar';
+$string['donut'] = 'Dona';
+$string['duetoday'] = 'Pendiente para hoy';
+$string['edit_purpose'] = 'Editar propósitos';
+$string['editsection'] = 'Editar sección de diseñador';
+$string['editsectionname'] = 'Editar nombre de sección de diseñador';
+$string['enabled'] = 'Habilitado';
+$string['enrolmentenddate'] = 'Fecha de fin de inscripción';
+$string['enrolmentenddate_help'] = 'La fecha de fin de inscripción será mostrada en laparte superior de los cursos.';
+$string['enrolmentstartdate'] = 'Fecha de inicio de inscripción';
+$string['enrolmentstartdate_help'] = 'La fecha de inicio del curso del usuario actual será mostrada en laparte superior del curso.';
+$string['everywhere'] = 'En todos lados';
+$string['expand'] = 'Expandido';
+$string['failed'] = 'Reprobado en';
+$string['firstexpand'] = 'Primero expandido';
+$string['fivecolumn'] = 'Cinco columnas';
+$string['flowanimationduration'] = 'Duración de animación de flujo';
+$string['flowanimationduration_help'] = 'Cambiar la duración de la animación para la animación de flujo';
+$string['flowsize'] = 'Tamaño del flujo';
+$string['flowsize_help'] = 'El tamaño del flujo es una configuración que le permite personalizar  el ancho y la altura de secciones y actividades dentro de su curso.<br><b>Pequeño</b>: Esta opción configura el ancho y la altura de secciones y actividades a 320 pixeles por 320 pixeles.<br><b>Medio</b>: Seleccione esta opción para aumentar el ancho y la altura a 360 pixeles por 360 pixeles.<br><b>Grande</b>: Si usted prefiere un dieño espacioso, elija esta opción para configurar el ancho y la altura de secciones y actividades a 400 pixeles por 400 pixeles.';
+$string['fourcolumn'] = 'Cuatro columnas';
+$string['full'] = 'Lleno';
+$string['general'] = 'General';
+$string['general_settings'] = 'Configuraciones generales';
+$string['generalsectionconfig'] = '<h5 class="font-weight-normal font-italic pt-2 pb-2" > Estilos Generales del Módulo </h5>';
+$string['generalsettings'] = 'Configuraciones generales del Diseñador';
+$string['gotosection'] = 'Ir a sección';
+$string['groupnotfound'] = 'Grupo no encontrado';
+$string['hero'] = 'Héroe';
+$string['heroactivity'] = 'Actividad Héroe';
+$string['heroactivity_help'] = 'Diseñador le da a los profesores la opción de hacer actividades específicas una "Actividad héroe". Las actividades héroe son añadidas ala navegación secundaria para hacerlas fácilmente accesibles para los estudiantes.';
+$string['heroactivitypos'] = '';
+$string['heroactivitypos_help'] = 'Esta configuración le da control sobre el orden de los elementos del menú en el menú secundario de navegación. Los elementos del menú con valores negativos son añadidos antes de los elementos del menú del curso; los elementos del menú con valores positivos son añadidos después. Usualmente, esto hace más sentido al usar número positivos.
+   Esta configuración funciona como un ajuste predeterminado y puede ser anulada en las configuraciones de la actividad.';
+$string['hideeverywhere'] = 'Ocultar en todos lados';
+$string['hidefromothers'] = 'Ocultar sección de diseñador';
+$string['hideoncourses'] = 'Ocultar en páginas del curso';
+$string['hideonhover'] = 'Ocultar al pasar el ratón encima';
+$string['hidesectiontitle'] = 'Ocultar título de sección';
+$string['horizontal_circles'] = 'Círculos Horizontales';
+$string['initial'] = 'Inicial';
+$string['initialstate'] = 'Estado Inicial';
+$string['kanbanboard'] = 'Tablero Kanban';
+$string['large'] = 'Grande';
+$string['leftbottom'] = 'Fondo Izquierda';
+$string['leftcenter'] = 'Centro Izquierda';
+$string['lefttop'] = 'Superior Izquierda';
+$string['less'] = 'Menos';
+$string['link'] = 'Enlaces de texto (Prdeterminado)';
+$string['list'] = 'Lista';
+$string['listprereqgroup'] = 'Grupos de pre-requisito';
+$string['listwidth'] = 'Ancho de Lista';
+$string['mail'] = 'Correo';
+$string['makeherohide'] = 'Hacer actividad héroe y ocultar sección 0';
+$string['makeherovisible'] = 'Hacer actividad héroe y conservar visible la sección0';
+$string['managepurposes'] = 'Gestionar propósitos';
+$string['markasdone'] = 'Marcar como hecho';
+$string['maskimage'] = 'Imagen de máscara';
+$string['maskimage_help'] = 'La imagen de máscar aseleccionada se mostrará en bloque de sección.';
+$string['maskimg_desc'] = 'Subir múltiples imágenes de máscara. Estas imágenes son reflejads en el formato. Usted puede seleccionar cualquier máscara de imagen.';
+$string['maskposition'] = 'Posición de máscara';
+$string['maskposition_desc'] = 'Escriba uno de los valores de propiedad de posición de fondo CSS para mostrar la imagen de máscar donde usted la quiera mostrar';
+$string['maskposition_help'] = 'Usar cualquier propiedad de posición del fondo para mostrar la máscara en esa posición';
+$string['masksize'] = 'Tamaño de máscara';
+$string['masksize_desc'] = 'Escriba una de las propiedades de tamaño del fondo CSS para arreglar el tamaño de la imágen de máscara.';
+$string['masksize_help'] = 'Escriba una de las propiedades de tamaño de fondo para mostrar la máscara en ese tamaño.';
+$string['medium'] = 'Medio';
+$string['message'] = 'Mensaje';
+$string['minheight'] = 'Altura mínima';
+$string['minheight_help'] = 'Los bloques de actividad serán mostrados en la altura dada. Use valores como 200px, auto, 4rem ...';
+$string['mobilecolumn'] = 'Diseño de columnas - Móvil';
+$string['mobilewidth'] = 'Ancho de sección en tamaño teléfono';
+$string['mobilewidth_help'] = 'La sección será mostrada en el ancho seleccionado en tamaño teléfono. Solo funciona para una sección por página.';
+$string['modmaskimage'] = 'Imagen de máscara de actividad';
+$string['modmaskposition'] = 'Posición de máscara de actividad';
+$string['modmasksize'] = 'Tamaño de máscara de actividad';
+$string['modtrimlength'] = 'Largo del Recorte';
+$string['modtrimlength_desc'] = 'Este es un campo de ingreso numérico que le permite especificar cuánto texto debería ser mostrado en el estado colapsado. Escriba el número deseado de caracteres para controlar la longitud de la descripción recortada.';
+$string['modulepurposes'] = '<h5 class="font-weight-normal font-italic pt-2 pb-2"  > Propósitos del Módulo </h5>';
+$string['modvisit'] = 'Visitado {$a} veces';
+$string['more'] = 'Más';
+$string['move_item'] = 'Mover este curso';
+$string['never'] = 'Nunca';
+$string['newsectionname'] = 'Nuevo nombre para sección de diseñador {$a}';
+$string['nocourses'] = 'Sin cursos';
+$string['nogroupsfound'] = 'No se encontraron grupos';
+$string['normal'] = 'Normal';
+$string['notvisit'] = 'Aun no visitado';
+$string['notyetcompleted'] = 'Aun no completado';
+$string['onecolumn'] = 'Columna única';
+$string['onlycoursepage'] = 'Solo en página principal del curso';
+$string['onseparatetab'] = 'En pestaña separada';
+$string['overdue'] = 'Vencido';
+$string['overdues'] = '{$a->overdues} vencidos';
+$string['page-course-view-designer'] = 'Cualquier página principal de curso en formato diseñador';
+$string['page-course-view-designer-x'] = 'Cualquier página de curso en formato diseñador';
+$string['passed'] = 'Pasado en';
+$string['plugin_description'] = 'Mezcle y combine diseños para crear diseños de curso únicos y visulmente atractivos.';
+$string['pluginname'] = 'Formato diseñador';
+$string['popupactivities'] = 'Mostrar actividades enventanas emergentes';
+$string['popupactivities_help'] = 'Mostrar los recursos enventana emergente. Si se habilita, algún tipo de recurso será mostrado en la ventana emergente.';
+$string['popupactivitiesnotinstalled'] = 'El formato de ventana emergente será instalado para mostrar las actividades en ventana emergente.';
+$string['pregroups'] = 'Grupos de pre-requisito';
+$string['prerequisitesautostudents'] = 'Inscribir alumnos automáticamente';
+$string['prerequisitesautostudents_help'] = 'Inscribir automáticamente estudiantes para cursos pre-requisitos';
+$string['prerequisitesbackmain'] = 'Regresar al curso principal';
+$string['prerequisitesbackmain_help'] = 'Regresar al curso principal de curso de pre-requisitos';
+$string['prerequisitesdesc'] = 'Por favor complete todos los cursos siguientes:';
+$string['prerequisitesgroupstudents'] = 'Agrupar estudiantes en pre-requisitos';
+$string['prerequisitesgroupstudents_help'] = 'Crear grupo para estudiantes para cursos pre-requisitos';
+$string['prerequisitesnewtab'] = 'Abrir pre-requisitos en nueva ventana';
+$string['prerequisitesnewtab_help'] = 'Abrir el menú de cursos de pre-requisitos en nueva pestaña';
+$string['prerequisitesunenrolstudents'] = 'Des-inscribir estudiantes de pre-requisitos';
+$string['prerequisitesunenrolstudents_help'] = 'Des-inscribir automáticamente estudiantes para cursos pre-requisito';
+$string['privacy:metadata'] = 'El plugin del formato Diseñador no almacena ningún dato personal.';
+$string['profilefieditem'] = '';
+$string['profilefieditem_help'] = 'Mostrar el campo de perfil del usuario en el bloque de staff del curso.';
+$string['progressbar'] = 'Barra de progreso';
+$string['purpose'] = 'Propósito';
+$string['purpose_created'] = 'Propósito creado exitosamente';
+$string['purpose_deleted'] = 'Propósito eliminado exitosamente';
+$string['purpose_edited'] = 'Propósito editado exitosamente';
+$string['purposeadministration'] = 'Administración';
+$string['purposeassessment'] = 'Evaluación';
+$string['purposeclass'] = 'Clase personalizada para estilizado';
+$string['purposecollaboration'] = 'Colaboración';
+$string['purposecommunication'] = 'Comunicación';
+$string['purposecontent'] = 'Contenido';
+$string['purposeicon'] = 'Ícono de Propósito';
+$string['purposeinteractivecontent'] = 'Contenido Interactivo';
+$string['purposeinterface'] = 'Interfaz';
+$string['purposeother'] = 'Otro';
+$string['purposesetting'] = 'Propósito';
+$string['relevantactivities'] = 'Actividades relevantes';
+$string['rightbottom'] = 'Inferior Derecha';
+$string['rightcenter'] = 'Centro Derecha';
+$string['righttop'] = 'Superior Derecha';
+$string['secondarymenu'] = '<h5 class="font-weight-normal font-italic pt-2 pb-2" > Menú secundario </h5>';
+$string['secondarymeu_title'] = 'Título de Menú secundario';
+$string['section0name'] = 'General';
+$string['section_layout'] = 'Diseño de sección';
+$string['section_layout_desc'] = '';
+$string['sectionbackdesignheader'] = 'Diseño';
+$string['sectionbackgroundheader'] = '<h5 class="font-weight-normal font-italic pt-2 pb-2" > Estilos de Fondo de sección </h5>';
+$string['sectionbackgroundtype'] = '<b> Encabezado de sección seleccionado </b>, El color del texto y del fondo serán aplicados solamente al contenido del encabezado.
+<b> Sección completa seleccionada </b>, El fondo será aplicado a toda la sección.';
+$string['sectionbackgroundtype_help'] = '<b> Encabezado de sección seleccionado </b>, El color del texto y del fondo serán aplicados solamente al contenido del encabezado.
+<b> Sección completa seleccionada </b>, El fondo será aplicado a toda la sección.';
+$string['sectioncardcta'] = 'No disponible CTA';
+$string['sectioncardheader'] = 'Contenidos de tarjeta de sección';
+$string['sectioncardredirect'] = 'Redireccionar a URL externa';
+$string['sectioncardsummary'] = 'Resumen de sección';
+$string['sectioncardtab'] = 'Abrir re-dirección en pestaña nueva';
+$string['sectioncardtitle'] = 'Título de sección';
+$string['sectioncompleted'] = 'Sección completada';
+$string['sectioncontainer'] = 'Contenedor de sección';
+$string['sectioncontainerwidth'] = 'Ancho de Contenedor de sección';
+$string['sectioncontent'] = 'Contenido de sección';
+$string['sectioncontentwidth'] = 'Ancho de Contenido de sección';
+$string['sectiondesignertextcolor'] = 'El color del texto será aplicado solo al título de sección y resumen de sección';
+$string['sectiondesignertextcolor_help'] = 'El color del texto será aplicado solo al título de sección y resumen de sección';
+$string['sectiondesignheader'] = 'Diseño';
+$string['sectionheader'] = 'Encabezado de sección';
+$string['sectionlayouts'] = 'Diseños';
+$string['sectionlink'] = 'Permaenlace';
+$string['sectionmaskimage'] = 'Imagen de máscara de sección';
+$string['sectionmasking'] = 'Máscara de sección';
+$string['sectionmaskposition'] = 'Posición de Máscara de sección';
+$string['sectionmasksize'] = 'Tamaño de Máscara de sección';
+$string['sectionname'] = 'Sección de diseñador';
+$string['sectionprogresstype'] = 'Progreso de sección';
+$string['sectionprogresstype_help'] = '<b>Deshabilitado</b>: Esta opción no mostrará ninguna información del progreso de sección en el encabezado.<br>
+<b>Barra d eProgreso</b>: Seleccionar esta opción mostrará la barra d eprogreso de sección como una barra, mostrando el estado de finalización de secciones individuales del curso.<br>
+<b>Dona</b>: Elegir esta opción mostrará el progreso de sección como un gráfico de dona, ofreciendo una representación visual alternativa.<br>';
+$string['sections'] = 'Secciones';
+$string['sectionsettings'] = 'Sección';
+$string['sectiontype'] = 'Tipo de sección';
+$string['sectionzeroactivities'] = 'Actividades de sección 0';
+$string['sectionzeroactivities_help'] = 'Esta configuración determina si es que las actividades en la sección general deberían o no volverse automáticamente actividades héroes.
+   Diseñador puede ocultar automáticamente la sección general cando la edición está desactivada. Esto es útil si usted quiere que los estudiantes accedan a las actividades en la scción general solo desde la navegación secundaria. Esta configuración trabaja como un predeterminado y puede ser anulada en las configuraciones de la actividad.';
+$string['showanimation'] = 'Animación de flujo';
+$string['showanimation_help'] = 'Habilitar revelar los móulos con efectos de animación.';
+$string['showastab'] = 'Mostrar como pestaña';
+$string['showastab_help'] = 'Use esta configuración para configurar en cuales páginas los elementos del menú de las actividades héroes deberían ser añadidos al menú de navegación secundario. Usted puede, ya sea tenerlas mostradas en todo el curso, o solo en la página principal del curso.
+   Esta configuración funciona como un ajuste predeterminado y puede ser anulada en las configuraciones d ela actividad.';
+$string['showfromothers'] = 'Mostrar sección diseñador';
+$string['showonhover'] = 'Mostrar al pasarle el ratón encima';
+$string['small'] = 'Pequeño';
+$string['start'] = 'Inicio';
+$string['stractivity'] = 'Actividad';
+$string['stractivitytitle'] = 'Título de actividad';
+$string['stractivitytype'] = 'Tipo de actividad';
+$string['stravoidduplicateentry'] = 'Evitar entradas duplicadas';
+$string['strcompleted'] = 'Completado';
+$string['strcourse'] = 'Curso';
+$string['strcustom'] = 'Personalizado';
+$string['strcustomtitle'] = 'Título personalizado';
+$string['strenrolled'] = 'Inscrito';
+$string['strinprogress'] = 'En progreso';
+$string['strprerequisiteinfo'] = 'Información pre-requisito';
+$string['strprerequisiteinfo_help'] = 'Mostrar el texto arriba de los pre-requisitos.';
+$string['strprerequisites'] = 'Pre-requisitos';
+$string['strprerequisites_role'] = 'Rol para estudiantes inscritos automáticamente';
+$string['strsecondarymenucourse'] = 'Curso';
+$string['strsecondarymenutocourse'] = 'Añadir curso al elemento de menú secundario en todas las páginas del curso';
+$string['strsecondarymenutocourse_help'] = 'Si se activa, un enlace al curso es añadido en todas las páginas en el curso a la navegación secundaria';
+$string['strsection'] = 'Sección';
+$string['strsectionlayout'] = 'Diseño de sección';
+$string['struppercompleted'] = 'COMPLETADO';
+$string['subcoursedisplayprogress'] = 'Usar progreso de subcurso como Progreso de actividad';
+$string['subcourseuseactivityimage'] = 'Usar imagen de subcurso como imagen de actividad';
+$string['summarylength'] = 'Largo del resumen';
+$string['summarylengthdesc'] = 'Ingresar el largo del resumen a recortar';
+$string['tabletcolumn'] = 'Diseño de columnas - Tableta';
+$string['tabletwidth'] = 'Ancho de sección en tamaño Tableta';
+$string['tabletwidth_help'] = 'La sección será mostrada en el ancho de sección en tamaño tableta. Solo funciona para \'una sección por página\'.';
+$string['textcolor'] = 'Color del texto';
+$string['threecolumn'] = 'Tres columnas';
+$string['timeago'] = 'atrás';
+$string['timeagoday'] = 'día';
+$string['timeagohour'] = 'hora';
+$string['timeagojustnow'] = 'ahorita mismo';
+$string['timeagominute'] = 'minuto';
+$string['timeagomonth'] = 'mes';
+$string['timeagosecond'] = 'segundo';
+$string['timeagoweek'] = 'semana';
+$string['timeagoyear'] = 'año';
+$string['timemanagementmissing'] = 'Learning Tools Pro es necesario para esta caracterítica. <a href="https://bdecent.de/product/learning-tools-pro/">Aprenda más</a>.';
+$string['title'] = 'Título';
+$string['todaydue'] = '{$a->due} esperado para hoy';
+$string['trimmed'] = 'Recortado';
+$string['twocolumn'] = 'Dos columnas';
+$string['type_flow'] = 'Flujo';
+$string['useactivityimage'] = 'Usar imagen de actividad';
+$string['usecompletionbg'] = 'Usar fondo diferente para finalización';
+$string['userfields'] = 'Usar campos del perfil';
+$string['userfields_help'] = 'Seleccionar campos de perfil a mostrar debajo del usuario en el encabezado del curso.';
+$string['verticalcircles'] = 'Círculos verticales';
+$string['wholesection'] = 'Sección completa';
+$string['withcoursemetadata'] = 'Con metadatos del curso';
